@@ -101,9 +101,9 @@ namespace taekwondo_backend
 
                 // Uncomment this if you need to generate some seed data
                 if (app.Environment.IsDevelopment())
-                {
-                    await seeder.TestSeed();
-                }
+                // {
+                //     await seeder.TestSeed();
+                // }
 
             }
 

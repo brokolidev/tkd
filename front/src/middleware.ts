@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
   }
 
   axios.interceptors.request.use((config) => {
-    config.headers.common['Authorization'] = `Bearer ${accessToken}`;
+    config.headers.Authorization = `Bearer ${accessToken}`;
     return config;
   })
   

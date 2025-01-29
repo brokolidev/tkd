@@ -45,14 +45,7 @@ import {
 } from '@heroicons/react/20/solid'
 import { redirect, usePathname } from 'next/navigation'
 
-let interceptorId: number | null = null
-
 const logout = async () => {
-  if (interceptorId !== null) {
-    axios.interceptors.request.eject(interceptorId)
-    interceptorId = null
-  }
-
   localStorage.removeItem('tkd-access-token')
   await setCookie('tkd-access-token', '')
 
