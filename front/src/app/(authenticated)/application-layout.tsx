@@ -22,12 +22,16 @@ import {
   SidebarSpacer,
 } from '@/components/sidebar'
 import { SidebarLayout } from '@/components/sidebar-layout'
+import { Spinner } from '@/components/spinner'
 import { getEvents } from '@/data'
+import useUser from '@/hooks/swrHooks'
+import axios from '@/lib/axios'
+import { setCookie } from '@/lib/cookie'
 import {
   ArrowRightStartOnRectangleIcon,
   ChevronUpIcon,
-  Cog8ToothIcon, LightBulbIcon,
-  PlusIcon, ShieldCheckIcon,
+  LightBulbIcon,
+  ShieldCheckIcon,
   UserCircleIcon,
 } from '@heroicons/react/16/solid'
 import {
@@ -40,20 +44,19 @@ import {
   UsersIcon,
 } from '@heroicons/react/20/solid'
 import { redirect, usePathname } from 'next/navigation'
-import useUser from '@/hooks/swrHooks'
-import axios from '@/lib/axios'
-import { setCookie } from '@/lib/cookie'
-import { Spinner } from '@/components/spinner'
+
+let interceptorId: number | null = null
 
 const logout = async () => {
-  axios.interceptors.request.use((config) => {
-    config.headers.Authorization = '';
-    return config;
-  })
-  localStorage.removeItem('tkd-access-token');
-  await setCookie('tkd-access-token', '');
+  if (interceptorId !== null) {
+    axios.interceptors.request.eject(interceptorId)
+    interceptorId = null
+  }
 
-  redirect('/login');
+  localStorage.removeItem('tkd-access-token')
+  await setCookie('tkd-access-token', '')
+
+  redirect('/login')
 }
 
 function AccountDropdownMenu({ anchor, onLogout }: { anchor: 'top start' | 'bottom end'; onLogout: () => void }) {
@@ -88,12 +91,11 @@ export function ApplicationLayout({
   events: Awaited<ReturnType<typeof getEvents>>
   children: React.ReactNode
 }) {
+  const { user, isError, isLoading } = useUser()
 
-  const { user, isError, isLoading } = useUser();
-  
   let pathname = usePathname()
-  
-  if (isLoading) return <Spinner></Spinner>;
+
+  if (isLoading) return <Spinner></Spinner>
 
   return (
     <SidebarLayout
