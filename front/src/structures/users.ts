@@ -1,3 +1,5 @@
+import { userViews } from "@/hooks/userViews"
+
 export interface IUser {
     id: number
     firstName: string
@@ -7,6 +9,16 @@ export interface IUser {
     profileImgUrl: string
 
     getFullName(): string
+}
+
+export class NewUser {
+  FirstName: string
+  LastName: string
+  Email: string
+  DateOfBirth: Date
+  BeltColor: beltColors | null //not needed for instructors/admins
+  Password: string
+  Role: userViews
 }
 
 export class Student implements IUser {

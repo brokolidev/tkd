@@ -10,32 +10,101 @@ import { Select } from '@/components/select'
 import { userViews, useUserViews } from '@/hooks/userViews'
 import { beltColors } from '@/structures/users'
 import { ChevronLeftIcon } from '@heroicons/react/16/solid'
+import { NewUser } from '@/structures/users'
 import { useState } from 'react'
+import { createUser } from '@/services/UserServices'
 
-export default function StudentRegisterPage() {
+export default function UserRegisterPage() {
 
   const { currentView } = useUserViews()
 
-  const formAction = (formData) => {
-    console.log("the form data: ", formData)
+  const formAction = (event) => {
+    event.preventDefault()
 
-    // await createStudent(formData).then((res) => {
-    //   if (res.status === 204) {
-    //     setIsCreated(true)
-    //   }
-    // })
+    console.log(newUser)
+
+    const errors: string[] = []
+
+    //alert the user if there are errors that exist
+
+    //this stuff will be moved to another function later
+    if (newUser.Role == userViews.UNKNOWN) {
+        errors.push("The user's role must be specified.")
+    }
+
+    if (!newUser.FirstName) {
+      errors.push("The first name must be filled in")
+    }
+
+    if (!newUser.LastName) {
+      errors.push("The last name must be filled in")
+    }
+
+    if (!newUser.Email) {
+      errors.push("The email must be filled in")
+    }
+
+    if (!newUser.DateOfBirth) {
+      errors.push("The birth date must be filled in")
+    }
+
+    if (newUser.BeltColor == beltColors.UNKNOWN && newUser.Role == userViews.STUDENT) {
+      errors.push("The user is a student, but no belt color was specified")
+    }
+
+    if (!newUser.Password) {
+      errors.push("A password must be set")
+    }
+
+
+    //if any errors exist with the data, return from the function and alert the user
+    if (errors.length > 0) {
+      alert("The following errors occurred while trying to register a user: \n\n"
+        + errors.join("\n\n"))
+      //exit the function
+      return
+    }
+
+
+    createUser(newUser)
+      .then(r => {
+        console.log("Success: ", r)
+        setIsCreated(true)
+      })
+      .catch(err => {
+        console.log("ERROR: formAction: " + err)
+      })
   }
 
-  let [isCreated, setIsCreated] = useState(false)
+  const [isCreated, setIsCreated] = useState(false)
+  const [newUser, setNewUser] = useState<NewUser>({
+    FirstName: "",
+    LastName: "",
+    Email: "",
+    DateOfBirth: new Date(),
+    BeltColor: beltColors.WHITE, //init to white, as that is the default below
+    Password: "",
+    Role: currentView //init to current view 
+  })
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+  const setIndividualPropertForUser = (event) => {
+    //copy the user so we're not changing newUser directly
+    const user = {...newUser}
+    //update the property
+    user[event.target.name] = event.target.value
+    //finally update the newUser
+    setNewUser(user)
+  }
 
   return (
     <>
       <Alert open={isCreated} onClose={setIsCreated}>
-        <AlertTitle>Congratulations!</AlertTitle>
-        <AlertDescription>A new student has been joined successfully</AlertDescription>
+        <AlertTitle>Registration Success</AlertTitle>
+        <AlertDescription>New User Registered Successfully</AlertDescription>
         <AlertActions>
           <Link href="/users">
-            <Button onClick={() => setIsCreated(false)}>Sounds Good!</Button>
+            <Button onClick={() => setIsCreated(false)}>Return to List</Button>
           </Link>
         </AlertActions>
       </Alert>
@@ -47,7 +116,7 @@ export default function StudentRegisterPage() {
       </div>
 
       
-      <form action={formAction} className="mt-4 lg:mt-8">
+      <form onSubmit={formAction} className="mt-4 lg:mt-8">
         <Heading>Student Registration</Heading>
         <Divider className="my-10 mt-6" />
 
@@ -56,31 +125,57 @@ export default function StudentRegisterPage() {
             <Subheading>First Name</Subheading>
           </div>
           <div>
-            <Input aria-label="First Name" name="first_name" placeholder="John" />
+            <Input
+              onChange={setIndividualPropertForUser}
+              aria-label="First Name"
+              name="FirstName"
+              placeholder="John"
+            />
           </div>
           <div className="space-y-1">
             <Subheading>Last Name</Subheading>
           </div>
           <div>
-            <Input aria-label="Last Name" name="last_name" placeholder="Doe" />
+            <Input
+              onChange={setIndividualPropertForUser}
+              aria-label="Last Name"
+              name="LastName"
+              placeholder="Doe"
+            />
           </div>
           <div className="space-y-1">
             <Subheading>Email</Subheading>
           </div>
           <div className="space-y-4">
-            <Input type="email" aria-label="Email" name="email" placeholder="info@example.com" />
+            <Input
+              onChange={setIndividualPropertForUser}
+              type="email"
+              aria-label="Email"
+              name="Email"
+              placeholder="info@example.com"
+            />
           </div>
           <div className="space-y-1">
             <Subheading>Date of Birth</Subheading>
           </div>
           <div>
-            <Input aria-label="Date of Birth" name="dob" placeholder="02/07/86" />
+            <Input
+              onChange={setIndividualPropertForUser}
+              aria-label="Date of Birth"
+              name="DateOfBirth"
+              placeholder="MM/DD/YYYY"
+            />
           </div>
           <div className="space-y-1">
             <Subheading>Belt Color</Subheading>
           </div>
           <div>
-            <Select aria-label="Belt Color" name="belt_color" defaultValue="1">
+            <Select
+              aria-label="Belt Color"
+              name="BeltColor"
+              defaultValue="1"
+              onChange={setIndividualPropertForUser}
+            >
               {
                 //looping refind from https://chatgpt.com/share/6793ebed-e188-800c-8126-8f22d0ae64af
                 Object.entries(beltColors).filter(entry => !isNaN(Number(beltColors[entry[0]])))
@@ -89,7 +184,7 @@ export default function StudentRegisterPage() {
 
                     <option
                       key={value}
-                      value={parseInt(value.toString())}
+                      value={value.toString()}
                       className='capitalize'
                     >
                       { key.toLowerCase() }
@@ -108,7 +203,12 @@ export default function StudentRegisterPage() {
               <Subheading>Role</Subheading>
             </div>
             <div>
-              <Select aria-label='Role' name='role' defaultValue={parseInt(currentView.toString())}>
+              <Select
+                aria-label='Role'
+                name='Role'
+                value={newUser.Role}
+                onChange={setIndividualPropertForUser}
+              >
                 {
                 //looping refind from https://chatgpt.com/share/6793ebed-e188-800c-8126-8f22d0ae64af
                   Object.entries(userViews).filter(entry => !isNaN(Number(userViews[entry[0]])))
@@ -117,14 +217,14 @@ export default function StudentRegisterPage() {
 
                           <option
                             key={value}
-                            value={parseInt(value.toString())}
+                            value={value.toString()}
                             className='capitalize'
                           >
                           { key.toLowerCase() }
                           </option>
                         ))
                 }
-                </Select>
+              </Select>
             </div>
           </section>
 
@@ -135,13 +235,23 @@ export default function StudentRegisterPage() {
             <Subheading>Password</Subheading>
           </div>
           <div>
-            <Input type="password" aria-label="Password" name="password" />
+            <Input
+              onChange={setIndividualPropertForUser}
+              type="password"
+              aria-label="Password"
+              name="Password"
+            />
           </div>
           <div className="space-y-1">
             <Subheading>Confirm Password</Subheading>
           </div>
           <div>
-            <Input type="password" aria-label="Confirm Password" name="password_confirmation" />
+            <Input
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              type="password"
+              aria-label="Confirm Password"
+              name="password_confirmation"
+            />
           </div>
         </section>
 
@@ -151,7 +261,15 @@ export default function StudentRegisterPage() {
           <Button type="reset" plain>
             Reset
           </Button>
-          <Button type="submit" className="cursor-pointer">
+          <Button
+            type="submit"
+            className="cursor-pointer"
+            disabled={!(confirmPassword === newUser.Password && newUser.Password != "")}
+            title={!(confirmPassword === newUser.Password && newUser.Password != "")
+                ? "A valid password is needed before continuing"
+                : ""
+            }
+          >
             Register
           </Button>
         </div>
