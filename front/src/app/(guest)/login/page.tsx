@@ -7,34 +7,50 @@ import { Input, InputGroup } from '@/components/input'
 import { Link } from '@/components/link'
 import { Switch } from '@/components/switch'
 import { Text } from '@/components/text'
-import Image from 'next/image'
 import axios from '@/lib/axios'
 import { setCookie } from '@/lib/cookie'
+import { AxiosHeaders } from 'axios'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export default function LoginPage() {
-
   const [loginErrorMsg, setLoginErrorMsg] = useState('')
-  
-  const router = useRouter()
-  const login = async (data: { email: string; password: string }) => {
-    await axios.post('/login', data).then((res) => {
-      axios.interceptors.request.use((config) => {
-        config.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
-        return config;
-      })
-      localStorage.setItem('tkd-access-token', res.data.accessToken);
-      setCookie('tkd-access-token', res.data.accessToken);
 
-      router.push("/")
-    }).catch(err => {
-      setLoginErrorMsg(err.message);
-    });
+  const router = useRouter()
+  let interceptorId: number | null = null
+
+  const login = async (data: { email: string; password: string }) => {
+    await axios
+      .post('/login', data)
+      .then((res) => {
+        if (interceptorId !== null) {
+          axios.interceptors.request.eject(interceptorId)
+        }
+
+        interceptorId = axios.interceptors.request.use((config) => {
+          if (!config.headers) {
+            config.headers = new AxiosHeaders()
+          }
+          const token = localStorage.getItem('tkd-access-token') || res.data.access_token
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`
+          }
+          return config
+        })
+
+        localStorage.setItem('tkd-access-token', res.data.accessToken)
+        setCookie('tkd-access-token', res.data.accessToken)
+
+        router.push('/')
+      })
+      .catch((err) => {
+        setLoginErrorMsg(err.message)
+      })
   }
 
   const submitForm: any = async (form: FormData) => {
-    setLoginErrorMsg('');
+    setLoginErrorMsg('')
     const email = form.get('email').toString()
     const password = form.get('password').toString()
 
@@ -52,13 +68,19 @@ export default function LoginPage() {
             <Fieldset>
               <Heading className="text-lg">Sign in</Heading>
               <InputGroup className="lg:mt-4">
-                  <Label className="pb-3 text-sm font-bold">Email</Label>
-                  <Input id="email" type="email" invalid={!!loginErrorMsg} name="email" placeholder="Enter your email" />
+                <Label className="pb-3 text-sm font-bold">Email</Label>
+                <Input id="email" type="email" invalid={!!loginErrorMsg} name="email" placeholder="Enter your email" />
               </InputGroup>
               <InputGroup>
                 <Field>
                   <Label className="pb-3 text-sm font-bold">Password</Label>
-                  <Input type="password" id="password" invalid={!!loginErrorMsg} name="password" placeholder="Enter your password" />
+                  <Input
+                    type="password"
+                    id="password"
+                    invalid={!!loginErrorMsg}
+                    name="password"
+                    placeholder="Enter your password"
+                  />
                   {loginErrorMsg && <ErrorMessage>{loginErrorMsg}</ErrorMessage>}
                 </Field>
               </InputGroup>

@@ -1,17 +1,17 @@
 import axios from '@/lib/axios'
 import { beltColors, Student } from '@/structures/users'
   
-export async function getStudent(id: string): Promise<Student> {
+export function getStudent(id: string): Promise<Student> {
     return axios.get(`/api/students/${id}`)
         .then((res) => res.data.data)    
 }
 
-export async function getSchedules() {
+export function getSchedules() {
     return axios.get('/api/schedule')
         .then((res) => res.data.data)
 }
   
-export async function getStudents(page: number) : Promise<Student[]> {
+export function getStudents(page: number) : Promise<Student[]> {
     //get all students in the system. for right now, return a promise of fake data.
 
     return new Promise((resolve, reject) => {
