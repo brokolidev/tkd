@@ -1,0 +1,18 @@
+services:
+  tkdpg_local:
+    build: ../../docker/postgres/.
+    env_file:
+      - ../../env/local.pg.env
+    ports:
+      - '5434:5432'
+    networks:
+      - tkdpg_network
+    volumes:
+      - tkdpg_data:/var/lib/postgresql/data
+
+volumes:
+  tkdpg_data:
+
+networks:
+  tkdpg_network:
+    driver: bridge

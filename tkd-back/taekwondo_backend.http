@@ -1,0 +1,6 @@
+@taekwondo_backend_HostAddress = http://localhost:5043
+
+GET {{taekwondo_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
