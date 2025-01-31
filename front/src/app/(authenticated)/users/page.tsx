@@ -18,9 +18,14 @@ import { use, useEffect, useState } from 'react'
 
 export default function UserPage(props) {
   const searchParams: any = use(props.searchParams)
-  const page = searchParams.page ? searchParams.page : '1'
 
   const [users, setUsers] = useState<IUser[]>([])
+  const [page, setPage] = useState<number>(1)
+  const [pageInfo, setPageInfo] = useState<Object>({
+    pageSize: Number,
+    totalItems: Number,
+    totalPages: Number
+  })
   const { currentView, setCurrentView } = useUserViews()
 
   const loadData = () => {
@@ -46,12 +51,18 @@ export default function UserPage(props) {
     }
 
     dataToFetch()
-        .then((data: IUser[]) => {
-            setUsers(data)
+      .then((data: any) => {
+        console.log("The data: ", data)
+        setPageInfo({
+          pageSize: data.PageSize,
+          totalItems: data.TotalItems,
+          totalPages: data.TotalPages
         })
-        .catch((err: string) => {
-            console.log("ERROR: " + err)
-        })
+        setUsers(data.users)
+      })
+      .catch((err: string) => {
+        console.log("ERROR: " + err)
+      })
   }
 
   useEffect(() => {
@@ -140,7 +151,7 @@ export default function UserPage(props) {
                 <TableCell>{user.id}</TableCell>
                 
                 {/* Student name */}
-                <TableCell>{user.getFullName()}</TableCell>
+                <TableCell>{user.firstName + " " + user.lastName}</TableCell>
                 
                 
                 

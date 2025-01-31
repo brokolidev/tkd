@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Mail;
-using taekwondo_backend.Models;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using taekwondo_backend.Data;
 using taekwondo_backend.DTO;
 using Microsoft.AspNetCore.Identity;
 using taekwondo_backend.Models.Identity;
+using taekwondo_backend.Enums;
 
 namespace taekwondo_backend.Controllers
 {
@@ -38,7 +36,7 @@ namespace taekwondo_backend.Controllers
                 return BadRequest("Page number and page size must be greater than zero.");
 
             // Get all users with the "Student" role
-            var allStudents = await _userManager.GetUsersInRoleAsync("Student");
+            var allStudents = await _userManager.GetUsersInRoleAsync(UserRoles.Student.ToString());
 
             // If there are no students, return 204 No Content
             if (!allStudents.Any())
@@ -54,7 +52,7 @@ namespace taekwondo_backend.Controllers
                 pagedStudents.PageSize, // Number of students per page
                 pagedStudents.TotalItems, // Total number of students
                 pagedStudents.TotalPages, // Total number of pages (by pagesize)
-                Students = pagedStudents,
+                Users = pagedStudents,
             };
 
             return Ok(response);
@@ -84,6 +82,43 @@ namespace taekwondo_backend.Controllers
 
             // Student found, return the data with 200 OK
             return Ok(student);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RegisterStudent(RegisterUserDTO userDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                //map the user object into the user
+                User newUser = new()
+                {
+                    UserName = userDTO.Email,
+                    Email = userDTO.Email,
+                    PasswordHash = userDTO.Password,
+                    FirstName = userDTO.FirstName,
+                    LastName = userDTO.LastName,
+                    DateOfBirth = userDTO.DateOfBirth,
+                };
+
+                //create the  user
+                IdentityResult userResult = await _userManager.CreateAsync(newUser, userDTO.Password);
+
+                //give the user the student role
+                IdentityResult roleResult = await _userManager.AddToRoleAsync(newUser, UserRoles.Student.ToString());
+
+                //only return if both results were a success
+                if (userResult.Succeeded && roleResult.Succeeded)
+                {
+                    // @TODO: Implement email verification
+                    return Created(String.Empty, new { id = newUser.Id });
+                }
+
+                //something failed, return the errors
+                return BadRequest(userResult.Errors);
+            }
+            return BadRequest(ModelState);
         }
     }
 };
