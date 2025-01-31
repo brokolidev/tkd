@@ -9,6 +9,6 @@ export async function getAdmin(id: string): Promise<Admin> {
 export async function getAdmins(page: number) : Promise<Admin[]> {
     //get all admins in the system. for right now, return a promise of fake data.
 
-    return axios.get(`admin?page=${page}`)
+    return axios.get(`admin?pageNumber=${page}&pageSize=100`)
         .then((res) => res.data)
 }

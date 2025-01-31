@@ -33,14 +33,18 @@ namespace taekwondo_backend.Controllers
         {
             // Check if pageNumber or pageSize are less than 1 and return response
             if (pageNumber <= 0 || pageSize <= 0)
+            {
                 return BadRequest("Page number and page size must be greater than zero.");
+            }
 
             // Get all users with the "Student" role
             var allStudents = await _userManager.GetUsersInRoleAsync(UserRoles.Student.ToString());
 
             // If there are no students, return 204 No Content
             if (!allStudents.Any())
+            {
                 return NoContent();
+            }
 
             // Get the students for the requested page order by ID
             var pagedStudents = PagedList<User>.Create(allStudents.OrderBy(s => s.Id), pageNumber, pageSize);

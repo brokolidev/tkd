@@ -33,14 +33,18 @@ namespace taekwondo_backend.Controllers
         {
             // Check if pageNumber or pageSize are less than 1 and return response
             if (pageNumber <= 0 || pageSize <= 0)
+            {
                 return BadRequest("Page number and page size must be greater than zero.");
+            }
 
             // Get all users with the "Admin" role
             var allAdmins = await _userManager.GetUsersInRoleAsync(UserRoles.Admin.ToString());
 
             // If there are no admins, return 204 No Content
             if (!allAdmins.Any())
+            {
                 return NoContent();
+            }
 
             // Get the admins for the requested page order by ID
             var pagedAdmins = PagedList<User>.Create(allAdmins.OrderBy(s => s.Id), pageNumber, pageSize);
@@ -112,7 +116,7 @@ namespace taekwondo_backend.Controllers
                 if (userResult.Succeeded && roleResult.Succeeded)
                 {
                     // @TODO: Implement email verification
-                    return CreatedAtAction("Register", new { id = newUser.Id });
+                    return Created(String.Empty, new { id = newUser.Id });
                 }
 
                 //something failed, return the errors
