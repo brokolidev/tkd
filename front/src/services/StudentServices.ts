@@ -9,6 +9,6 @@ export function getStudent(id: string): Promise<Student> {
 export function getStudents(page: number) : Promise<Student[]> {
     //get all students in the system. for right now, return a promise of fake data.
 
-    return axios.get(`student?pageNumber=${14}&pageSize=100`)
+    return axios.get(`student?pageNumber=${page}`)
         .then((res) => res.data)
 }

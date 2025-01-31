@@ -9,6 +9,6 @@ export async function getInstructor(id: string): Promise<Instructor> {
 export async function getInstructors(page: number) : Promise<Instructor[]> {
     //get all instructors in the system. for right now, return a promise of fake data.
 
-    return axios.get(`instructor?pageNumber=${page}&pageSize=100`)
+    return axios.get(`instructor?pageNumber=${page}`)
         .then((res) => res.data)
 }
