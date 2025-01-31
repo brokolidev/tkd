@@ -57,37 +57,5 @@ namespace taekwondo_backend.Controllers
 				ProfileImage = user.ProfileImage ?? "https://i.pravatar.cc/300",
 			});
 		}
-
-		// Default register route for students
-		[HttpPost("register")]
-		[ProducesResponseType(StatusCodes.Status201Created)]
-		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		public async Task<IActionResult> Register([FromBody] RegisterUserDTO userDTO)
-		{
-			if (ModelState.IsValid)
-			{
-				User newUser = new User()
-				{
-					UserName = userDTO.Email,
-					Email = userDTO.Email,
-					PasswordHash = userDTO.Password,
-					FirstName = userDTO.FirstName,
-					LastName = userDTO.LastName,
-					DateOfBirth = userDTO.DateOfBirth,
-				};
-
-				IdentityResult Result = await _userManager.CreateAsync(newUser, userDTO.Password);
-				IdentityResult RoleResult = await _userManager.AddToRoleAsync(newUser, UserRoles.Student.ToString());
-
-
-				if (Result.Succeeded && RoleResult.Succeeded)
-				{
-					// @TODO: Implement email verification
-					return CreatedAtAction("Register", new { id = newUser.Id });
-				}
-				return BadRequest(Result.Errors);
-			}
-			return BadRequest(ModelState);
-		}
 	}
 }
