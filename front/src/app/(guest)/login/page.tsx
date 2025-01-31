@@ -18,27 +18,11 @@ export default function LoginPage() {
   const [loginErrorMsg, setLoginErrorMsg] = useState('')
 
   const router = useRouter()
-  let interceptorId: number | null = null
 
   const login = async (data: { email: string; password: string }) => {
     await axios
       .post('/login', data)
       .then((res) => {
-        if (interceptorId !== null) {
-          axios.interceptors.request.eject(interceptorId)
-        }
-
-        interceptorId = axios.interceptors.request.use((config) => {
-          if (!config.headers) {
-            config.headers = new AxiosHeaders()
-          }
-          const token = localStorage.getItem('tkd-access-token') || res.data.access_token
-          if (token) {
-            config.headers.Authorization = `Bearer ${token}`
-          }
-          return config
-        })
-
         localStorage.setItem('tkd-access-token', res.data.accessToken)
         setCookie('tkd-access-token', res.data.accessToken)
 

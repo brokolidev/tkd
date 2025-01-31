@@ -65,8 +65,23 @@ export default function UserRegisterPage() {
       return
     }
 
+    //ensure the enum values are numbers, not strings
+    const user = {...newUser}
 
-    createUser(newUser)
+    user.BeltColor = parseInt(user.BeltColor.toString());
+    if (isNaN(user.BeltColor)) {
+        alert("invalid belt color chosen.")
+        return
+    }
+
+    user.Role = parseInt(user.Role.toString());
+    if (isNaN(user.Role)) {
+        alert("invalid role chosen.")
+        return
+    }
+
+
+    createUser(user)
       .then(r => {
         console.log("Success: ", r)
         setIsCreated(true)
@@ -163,7 +178,7 @@ export default function UserRegisterPage() {
               onChange={setIndividualPropertForUser}
               aria-label="Date of Birth"
               name="DateOfBirth"
-              placeholder="MM/DD/YYYY"
+              placeholder="YYYY-MM-DD"
             />
           </div>
           <div className="space-y-1">

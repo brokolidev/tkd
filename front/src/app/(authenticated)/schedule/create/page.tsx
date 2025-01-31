@@ -131,13 +131,57 @@ export default function SchedulecreatePage() {
         <Divider className="my-10 w-full" />
 
         <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-          <div>
-            <Subheading>Class Name</Subheading>
-          </div>
-          <div>
-            <Input aria-label="Class Name" name="class_name" placeholder="Little Warrior 1" />
-          </div>
-        </section>
+  <div>
+    <Subheading>Class Name</Subheading>
+  </div>
+  <div>
+    <Input aria-label="Class Name" name="class_name" placeholder="Little Warrior 1" />
+  </div>
+
+  <div>
+    <Subheading>Class Description</Subheading>
+  </div>
+  <div>
+    <textarea
+      aria-label="Class Description"
+      name="class_description"
+      placeholder="Enter a description for the class"
+      className="w-full p-2 border rounded-md h-11"
+      rows={4}
+    />
+  </div>
+
+  <div> {/*OpenAI, "Custom implementation for image upload 
+            in a user management system,"
+          ChatGPT-generated response, Jan. 27, 2025.  */}
+    <Subheading>Class Image</Subheading>
+  </div>
+  <div>
+    <input
+      type="file"
+      aria-label="Class Image"
+      name="class_image"
+      accept="image/*"
+      onChange={(e) => {
+        if (e.target.files && e.target.files[0]) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const imagePreview = document.getElementById('classImagePreview') as HTMLImageElement;
+            if (imagePreview) imagePreview.src = event.target?.result as string;
+          };
+          reader.readAsDataURL(e.target.files[0]);
+        }
+      }}
+      className="w-full p-2 border rounded-md"
+    />
+    {/* <img
+      id="classImagePreview"
+      alt="Class Preview"
+      className="mt-4 rounded-md max-w-full max-h-64"
+    /> */}
+    {/* till this  */}
+  </div>
+</section>
 
         <Divider className="my-10 w-full" />
 
@@ -195,76 +239,85 @@ export default function SchedulecreatePage() {
         <Divider className="my-10 w-full" />
 
         <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-          <div>
-            <Subheading>Instructors</Subheading>
+  <div>
+    <Subheading>Instructors</Subheading>
+  </div>
+  <div className="max-h-64 overflow-y-auto border rounded-md p-4 bg-gray-50 dark:bg-zinc-800">
+    {instructors.length > 0 ? (
+      instructors.map((instructor: any) => (
+        <div
+          key={instructor.id}
+          className={`p-4 rounded-md cursor-pointer ${
+            /** OpenAI, "Error Remove for selecting instructor  
+            in a user management system,"
+          ChatGPT-generated response, Jan. 27, 2025.  */
+            selectedInstructors.find((inst) => inst.id === instructor.id) ? 'bg-blue-100' : 'hover:bg-gray-200'
+          }`}
+          
+          onClick={() => { 
+            const isSelected = selectedInstructors.find((inst) => inst.id === instructor.id);
+            if (isSelected) {
+              setSelectedInstructors(selectedInstructors.filter((inst) => inst.id !== instructor.id));
+            } else {
+              setSelectedInstructors([...selectedInstructors, instructor]);
+            }
+          }} /// til here
+        >
+          <div className="flex items-center gap-2">
+            <Avatar src={instructor.profileImgUrl} className="size-6" />
+            <span className="font-medium">{instructor.name}</span>
           </div>
-          <div className="max-h-64 overflow-y-auto border rounded-md p-4 bg-gray-50 dark:bg-zinc-800">
-            {instructors.length > 0 ? (
-              instructors.map((instructor: any) => (
-                <div key={instructor.id} className="mb-4">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      value={instructor.id}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedInstructors([
-                            ...selectedInstructors,
-                            { id: instructor.id, name: `${instructor.firstName} ${instructor.lastName}` }
-                          ])
-                        } else {
-                          setSelectedInstructors(
-                            selectedInstructors.filter((inst) => inst.id !== instructor.id)
-                          )
-                        }
-                      }}
-                    />
-                    <Avatar src={instructor.profileImgUrl} className="size-6" />
-                    <span className="font-medium">{instructor.name}</span>
-                  </label>
-                </div>
-              ))
-            ) : (
-              <p>No instructors available</p>
-            )}
-          </div>
-        </section>
+          <Divider className="mt-2" />
+        </div>
+      ))
+    ) : (
+      <p>No instructors available</p>
+    )}
+  </div>
+</section>
 
-        <Divider className="my-10 w-full" />
+<Divider className="my-10 w-full" />
 
-        <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-          <div>
-            <Subheading>Customers</Subheading>
+<section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+  <div>
+    <Subheading className='text-lg font-semibold text-gray-700 dark:text-gray-300'>Customers</Subheading>
+  </div>
+  <div className="max-h-64 overflow-y-auto border rounded-md p-4 bg-gray-50 dark:bg-zinc-800">
+    {customers.length > 0 ? (
+      customers.map((customer: any) => (
+        /** OpenAI, "Error Remove  for selecting Customer 
+          in a user management system,"
+          ChatGPT-generated response, Jan. 27, 2025.  */
+        <div
+          key={customer.id}
+          className={`p-4 rounded-md cursor-pointer ${
+            selectedCustomers.find((cust) => cust.id === customer.id) ? 'bg-blue-100' : 'hover:bg-gray-200'
+          }`}
+          onClick={() => {
+            const isSelected = selectedCustomers.find((cust) => cust.id === customer.id);
+            if (isSelected) {
+              setSelectedCustomers(selectedCustomers.filter((cust) => cust.id !== customer.id));
+            } else {
+              setSelectedCustomers([...selectedCustomers, customer]);
+            }
+          }} // till here 
+        >
+          <div className="flex items-center gap-4">
+            <Avatar src={customer.profileImgUrl} className="w-12 h-12 rounded-full" />
+            <div>
+              <span className="text-lg font-semibold">{customer.name}</span>
+              <p className="text-sm text-gray-500 mt-1">{customer.email}</p>
+            </div>
           </div>
-          <div className="max-h-64 overflow-y-auto border rounded-md p-4 bg-gray-50 dark:bg-zinc-800">
-            {customers.length > 0 ? (
-              customers.map((customer: any, index: number) => (
-                <div key={index} className="mb-4">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      value={customer.id}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedCustomers([...selectedCustomers, { id: customer.id, name: customer.name }])
-                        } else {
-                          setSelectedCustomers(
-                            selectedCustomers.filter((cust) => cust.id !== customer.id)
-                          )
-                        }
-                      }}
-                    />
-                    <Avatar src={customer.profileImgUrl} className="size-6" />
-                    <span className="font-medium">{customer.name}</span>
-                  </label>
-                  <p className="text-sm text-gray-500">{customer.email}</p>
-                </div>
-              ))
-            ) : (
-              <p>No customers available</p>
-            )}
-          </div>
-        </section>
+          <Divider className="mt-4" />
+        </div>
+      ))
+    ) : (
+      <p>No customers available</p>
+    )}
+  </div>
+</section>
+
 
         <Divider className="my-10 w-full" />
 
