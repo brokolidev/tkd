@@ -16,15 +16,21 @@ import { beltColors, IUser, Student } from '@/structures/users'
 // @ts-ignore
 import { use, useEffect, useState } from 'react'
 
+interface PageInfo {
+    pageSize: number,
+    totalItems: number,
+    totalPages: number
+}
+
 export default function UserPage(props) {
   const searchParams: any = use(props.searchParams)
 
   const [users, setUsers] = useState<IUser[]>([])
-  const [page, setPage] = useState<number>(1)
-  const [pageInfo, setPageInfo] = useState<Object>({
-    pageSize: Number,
-    totalItems: Number,
-    totalPages: Number
+  const page = searchParams.page ? parseInt(searchParams.page) : 1
+  const [pageInfo, setPageInfo] = useState<PageInfo>({
+    pageSize: 0,
+    totalItems: 0,
+    totalPages: 0
   })
   const { currentView, setCurrentView } = useUserViews()
 
@@ -54,11 +60,12 @@ export default function UserPage(props) {
       .then((data: any) => {
         console.log("The data: ", data)
         setPageInfo({
-          pageSize: data.PageSize,
-          totalItems: data.TotalItems,
-          totalPages: data.TotalPages
+          pageSize: data.pageSize,
+          totalItems: data.totalItems,
+          totalPages: data.totalPages
         })
         setUsers(data.users)
+
       })
       .catch((err: string) => {
         console.log("ERROR: " + err)
@@ -70,6 +77,37 @@ export default function UserPage(props) {
     loadData()
   }, [page, currentView])
 
+  const buildPagination = (): JSX.Element[] => {
+    console.log("pagination building time")
+
+    const elements: JSX.Element[] = []
+
+    //push the previous button
+    if (page > 1) {
+        elements.push(<PaginationPrevious href={location.pathname + "?page=" + (page - 1)} />)
+    }
+
+    //push the page buttons
+    for (let i = 1; i < (pageInfo.totalPages + 1); i++) {
+        elements.push(
+          <PaginationPage
+            key={i}
+            href={location.pathname + "?page=" + (i)}
+            {...(i == page ? { current: true } : {})}
+          >
+            {i}
+          </PaginationPage>
+        )
+    }
+
+    //push the next button
+    if (page < pageInfo.totalPages) {
+        elements.push(<PaginationNext href={location.pathname + "?page=" + (page + 1)} />)
+    }
+
+    //return the buttons
+    return elements
+  }
   
   const conditionalStyle = (expiredAt) => {
     const currentDate = new Date().valueOf()
@@ -194,23 +232,11 @@ export default function UserPage(props) {
       </Table>
 
       {/* add pagination when the backend is connected. */}
-      {/* <Pagination className="mt-10">
-        {links &&
-          links.length > 0 &&
-          links.map((link, idx) =>
-            idx === 0 ? (
-              <PaginationPrevious key={idx} href={link.url} />
-            ) : link.url === null && idx < links.length - 1 ? (
-              <PaginationGap key={idx} />
-            ) : idx === links.length - 1 ? (
-              <PaginationNext key={idx} href={link.url} />
-            ) : (
-              <PaginationPage key={idx} href={link.url} {...(link.active ? { current: true } : {})}>
-                {link.label}
-              </PaginationPage>
-            )
-          )}
-      </Pagination> */}
+      <Pagination className="mt-10">
+        { pageInfo?.totalPages > 1 &&
+          buildPagination()
+        }
+      </Pagination>
     </>
   )
 }
