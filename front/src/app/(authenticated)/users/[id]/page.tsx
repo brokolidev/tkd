@@ -66,8 +66,6 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
             return 'zinc'
         case beltColors.BROWN:
             return 'orange'
-        case beltColors.WHITE:
-            return 'sky'
         default:
             return beltColors[student.beltColor].toLowerCase() as BadgeProps["color"]
     }
