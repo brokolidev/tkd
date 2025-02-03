@@ -65,8 +65,8 @@ export default function CreateEventPage() {
       </Alert>
 
       <div className="max-lg:hidden">
-        <Button href="/events" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500 dark:text-zinc-400">
-          <ChevronLeftIcon className="size-4 fill-zinc-400 dark:fill-zinc-500" />
+        <Button href="/events" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500 ">
+          <ChevronLeftIcon className="size-4 fill-zinc-400 " />
           Back to Events
         </Button>
       </div>

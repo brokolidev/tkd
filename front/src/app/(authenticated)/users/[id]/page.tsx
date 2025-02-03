@@ -29,8 +29,8 @@ export default function Student({ params }: { params: Promise<{ id: string }> })
   return (
     <>
       <div className="max-lg:hidden">
-        <Link href="/users" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500 dark:text-zinc-400">
-          <ChevronLeftIcon className="size-4 fill-zinc-400 dark:fill-zinc-500" />
+        <Link href="/users" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500 ">
+          <ChevronLeftIcon className="size-4 fill-zinc-400 " />
           Users
         </Link>
       </div>
@@ -43,19 +43,19 @@ export default function Student({ params }: { params: Promise<{ id: string }> })
         </div>
         <div className="isolate mt-2.5 flex flex-wrap justify-between gap-x-6 gap-y-4">
           <div className="flex flex-wrap gap-x-10 gap-y-4 py-1.5">
-            <span className="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">
-              <CalendarIcon className="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
+            <span className="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 ">
+              <CalendarIcon className="size-4 shrink-0 fill-zinc-400 " />
               <span>Trained from {student.createdAt}</span>
             </span>
-            {/*<span className="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">*/}
-            {/*  <CreditCardIcon className="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />*/}
+            {/*<span className="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6">*/}
+            {/*  <CreditCardIcon className="size-4 shrink-0 fill-zinc-400 " />*/}
             {/*  <span className="inline-flex gap-3">*/}
             {/*    {student.payment.card.type}{' '}*/}
             {/*    <span>/!*<span aria-hidden="true">••••</span> {student.payment.card.number}*!/</span>*/}
             {/*  </span>*/}
             {/*</span>*/}
-            {/*<span className="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">*/}
-            {/*  <CalendarIcon className="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />*/}
+            {/*<span className="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 >*/}
+            {/*  <CalendarIcon className="size-4 shrink-0 fill-zinc-400 " />*/}
             {/*  <span>{student.date}</span>*/}
             {/*</span>*/}
           </div>

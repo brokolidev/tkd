@@ -11,7 +11,7 @@ import { ChevronLeftIcon, PlusIcon, MinusIcon } from '@heroicons/react/16/solid'
 import { useState, useEffect } from 'react'
 import { getInstructors } from '@/services/InstructorServices'
 import { getStudents } from '@/services/StudentServices'
-import axios from 'axios'
+import axios from "axios"
 import { Avatar } from '@/components/avatar'
 // import { Table, TableBody, TableCell, TableRow } from '@/components/table'
 
@@ -120,8 +120,8 @@ export default function SchedulecreatePage() {
       </Alert>
 
       <div className="max-lg:hidden">
-        <Link href="/schedule" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500 dark:text-zinc-400">
-          <ChevronLeftIcon className="size-4 fill-zinc-400 dark:fill-zinc-500" />
+        <Link href="/schedule" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500">
+          <ChevronLeftIcon className="size-4 fill-zinc-400 " />
           Schedule
         </Link>
       </div>
@@ -242,7 +242,7 @@ export default function SchedulecreatePage() {
   <div>
     <Subheading>Instructors</Subheading>
   </div>
-  <div className="max-h-64 overflow-y-auto border rounded-md p-4 bg-gray-50 dark:bg-zinc-800">
+  <div className="max-h-64 overflow-y-auto border rounded-md p-4 bg-gray-50 ">
     {instructors.length > 0 ? (
       instructors.map((instructor: any) => (
         <div
@@ -280,9 +280,9 @@ export default function SchedulecreatePage() {
 
 <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
   <div>
-    <Subheading className='text-lg font-semibold text-gray-700 dark:text-gray-300'>Customers</Subheading>
+    <Subheading className='text-lg font-semibold text-gray-700 '>Customers</Subheading>
   </div>
-  <div className="max-h-64 overflow-y-auto border rounded-md p-4 bg-gray-50 dark:bg-zinc-800">
+  <div className="max-h-64 overflow-y-auto border rounded-md p-4 bg-gray-50 ">
     {customers.length > 0 ? (
       customers.map((customer: any) => (
         /** OpenAI, "Error Remove  for selecting Customer 

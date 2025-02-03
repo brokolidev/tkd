@@ -74,7 +74,7 @@ function Schedules() {
                     )
                     )}
                     // ${item.isOpen ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}
-                    className={`px-4 py-2 text-sm dark:bg-green-500`}
+                    className={`px-4 py-2 text-sm `}
                   >
                     {item.isOpen ? 'Open' : 'Closed'}
                   </Button>
