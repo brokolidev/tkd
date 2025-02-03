@@ -1,26 +1,77 @@
 'use client'
 
-import { Badge } from '@/components/badge'
+import { Badge, BadgeProps } from '@/components/badge'
 import { Button } from '@/components/button'
 import { DescriptionDetails, DescriptionList, DescriptionTerm } from '@/components/description-list'
 import { Divider } from '@/components/divider'
 import { Heading, Subheading } from '@/components/heading'
 import { Link } from '@/components/link'
 import { getStudent } from '@/services/StudentServices'
+import { beltColors, Student } from '@/structures/users'
 import { CalendarIcon, ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { notFound } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
-export default function Student({ params }: { params: Promise<{ id: string }> }) {
-  const [student, setStudent]: any = useState({})
+export default function UserPage({ params }: { params: Promise<{ id: string }> }) {
+  const [student, setStudent] = useState<Student>(new Student(
+    0,
+    "",
+    "",
+    "",
+    new Date(Date.now()),
+    beltColors.UNKNOWN,
+    ""
+  ))
+
+  const getId = () => {
+    return params.then(data => parseInt(data.id))
+  }
+
+  const loadStudent = (id: number) => {
+    getStudent(id)
+      .then(data => {
+        console.log(data)
+        setStudent(data)
+      })
+      .catch(err => console.log("ERROR: loadStudent: " + err))
+  }
 
   useEffect(() => {
-    const getId = async () => {
-      const paramId = (await params).id
-      setStudent(await getStudent(paramId))
-    }
+
+    //pull out the id from the parameters
     getId()
+      .then(id => {
+
+        //ensure the id is a number
+        if (isNaN(id)) {
+            //invalid id, return not found
+            notFound()
+        } else {
+            //id is good, load the student
+            loadStudent(id)
+        }
+      })
+      .catch(err => console.log("ERROR: useEffect: " + err))
+
   }, [params])
+
+
+  const getColor = () => {
+    //deal with the colors that don't have a value in tailwind
+
+    console.log(student.beltColor)
+
+    switch (student.beltColor) {
+        case beltColors.BLACK:
+            return 'zinc'
+        case beltColors.BROWN:
+            return 'orange'
+        case beltColors.WHITE:
+            return 'sky'
+        default:
+            return beltColors[student.beltColor].toLowerCase() as BadgeProps["color"]
+    }
+  }
 
   if (!student) {
     notFound()
@@ -36,28 +87,17 @@ export default function Student({ params }: { params: Promise<{ id: string }> })
       </div>
       <div className="mt-4 lg:mt-8">
         <div className="flex items-center gap-4">
-          <Heading>{student && student.fullName}</Heading>
-          <Badge {...(student.beltColor ? { color: student.beltColor.toLowerCase() } : {})}>
-            {student && student.beltColor}
+          <Heading>{((student?.firstName ?? "") + " " + (student?.lastName ?? ""))}</Heading>
+          <Badge {...(student.beltColor ? { color: getColor() } : {})}>
+            {beltColors[student?.beltColor ?? beltColors.UNKNOWN]}
           </Badge>
         </div>
         <div className="isolate mt-2.5 flex flex-wrap justify-between gap-x-6 gap-y-4">
           <div className="flex flex-wrap gap-x-10 gap-y-4 py-1.5">
-            <span className="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 ">
-              <CalendarIcon className="size-4 shrink-0 fill-zinc-400 " />
-              <span>Trained from {student.createdAt}</span>
+            <span className="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6">
+              <CalendarIcon className="size-4 shrink-0 fill-zinc-400" />
+              <span>Trained from</span>
             </span>
-            {/*<span className="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6">*/}
-            {/*  <CreditCardIcon className="size-4 shrink-0 fill-zinc-400 " />*/}
-            {/*  <span className="inline-flex gap-3">*/}
-            {/*    {student.payment.card.type}{' '}*/}
-            {/*    <span>/!*<span aria-hidden="true">••••</span> {student.payment.card.number}*!/</span>*/}
-            {/*  </span>*/}
-            {/*</span>*/}
-            {/*<span className="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 >*/}
-            {/*  <CalendarIcon className="size-4 shrink-0 fill-zinc-400 " />*/}
-            {/*  <span>{student.date}</span>*/}
-            {/*</span>*/}
           </div>
         </div>
       </div>
@@ -66,16 +106,16 @@ export default function Student({ params }: { params: Promise<{ id: string }> })
         <Divider className="mt-4" />
         <DescriptionList>
           <DescriptionTerm>Student Name</DescriptionTerm>
-          <DescriptionDetails>{student.fullName}</DescriptionDetails>
+          <DescriptionDetails>{((student?.firstName ?? "") + " " + (student?.lastName ?? ""))}</DescriptionDetails>
           <DescriptionTerm>Email</DescriptionTerm>
-          <DescriptionDetails>{student.email}</DescriptionDetails>
+          <DescriptionDetails>{student?.email ?? ""}</DescriptionDetails>
           <DescriptionTerm>Date of Birth</DescriptionTerm>
-          <DescriptionDetails>{student.dob}</DescriptionDetails>
+          <DescriptionDetails>{student?.birthDate?.toDateString() ?? ""}</DescriptionDetails>
           <DescriptionTerm>Belt Color</DescriptionTerm>
-          <DescriptionDetails>{student.beltColor}</DescriptionDetails>
+          <DescriptionDetails>{student?.beltColor ?? ""}</DescriptionDetails>
           <DescriptionTerm>Payment Status</DescriptionTerm>
           <DescriptionDetails>
-            <Badge color="lime">Expired at {student.expiredAt}</Badge>
+            <Badge color="lime">Expired at</Badge>
           </DescriptionDetails>
           <DescriptionTerm>Promotion Availability</DescriptionTerm>
           <DescriptionDetails>

@@ -24,18 +24,22 @@ interface PageInfo {
 
 export default function UserPage(props) {
   const searchParams: any = use(props.searchParams)
+  const page = searchParams.page ? parseInt(searchParams.page) : 1
 
   const [users, setUsers] = useState<IUser[]>([])
-  const page = searchParams.page ? parseInt(searchParams.page) : 1
   const [pageInfo, setPageInfo] = useState<PageInfo>({
     pageSize: 0,
     totalItems: 0,
     totalPages: 0
   })
+
   const { currentView, setCurrentView } = useUserViews()
 
+  /**
+   * Loads the users in from the BE, based on the user view chosen
+   */
   const loadData = () => {
-
+    //this will store the function to load the specific set of users
     let dataToFetch = null
 
     //load in the correct users for the chosen view
@@ -78,6 +82,8 @@ export default function UserPage(props) {
   }, [page, currentView])
 
   /**
+   * Builds the pagination element list for the page. This way, it's not a whole bunch of stuff
+   * trying to be done in the map function down below.
    * 
    * @returns A list of the pagination buttons for the bottom of the screen
    */

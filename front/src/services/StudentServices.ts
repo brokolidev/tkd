@@ -1,9 +1,9 @@
 import axios from '@/lib/axios'
 import { Student } from '@/structures/users'
   
-export function getStudent(id: string): Promise<Student> {
+export function getStudent(id: number): Promise<Student> {
     return axios.get(`student/${id}`)
-        .then((res) => res.data.data)    
+        .then((res) => res.data)
 }
 
 export function getStudents(page: number) : Promise<Student[]> {
