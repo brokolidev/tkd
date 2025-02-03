@@ -77,6 +77,10 @@ export default function UserPage(props) {
     loadData()
   }, [page, currentView])
 
+  /**
+   * 
+   * @returns A list of the pagination buttons for the bottom of the screen
+   */
   const buildPagination = (): JSX.Element[] => {
     console.log("pagination building time")
 
@@ -84,15 +88,23 @@ export default function UserPage(props) {
 
     //push the previous button
     if (page > 1) {
-        elements.push(<PaginationPrevious href={location.pathname + "?page=" + (page - 1)} />)
+        elements.push(<PaginationPage href="?page=1">Start</PaginationPage>)
+        elements.push(<PaginationPrevious href={"?page=" + (page - 1)} />)
+    } else {
+        elements.push(<span className='grow basis-0'></span>)
     }
 
+    //this should end up showing the current page, and nine pages after that.
+
+    //determine the number to start at (prevents 0 from being added when the page is 1)
+    let start = (page == 1 ? page : page - 1)
+
     //push the page buttons
-    for (let i = 1; i < (pageInfo.totalPages + 1); i++) {
+    for (let i = start; i < (pageInfo.totalPages + 1) && i < (page + 10); i++) {
         elements.push(
           <PaginationPage
             key={i}
-            href={location.pathname + "?page=" + (i)}
+            href={"?page=" + (i)}
             {...(i == page ? { current: true } : {})}
           >
             {i}
@@ -102,22 +114,26 @@ export default function UserPage(props) {
 
     //push the next button
     if (page < pageInfo.totalPages) {
-        elements.push(<PaginationNext href={location.pathname + "?page=" + (page + 1)} />)
+        elements.push(<PaginationNext href={"?page=" + (page + 1)} />)
+        elements.push(<PaginationPage href={'?page=' + pageInfo.totalPages}>End</PaginationPage>)
+    } else {
+        elements.push(<span className='grow basis-0'></span>)
     }
 
     //return the buttons
     return elements
   }
   
-  const conditionalStyle = (expiredAt) => {
-    const currentDate = new Date().valueOf()
-    const expirationDate = new Date(expiredAt).valueOf()
-    const daysUntilExpiration: number = (expirationDate - currentDate) / (1000 * 60 * 60 * 24)
+  //This will be needed eventually, but right now, it can probably just be commented out.
+//   const conditionalStyle = (expiredAt) => {
+//     const currentDate = new Date().valueOf()
+//     const expirationDate = new Date(expiredAt).valueOf()
+//     const daysUntilExpiration: number = (expirationDate - currentDate) / (1000 * 60 * 60 * 24)
 
-    return {
-      color: daysUntilExpiration <= 5 && daysUntilExpiration >= 0 ? 'red' : '',
-    }
-  }
+//     return {
+//       color: daysUntilExpiration <= 5 && daysUntilExpiration >= 0 ? 'red' : '',
+//     }
+//   }
 
   return (
     <>
@@ -232,7 +248,7 @@ export default function UserPage(props) {
       </Table>
 
       {/* add pagination when the backend is connected. */}
-      <Pagination className="mt-10">
+      <Pagination className="mt-8">
         { pageInfo?.totalPages > 1 &&
           buildPagination()
         }
