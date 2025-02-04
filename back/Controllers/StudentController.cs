@@ -5,6 +5,8 @@ using taekwondo_backend.DTO;
 using Microsoft.AspNetCore.Identity;
 using taekwondo_backend.Models.Identity;
 using taekwondo_backend.Enums;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace taekwondo_backend.Controllers
 {
@@ -29,6 +31,7 @@ namespace taekwondo_backend.Controllers
         /// <response code="204">No students found in the database</response>
         /// <response code="400">Invalid page number or page size</response>
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetStudents(int pageNumber = 1, int pageSize = 10)
         {
             // Check if pageNumber or pageSize are less than 1 and return response
@@ -70,6 +73,7 @@ namespace taekwondo_backend.Controllers
         /// <response code="200">The student was found</response>
         /// <response code="204">No student matching the given id was found</response>
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetStudentById(int id)
         {
             // Find the student with the given ID and role "Student"
