@@ -5,7 +5,7 @@ export interface IUser {
     firstName: string
     lastName: string
     email: string
-    birthDate: Date
+    dateOfBirth: Date
     profileImgUrl: string
 
     getFullName(): string
@@ -26,7 +26,7 @@ export class Student implements IUser {
     firstName: string
     lastName: string
     email: string
-    birthDate: Date //birthdate is more descriptive and less likely to run into issues than dob
+    dateOfBirth: Date //dateOfBirth is more descriptive and less likely to run into issues than dob
     beltColor: beltColors
     profileImgUrl: string
 
@@ -35,7 +35,7 @@ export class Student implements IUser {
         firstName: string,
         lastName: string,
         email: string,
-        birthDate: Date,
+        dateOfBirth: Date,
         beltColor: beltColors,
         profileImgUrl: string
     ) {
@@ -43,7 +43,7 @@ export class Student implements IUser {
         this.firstName = firstName
         this.lastName = lastName
         this.email = email
-        this.birthDate = birthDate
+        this.dateOfBirth = dateOfBirth
         this.beltColor = beltColor
         this.profileImgUrl = profileImgUrl
     }
@@ -63,7 +63,7 @@ export class Instructor implements IUser {
     firstName: string
     lastName: string
     email: string
-    birthDate: Date //birthdate is more descriptive and less likely to run into issues than dob
+    dateOfBirth: Date //dateOfBirth is more descriptive and less likely to run into issues than dob
     profileImgUrl: string
 
     constructor(
@@ -71,14 +71,14 @@ export class Instructor implements IUser {
         firstName: string,
         lastName: string,
         email: string,
-        birthDate: Date,
+        dateOfBirth: Date,
         profileImgUrl: string
     ) {
         this.id = id
         this.firstName = firstName
         this.lastName = lastName
         this.email = email
-        this.birthDate = birthDate
+        this.dateOfBirth = dateOfBirth
         this.profileImgUrl = profileImgUrl
     }
 
@@ -97,7 +97,7 @@ export class Admin implements IUser {
     firstName: string
     lastName: string
     email: string
-    birthDate: Date //birthdate is more descriptive and less likely to run into issues than dob
+    dateOfBirth: Date //dateOfBirth is more descriptive and less likely to run into issues than dob
     profileImgUrl: string
 
     constructor(
@@ -105,14 +105,14 @@ export class Admin implements IUser {
         firstName: string,
         lastName: string,
         email: string,
-        birthDate: Date,
+        dateOfBirth: Date,
         profileImgUrl: string
     ) {
         this.id = id
         this.firstName = firstName
         this.lastName = lastName
         this.email = email
-        this.birthDate = birthDate
+        this.dateOfBirth = dateOfBirth
         this.profileImgUrl = profileImgUrl
     }
 

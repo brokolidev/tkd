@@ -94,10 +94,10 @@ export default function UserPage(props) {
 
     //push the previous button
     if (page > 1) {
-        elements.push(<PaginationPage href="?page=1">Start</PaginationPage>)
-        elements.push(<PaginationPrevious href={"?page=" + (page - 1)} />)
+        elements.push(<PaginationPage key={'start'} href="?page=1">Start</PaginationPage>)
+        elements.push(<PaginationPrevious key={'prev'} href={"?page=" + (page - 1)} />)
     } else {
-        elements.push(<span className='grow basis-0'></span>)
+        elements.push(<span key={'prev'} className='grow basis-0'></span>)
     }
 
     //this should end up showing the current page, and nine pages after that.
@@ -120,10 +120,12 @@ export default function UserPage(props) {
 
     //push the next button
     if (page < pageInfo.totalPages) {
-        elements.push(<PaginationNext href={"?page=" + (page + 1)} />)
-        elements.push(<PaginationPage href={'?page=' + pageInfo.totalPages}>End</PaginationPage>)
+        elements.push(<PaginationNext key={'next'} href={"?page=" + (page + 1)} />)
+        elements.push(
+          <PaginationPage key={'end'} href={'?page=' + pageInfo.totalPages}>End</PaginationPage>
+        )
     } else {
-        elements.push(<span className='grow basis-0'></span>)
+        elements.push(<span key={'next'} className='grow basis-0'></span>)
     }
 
     //return the buttons
