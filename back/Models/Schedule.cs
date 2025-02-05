@@ -8,30 +8,51 @@ namespace taekwondo_backend.Models
         [Required]
         public int Id { get; set; }
 
-        //The time slot can't be empty. if there is a schedule, there will be an associated timeslot.
-        [Required] //This property tells the db that this is a required field without the program throwing errors
+        [Required]
         public TimeSlot TimeSlot { get; set; }
 
-        //The students and intstructor lists must be defined, but don't need users added.
-        //The required only ensures the property is not null.
-        [Required] //This property tells the db that this is a required field without the program throwing errors
+        [Required]
         public List<User> Students { get; set; }
 
-        [Required] //This property tells the db that this is a required field without the program throwing errors
-        public required List<User> Instructors { get; set; }
+        [Required]
+        public List<User> Instructors { get; set; }
+        
+        [Required]
+        public DayOfWeek Day { get; set; }
+        
+        [Required]
+        public string Level { get; set; }
+        
+        [Required]
+        public DateTime? CreatedAt { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
+        
 
         public Schedule()
         {
-            this.TimeSlot = new();
-            this.Students = [];
-            this.Instructors = [];
+            TimeSlot = new();
+            Students = [];
+            Instructors = [];
+            Day = 0;
+            Level = "Beginner Class";
+            CreatedAt = DateTime.MinValue;
         }
 
-        public Schedule(TimeSlot timeSlot, List<User> Students, List<User> Instructors)
+        public Schedule(
+            TimeSlot timeSlot, 
+            List<User> students, 
+            List<User> instructors,
+            DayOfWeek day,
+            string level,
+            DateTime createdAt)
         {
-            this.TimeSlot = timeSlot;
-            this.Students = Students;
-            this.Instructors = Instructors;
+            TimeSlot = timeSlot;
+            Students = students;
+            Instructors = instructors;
+            Day = day;
+            Level = level;
+            CreatedAt = createdAt;
         }
     }
 }
