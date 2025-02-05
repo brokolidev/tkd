@@ -21,7 +21,7 @@ namespace taekwondo_backend.Controllers
         // GET: api/schedule
         [HttpGet]
         [Authorize]
-        public ActionResult<IEnumerable<GetSchedulesDTO>> GetSchedules()
+        public ActionResult<IEnumerable<GetSchedulesDTO>> GetSchedules(int pageIndex = 1, int pageSize = 30)
         {
             var schedules = _context.Schedules
                 .Select(s => new GetSchedulesDTO
@@ -32,9 +32,11 @@ namespace taekwondo_backend.Controllers
                     Instructors = s.Instructors,
                     DayOfWeek = s.Day,
                     Level = s.Level
-                }).ToList();
-
-            return Ok(schedules);
+                });
+            
+            var pagedSchedules = PagedList<GetSchedulesDTO>.Create(schedules, pageIndex, pageSize);
+            
+            return Ok(pagedSchedules);
         }
 
         // GET: api/schedule/5
