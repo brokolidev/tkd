@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using taekwondo_backend.Data;
 using taekwondo_backend.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace taekwondo_backend.Controllers
 {
@@ -17,6 +19,7 @@ namespace taekwondo_backend.Controllers
 
         // GET: api/schedule
         [HttpGet]
+        [Authorize]
         public ActionResult<IEnumerable<ScheduleControllerDTO>> GetSchedules()
         {
             var schedules = _context.Schedules
@@ -33,6 +36,7 @@ namespace taekwondo_backend.Controllers
 
         // GET: api/schedule/5
         [HttpGet("{id}")]
+        [Authorize]
         public ActionResult<ScheduleControllerDTO> GetSchedule(int id)
         {
             var schedule = _context.Schedules
@@ -55,6 +59,7 @@ namespace taekwondo_backend.Controllers
 
         // POST: api/schedule
         [HttpPost]
+        [Authorize]
         public ActionResult<Schedule> CreateSchedule(ScheduleControllerDTO scheduleDTO)
         {
             // Map DTO to Schedule model
@@ -88,6 +93,7 @@ namespace taekwondo_backend.Controllers
 
         // PUT: api/schedule/5
         [HttpPut("{id}")]
+        [Authorize]
         public ActionResult UpdateSchedule(int id, ScheduleControllerDTO scheduleDTO)
         {
             var schedule = _context.Schedules.FirstOrDefault(s => s.Id == id);
@@ -128,6 +134,7 @@ namespace taekwondo_backend.Controllers
 
         // DELETE: api/schedule/5
         [HttpDelete("{id}")]
+        [Authorize]
         public ActionResult DeleteSchedule(int id)
         {
             var schedule = _context.Schedules.FirstOrDefault(s => s.Id == id);
