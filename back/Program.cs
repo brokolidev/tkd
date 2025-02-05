@@ -1,13 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using taekwondo_backend.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
 using taekwondo_backend.Services;
 using taekwondo_backend.Data;
 using taekwondo_backend.Models.Identity;
-using taekwondo_backend.Enums;
 using taekwondo_backend.Seeder;
 
 namespace taekwondo_backend
