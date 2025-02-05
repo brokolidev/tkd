@@ -20,10 +20,10 @@ namespace taekwondo_backend.Controllers
         // GET: api/schedule
         [HttpGet]
         [Authorize]
-        public ActionResult<IEnumerable<ScheduleControllerDTO>> GetSchedules()
+        public ActionResult<IEnumerable<GetSchedulesDTO>> GetSchedules()
         {
             var schedules = _context.Schedules
-                .Select(s => new ScheduleControllerDTO
+                .Select(s => new GetSchedulesDTO
                 {
                     Id = s.Id,
                     TimeSlot = s.TimeSlot,
@@ -37,11 +37,11 @@ namespace taekwondo_backend.Controllers
         // GET: api/schedule/5
         [HttpGet("{id}")]
         [Authorize]
-        public ActionResult<ScheduleControllerDTO> GetSchedule(int id)
+        public ActionResult<GetSchedulesDTO> GetSchedule(int id)
         {
             var schedule = _context.Schedules
                 .Where(s => s.Id == id)
-                .Select(s => new ScheduleControllerDTO
+                .Select(s => new GetSchedulesDTO
                 {
                     Id = s.Id,
                     TimeSlot = s.TimeSlot,
@@ -60,7 +60,7 @@ namespace taekwondo_backend.Controllers
         // POST: api/schedule
         [HttpPost]
         [Authorize]
-        public ActionResult<Schedule> CreateSchedule(ScheduleControllerDTO scheduleDTO)
+        public ActionResult<Schedule> CreateSchedule(GetSchedulesDTO scheduleDTO)
         {
             // Map DTO to Schedule model
             var students = _context.Users.Where(u => scheduleDTO.StudentIds.Contains(u.Id)).ToList();
@@ -94,7 +94,7 @@ namespace taekwondo_backend.Controllers
         // PUT: api/schedule/5
         [HttpPut("{id}")]
         [Authorize]
-        public ActionResult UpdateSchedule(int id, ScheduleControllerDTO scheduleDTO)
+        public ActionResult UpdateSchedule(int id, GetSchedulesDTO scheduleDTO)
         {
             var schedule = _context.Schedules.FirstOrDefault(s => s.Id == id);
             if (schedule == null)

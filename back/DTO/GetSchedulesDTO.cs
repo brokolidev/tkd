@@ -1,13 +1,13 @@
 ﻿namespace taekwondo_backend.Models
 {
-    public class ScheduleControllerDTO
+    public class GetSchedulesDTO
     {
         public int Id { get; set; }
         public TimeSlot? TimeSlot { get; set; } // Make TimeSlot nullable
         public List<int> StudentIds { get; set; }
         public List<int> InstructorIds { get; set; }
 
-        public ScheduleControllerDTO()
+        public GetSchedulesDTO()
         {
             StudentIds = new List<int>();
             InstructorIds = new List<int>();

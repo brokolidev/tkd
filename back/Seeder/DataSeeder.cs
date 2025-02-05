@@ -24,7 +24,55 @@ public class DataSeeder(
         await SeedRoles();
     }
 
-    public async Task SeedTimeSlots()
+    public async Task TestSeed()
+    {
+        await SeedAdmin();
+        await SeedInstructorsAndStudents();
+        await SeedTimeSlots();
+        await SeedSchedules();
+    }
+    
+    private async Task SeedSchedules()
+    {
+        var schedules = new List<Schedule>();
+        var random = new Random();
+        
+        var timeslots = _context.TimeSlots.ToList();
+        var students = await _userManager.GetUsersInRoleAsync(UserRoles.Student.ToString());
+        var instructors = await _userManager.GetUsersInRoleAsync(UserRoles.Student.ToString());
+        
+        for (int i = 0; i < 30; i++)
+        {
+            
+            var randomTimeslot = timeslots[random.Next(timeslots.Count)];
+            var randomStudents = students.OrderBy(x => random.Next()).Take(random.Next(10, 31)).ToList();
+            var randomInstructors = instructors.OrderBy(x => random.Next()).Take(random.Next(2, 3)).ToList();
+
+            string[] classLevels = { 
+                "Beginner Class 1", 
+                "Little Warriors 1",
+                "Private Lesson",
+                "Little Warriors",
+                "Family Class",
+                "Private Class"
+            };
+
+            var schedule = new Schedule
+            {
+                TimeSlot = randomTimeslot,
+                Students = randomStudents,
+                Instructors = randomInstructors,
+                Day = (DayOfWeek)random.Next(0, 7),
+                Level = classLevels[random.Next(classLevels.Length)],
+            };
+            schedules.Add(schedule);
+        }
+
+        _context.Schedules.AddRange(schedules);
+        await _context.SaveChangesAsync();
+    }
+    
+    private async Task SeedTimeSlots()
     {
         TimeOnly[,] timeArray = new TimeOnly[,]
         {
@@ -43,19 +91,12 @@ public class DataSeeder(
             { new TimeOnly(19, 50), new TimeOnly(20, 40) }
         };
         
-        List<TimeSlot> timeSlots = Enumerable.Range(0, timeArray.GetLength(0))
+        var timeSlots = Enumerable.Range(0, timeArray.GetLength(0))
             .Select(i => new TimeSlot(timeArray[i, 0], timeArray[i, 1]))
             .ToList();
 
         _context.TimeSlots.AddRange(timeSlots);
         await _context.SaveChangesAsync();
-    }
-
-    public async Task TestSeed()
-    {
-        await SeedAdmin();
-        await SeedInstructorsAndStudents();
-        await SeedTimeSlots();
     }
 
     private async Task SeedRoles()
@@ -169,6 +210,23 @@ public class DataSeeder(
             await _userManager.AddToRoleAsync(student, UserRoles.Student.ToString());
             
         }
+    }
+
+    private static List<User> GetRandomUsers(List<User> users, int count, Random random)
+    {
+        var selectedUsers = new List<User>();
+        var usedIndexes = new HashSet<int>();
+
+        while (selectedUsers.Count < count)
+        {
+            int index = random.Next(users.Count);
+            if (usedIndexes.Add(index))
+            {
+                selectedUsers.Add(users[index]);
+            }
+        }
+
+        return selectedUsers;
     }
 }
 
