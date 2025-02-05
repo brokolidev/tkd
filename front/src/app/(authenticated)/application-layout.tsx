@@ -97,7 +97,6 @@ export function ApplicationLayout({
           <NavbarSpacer />
           <NavbarSection>
             <Dropdown>
-              <p>This sis</p>
               <DropdownButton as={NavbarItem}>
                 <Avatar src={user && user.profileImage} square />
               </DropdownButton>
