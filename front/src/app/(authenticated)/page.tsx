@@ -6,8 +6,9 @@ import { Divider } from '@/components/divider'
 import { Heading, Subheading } from '@/components/heading'
 import { Select } from '@/components/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
-// import { getSchedules } from '@/data'
 import { useEffect, useState } from 'react'
+import useUser from "@/hooks/swrHooks";
+import axios from "@/lib/axios";
 
 function Stat({ title, value, change }: { title: string; value: string; change: string }) {
   return (
@@ -25,9 +26,10 @@ function Stat({ title, value, change }: { title: string; value: string; change: 
 
 export default function Home() {
   
-  const [firstName, setFirstName] = useState('')
   const [schedules, setSchedules] = useState([])
 
+  const { user, isError, isLoading } = useUser()
+  
   const getGreeting = () => {
     const currentHour = new Date().getHours()
 
@@ -39,24 +41,21 @@ export default function Home() {
       return 'evening'
     }
   }
-
+  
   async function loadSchedules(): Promise<void> {
-    //use an empty array until we get data to work with
-    const data = [] //await getSchedules()
-    setSchedules(data)
+    await axios.get('/api/schedule').then((response) => {
+      setSchedules(response.data);
+    });
   }
 
-  // useEffect(() => {
-  //   loadSchedules()
-  //   if (user && user.first_name) {
-  //     setFirstName(user.first_name)
-  //   }
-  // }, [user])
-
+  useEffect(() => {
+    loadSchedules();
+  }, []);
+  
   return (
     <>
       <Heading>
-        Good {getGreeting()}, {firstName}
+        Good {getGreeting()}, {user && user.firstName}
       </Heading>
       <div className="mt-8 flex items-end justify-between">
         <Subheading>Overview</Subheading>
@@ -89,13 +88,13 @@ export default function Home() {
           {schedules.map((schedule) => (
             <TableRow key={schedule.id} title={`Schedule #${schedule.id}`}>
               <TableCell className="text-zinc-500">
-                {schedule.timeslot.starts_at} - {schedule.timeslot.ends_at}
+                {schedule.timeSlot.startsAt} - {schedule.timeSlot.endsAt}
               </TableCell>
-              <TableCell>{schedule.dow}</TableCell>
-              <TableCell>{schedule.mainInstructor}</TableCell>
+              <TableCell>{schedule.dayOfWeekString}</TableCell>
+              <TableCell>{schedule.mainInstructorName}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <Avatar src={schedule.levelImgUrl} className="size-6" />
+                  <Avatar src={schedule.levelImageUrl} className="size-6" />
                   <span>{schedule.level}</span>
                 </div>
               </TableCell>

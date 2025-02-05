@@ -1,8 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-using taekwondo_backend.Enums;
-using taekwondo_backend.Models;
+﻿using taekwondo_backend.Enums;
 
 namespace taekwondo_backend.DTO
 {

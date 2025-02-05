@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Runtime.Intrinsics.X86;
+using Microsoft.AspNetCore.Mvc;
 using taekwondo_backend.Data;
 using taekwondo_backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +29,9 @@ namespace taekwondo_backend.Controllers
                     Id = s.Id,
                     TimeSlot = s.TimeSlot,
                     StudentIds = s.Students.Select(st => st.Id).ToList(),
-                    InstructorIds = s.Instructors.Select(inst => inst.Id).ToList()
+                    Instructors = s.Instructors,
+                    DayOfWeek = s.Day,
+                    Level = s.Level
                 }).ToList();
 
             return Ok(schedules);
@@ -46,7 +49,9 @@ namespace taekwondo_backend.Controllers
                     Id = s.Id,
                     TimeSlot = s.TimeSlot,
                     StudentIds = s.Students.Select(st => st.Id).ToList(),
-                    InstructorIds = s.Instructors.Select(inst => inst.Id).ToList()
+                    Instructors = s.Instructors,
+                    DayOfWeek = s.Day,
+                    Level = s.Level
                 }).FirstOrDefault();
 
             if (schedule == null)
@@ -64,7 +69,7 @@ namespace taekwondo_backend.Controllers
         {
             // Map DTO to Schedule model
             var students = _context.Users.Where(u => scheduleDTO.StudentIds.Contains(u.Id)).ToList();
-            var instructors = _context.Users.Where(u => scheduleDTO.InstructorIds.Contains(u.Id)).ToList();
+            var instructors = scheduleDTO.Instructors;
 
             // Ensure students and instructors are valid and not empty
             if (students == null || students.Count == 0 || instructors == null || instructors.Count == 0)
@@ -114,7 +119,7 @@ namespace taekwondo_backend.Controllers
 
             // Ensure instructors and students are properly assigned (non-null and valid)
             var students = _context.Users.Where(u => scheduleDTO.StudentIds.Contains(u.Id)).ToList();
-            var instructors = _context.Users.Where(u => scheduleDTO.InstructorIds.Contains(u.Id)).ToList();
+            var instructors = scheduleDTO.Instructors;
 
             // Ensure that Instructors and Students lists are not null or empty
             if (students == null || instructors == null || students.Count == 0 || instructors.Count == 0)
