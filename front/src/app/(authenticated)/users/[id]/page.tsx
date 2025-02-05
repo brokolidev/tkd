@@ -8,6 +8,7 @@ import { Divider } from '@/components/divider'
 import { Heading, Subheading } from '@/components/heading'
 import { Link } from '@/components/link'
 import { getStudent } from '@/services/StudentServices'
+import { deleteUser } from '@/services/UserServices'
 import { beltColors, IUser, Student } from '@/structures/users'
 import { CalendarIcon, ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { notFound } from 'next/navigation'
@@ -76,9 +77,20 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
     }
   }
 
-  const deleteUser = () => {
+  const deleteCurrentUser = () => {
     //ask the user if they are sure they want to continue
-    
+    console.log("Deleting this user")
+
+    deleteUser(user.id)
+        .then(r => {
+            console.log("user " + user.id + " deleted successfully")
+        })
+        .catch(err => {
+            console.log("ERROR: deleteCurrentUser: " + err)
+        })
+
+    //hide the alerts
+    setShowDeleteAlert(false)
   }
 
   if (!user) {
@@ -95,7 +107,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
             cannot be undone!
           </AlertDescription>
           <AlertActions>
-            <Button onClick={deleteUser}>Delete User</Button>
+            <Button onClick={deleteCurrentUser}>Delete User</Button>
             <Button onClick={() => setShowDeleteAlert(false)}>Cancel Deletion</Button>
           </AlertActions>
       </Alert>

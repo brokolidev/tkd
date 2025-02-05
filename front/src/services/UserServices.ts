@@ -31,3 +31,12 @@ export function createUser(newUser: NewUser) {
         throw new Error(msg)
       })
 }
+
+export function deleteUser(id: number) {
+    //send the user off to be deleted
+    return axios.delete("user/" + id)
+        .catch(err => {
+            console.log("ERROR: deleteUser: " + err)
+            throw new Error("ERROR: deleteUser: " + err)
+        })
+}

@@ -32,22 +32,29 @@ namespace taekwondo_backend.Controllers
 
 		[HttpGet]
 		[Authorize]
-		public IActionResult Get()
+		public async Task<IActionResult> Get()
 		{
 
+			//attempt to pull out the user id from the user claims
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+			//if the user id cannot be found return not null
 			if (userId == null)
+			{
 				return NotFound();
+			}
 
 			// get user with user id
-			var user = _userManager.FindByIdAsync(userId).GetAwaiter().GetResult();
-			
+			var user = await _userManager.FindByIdAsync(userId);
+
+			//If the user doesn't exist, return not found
 			if (user == null)
+			{
 				return NotFound();
-			
-			var role = _userManager.GetRolesAsync(user).GetAwaiter().GetResult();
-			
+			}
+
+			var role = await _userManager.GetRolesAsync(user);
+
 			return Ok(new LoggedInUserDTO
 			{
 				Id = user.Id,
@@ -71,6 +78,39 @@ namespace taekwondo_backend.Controllers
 			var counts = new List<int> { studentCount, instructorCount };
 
 			return Ok(counts);
+		}
+
+		[HttpDelete("{id:int}")]
+		[Authorize]
+		public async Task<IActionResult> DeleteUser(int id)
+		{
+			if (id < 0)
+			{
+				return BadRequest("The id cannot be negative.");
+			}
+
+			//check if the user exists in the system
+			var user = await _userManager.FindByIdAsync(id.ToString());
+
+			//return if the user could not be found
+			if (user == null)
+			{
+				return NotFound();
+			}
+
+			//the user was found in the system, delete.
+			var result = await _userManager.DeleteAsync(user);
+
+			//check if the result succeeded. if it didn't, then something has gone wrong in the server.
+			if (!result.Succeeded)
+			{
+				//the result didn't succeed, send back an error
+				return StatusCode(500, new { errors = result.Errors });
+			} else
+			{
+				//result was good, return Ok
+				return Ok(id);
+			}
 		}
 	}
 }
