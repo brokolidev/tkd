@@ -8,7 +8,7 @@ using taekwondo_backend.Enums;
 
 namespace taekwondo_backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [Authorize(Roles = nameof(UserRoles.Admin) + "," + nameof(UserRoles.Instructor))]
     [ApiController]
     public class ScheduleController : ControllerBase
