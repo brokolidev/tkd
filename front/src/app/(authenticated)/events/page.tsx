@@ -40,6 +40,13 @@ function EditEvents() {
       setCurrentPage(page);
     }
   };
+  const handlePageClick = (page: number, e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+  const getPageHref = (page: number) => (page >= 1 && page <= totalPages ? `?page=${page}` : undefined);
 
   return (
     <div className="p-8 space-y-10">
@@ -77,7 +84,7 @@ function EditEvents() {
                       )
                     )
                   }
-                  className={`px-3 py-1 text-sm ${item.isOpen ? 'bg-green-500 text-green-200' : 'bg-red-500 text-red-200'}`}
+                  className={`px-3 py-1 text-sm ${item.isOpen ? 'bg-green-200 text-green-500' : 'bg-red-200 text-red-500'}`}
                 >
                   {item.isOpen ? 'Open' : 'Closed'}
                 </Button>
@@ -93,48 +100,29 @@ function EditEvents() {
           </div>
         ))}
       </div>
-      <Pagination className="flex justify-center items-center space-x-2">
-  <button
-    onClick={(e) => {
-      e.preventDefault();
-      if (currentPage > 1) handlePageChange(currentPage - 1);
-    }}
-  >
-    <PaginationPrevious
-      href={currentPage > 1 ? `?page=${currentPage - 1}` : undefined}>
-      Previous
-    </PaginationPrevious>
-  </button>
-  <PaginationList className="flex space-x-2">
-    {[...Array(totalPages)].map((_, index) => (
-      <button
-        key={index + 1}
-        onClick={(e) => {
-          e.preventDefault();
-          handlePageChange(index + 1);
-        }}
-      >
-        <PaginationPage
-          href={`?page=${index + 1}`}
-          current={index + 1 === currentPage}
-        >
-          {index + 1}
-        </PaginationPage>
-      </button>
-    ))}
-  </PaginationList>
-  <button
-    onClick={(e) => {
-      e.preventDefault();
-      if (currentPage < totalPages) handlePageChange(currentPage + 1);
-    }}
-  >
-    <PaginationNext
-      href={currentPage < totalPages ? `?page=${currentPage + 1}` : undefined}>
-      Next
-    </PaginationNext>
-  </button>
-</Pagination>
+    {/* PAGINATION COMPONENT */}
+    <Pagination className="flex justify-center items-center space-x-2">
+        {/* Previous Button */}
+        <button onClick={(e) => handlePageClick(currentPage - 1, e)} disabled={currentPage === 1}>
+          <PaginationPrevious href={getPageHref(currentPage - 1)}>Previous</PaginationPrevious>
+        </button>
+
+        {/* Pagination List */}
+        <PaginationList className="flex space-x-2">
+          {[...Array(totalPages)].map((_, index) => (
+            <button key={index + 1} onClick={(e) => handlePageClick(index + 1, e)}>
+              <PaginationPage href={getPageHref(index + 1)} current={index + 1 === currentPage}>
+                {index + 1}
+              </PaginationPage>
+            </button>
+          ))}
+        </PaginationList>
+
+        {/* Next Button */}
+        <button onClick={(e) => handlePageClick(currentPage + 1, e)} disabled={currentPage === totalPages}>
+          <PaginationNext href={getPageHref(currentPage + 1)}>Next</PaginationNext>
+        </button>
+      </Pagination>
 
       
     </div>
