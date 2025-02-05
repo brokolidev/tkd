@@ -10,7 +10,7 @@ import {Pagination,PaginationList,PaginationNext,PaginationPage,PaginationPrevio
 import { BadgeButton } from '@/components/badge'
 import { Link } from '@/components/link'
 import { ChevronLeftIcon, PlusIcon, MinusIcon } from '@heroicons/react/16/solid'
-function Schedules() {
+function EditEvents() {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -44,9 +44,9 @@ function Schedules() {
   return (
     <div className="p-8 space-y-10">
       <div className="flex justify-between items-center">
-        <Heading className="text-xl font-bold">Schedules</Heading>
+        <Heading className="text-xl font-bold">Events</Heading>
         <Button className='flex items-center gap-2 bg-black'>
-        <Link href="/schedule/create" className="inline-flex items-center gap-2 text-sm/6 text-white ">
+        <Link href="/events/create" className="inline-flex items-center gap-2 text-sm/6 text-white ">
           
           Create New
         </Link></Button>
@@ -64,7 +64,7 @@ function Schedules() {
               <div className="flex-1">
                 <h2 className="text-lg font-semibold">{item.className}</h2>
                 <p className="text-sm mt-2">{item.description}</p>
-                <p className="text-sm text-gray-600 mt-1">{item.seatsLeft} seats left</p>
+                
               </div>
               <div className="flex items-center space-x-4">
                 <Button
@@ -82,7 +82,7 @@ function Schedules() {
                   {item.isOpen ? 'Open' : 'Closed'}
                 </Button>
                 <Button className="px-3 py-1 text-sm bg-blue-500 text-white">
-                <Link href="/schedule/edit" className="inline-flex items-center gap-2 text-sm/6 text-white ">
+                <Link href="/events/edit" className="inline-flex items-center gap-2 text-sm/6 text-white ">
           
                    Edit
                        </Link>
@@ -141,4 +141,4 @@ function Schedules() {
   );
 }
 
-export default Schedules;
+export default EditEvents;

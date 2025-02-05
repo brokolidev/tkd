@@ -113,7 +113,7 @@ export default function SchedulecreatePage() {
       <div className="max-w-full max-h-full ">
       <Alert open={isCreated} onClose={setIsCreated}>
         <AlertTitle>Congratulations!</AlertTitle>
-        <AlertDescription>A new schedule has been created</AlertDescription>
+        <AlertDescription>The Schdeule has been updated </AlertDescription>
         <AlertActions>
           <Link href="/schedule">
             <Button onClick={() => setIsCreated(false)}>Sounds Good!</Button>
@@ -124,12 +124,12 @@ export default function SchedulecreatePage() {
       <div className="max-lg:hidden">
         <Link href="/schedule" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500 ">
           <ChevronLeftIcon className="size-4 fill-zinc-400 " />
-          Schedule
+          Edit
         </Link>
       </div>
 
       <form onSubmit={handleSubmit} className="mt-4 lg:mt-8">
-        <Heading>Create a new schedule</Heading>
+        <Heading>Edit a schedule</Heading>
         <Divider className="my-10 w-full" />
 
         <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
