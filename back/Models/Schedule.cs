@@ -23,7 +23,6 @@ namespace taekwondo_backend.Models
         [Required]
         public string Level { get; set; }
         
-        [Required]
         public DateTime? CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
@@ -36,7 +35,6 @@ namespace taekwondo_backend.Models
             Instructors = [];
             Day = 0;
             Level = "Beginner Class";
-            CreatedAt = DateTime.MinValue;
         }
 
         public Schedule(
@@ -44,15 +42,13 @@ namespace taekwondo_backend.Models
             List<User> students, 
             List<User> instructors,
             DayOfWeek day,
-            string level,
-            DateTime createdAt)
+            string level)
         {
             TimeSlot = timeSlot;
             Students = students;
             Instructors = instructors;
             Day = day;
             Level = level;
-            CreatedAt = createdAt;
         }
     }
 }
