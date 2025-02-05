@@ -1,6 +1,6 @@
 import { userViews } from "@/hooks/userViews";
 import axios from "@/lib/axios";
-import { NewUser } from "@/structures/users";
+import { IUser, NewUser } from "@/structures/users";
 
 export function createUser(newUser: NewUser) {
 
@@ -27,6 +27,18 @@ export function createUser(newUser: NewUser) {
       .then(r => r.data)
       .catch(err => {
         const msg = "ERROR: createUser: " + err
+        console.error(msg)
+        throw new Error(msg)
+      })
+}
+
+export function updateUser(updatedUser: IUser) {
+
+    //send the user off to be created at the backend
+    return axios.post("/user/" + updatedUser.id, JSON.stringify(updatedUser))
+      .then(r => r.data)
+      .catch(err => {
+        const msg = "ERROR: updateUser: " + err
         console.error(msg)
         throw new Error(msg)
       })

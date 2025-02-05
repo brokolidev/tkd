@@ -7,3 +7,8 @@ export const buildDate = (dateString: string) => {
     
     return newDate
 }
+
+export const formatDate = (date: Date) => {
+    return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, "0") + "-" + 
+      date.getDay().toString().padStart(2, "0")
+}

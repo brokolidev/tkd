@@ -80,7 +80,46 @@ namespace taekwondo_backend.Controllers
 			return Ok(counts);
 		}
 
-		[HttpDelete("{id:int}")]
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdateUser(int id, RegisterUserDTO userDTO)
+        {
+            if (ModelState.IsValid)
+            {
+				//pull out the user from the system
+				User? user = await _userManager.FindByIdAsync(id.ToString());
+
+				//if the user wasn't found, send an error back to the FE
+				if (user == null)
+				{
+					return NotFound();
+				}
+
+				//user found, update.
+
+				//for right now, the email can't be changed.
+				user.FirstName = userDTO.FirstName;
+				user.LastName = userDTO.LastName;
+				user.DateOfBirth = userDTO.DateOfBirth;
+				user.BeltColor = userDTO.BeltColor;
+
+                //update the user.
+                IdentityResult result = await _userManager.UpdateAsync(user);
+
+                //only return if both results were a success
+                if (result.Succeeded)
+                {
+                    return Ok(id);
+                }
+
+                //something failed, return the errors
+                return BadRequest(result.Errors);
+            }
+            return BadRequest(ModelState);
+        }
+
+        [HttpDelete("{id:int}")]
 		[Authorize]
 		public async Task<IActionResult> DeleteUser(int id)
 		{

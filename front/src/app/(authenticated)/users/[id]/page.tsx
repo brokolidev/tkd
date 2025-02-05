@@ -32,7 +32,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
 
   const loadUser = (id: number) => {
 
-    let loadFunction: (id: number) => Promise<IUser> = null
+    let loadFunction = null
 
     switch(currentView) {
         case userViews.ADMIN:
@@ -187,25 +187,29 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
           <DescriptionDetails>{user?.email ?? ""}</DescriptionDetails>
           <DescriptionTerm>Date of Birth</DescriptionTerm>
           <DescriptionDetails>{user?.dateOfBirth?.toDateString() ?? ""}</DescriptionDetails>
-          <DescriptionTerm>Belt Color</DescriptionTerm>
-          <DescriptionDetails>
-            {
-              user instanceof Student &&
-              beltColors[user?.beltColor ?? beltColors.UNKNOWN]?.toLowerCase()
-            }
-          </DescriptionDetails>
-          <DescriptionTerm>Payment Status</DescriptionTerm>
-          <DescriptionDetails>
-            <Badge color="lime">Expired at</Badge>
-          </DescriptionDetails>
-          <DescriptionTerm>Promotion Availability</DescriptionTerm>
-          <DescriptionDetails>
-            <Badge color="lime">Available</Badge>
-          </DescriptionDetails>
+          
+          {/* Student Specifics */}
+          {
+            user instanceof Student &&
+            <>
+              <DescriptionTerm>Belt Color</DescriptionTerm>
+              <DescriptionDetails>
+                beltColors[user?.beltColor ?? beltColors.UNKNOWN]?.toLowerCase()
+              </DescriptionDetails>
+              <DescriptionTerm>Payment Status</DescriptionTerm>
+              <DescriptionDetails>
+                <Badge color="lime">Expired at</Badge>
+              </DescriptionDetails>
+              <DescriptionTerm>Promotion Availability</DescriptionTerm>
+              <DescriptionDetails>
+                <Badge color="lime">Available</Badge>
+              </DescriptionDetails>
+            </>
+          }
         </DescriptionList>
       </div>
       <div className="mt-10 w-full flex gap-3 justify-end">
-        <Button>Edit Information</Button>
+        <Button href={"/users/" + user.id + "/edit"} >Edit Information</Button>
         <Button {...{color: 'red'}} onClick={() => setShowDeleteAlert(true)}>Delete User</Button>
       </div>
     </>
