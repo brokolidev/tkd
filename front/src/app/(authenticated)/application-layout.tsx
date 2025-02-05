@@ -98,6 +98,7 @@ export function ApplicationLayout({
           <NavbarSection>
             <Dropdown>
               <DropdownButton as={NavbarItem}>
+                <p>{user && user.firstName}</p>  
                 <Avatar src={user && user.profileImage} square />
               </DropdownButton>
               <AccountDropdownMenu anchor="bottom end" onLogout={logout} />
