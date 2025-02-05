@@ -1,13 +1,21 @@
 import axios from '@/lib/axios'
 import { Student } from '@/structures/users'
 import { buildDate } from '@/utils/dates'
-  
-export function getStudent(id: number): Promise<Student> {
+
+export interface StudentPagination {
+    currentPage: number,
+    pageSize: number,
+    totalItems: number,
+    totalPages: number,
+    users: Student[]
+}
+
+export async function getStudent(id: number): Promise<Student> {
     return axios.get(`student/${id}`)
         .then((res) => ensureValidTypes([res.data])[0])
 }
-
-export function getStudents(page: number) : Promise<Student[]> {
+  
+export async function getStudents(page: number) : Promise<StudentPagination> {
     //get all students in the system. for right now, return a promise of fake data.
 
     return axios.get(`student?pageNumber=${page}`)
@@ -25,10 +33,10 @@ export function getStudents(page: number) : Promise<Student[]> {
 const ensureValidTypes = (students: Student[]) => {
     
     //ensure we're not altering the original array
-    const studentArray = [...students]
+    const studentsArray = [...students]
     
     //perform the type validation needed.
-    studentArray.forEach(student => {
+    studentsArray.forEach(student => {
         //map the date string to a date object
         if (student.dateOfBirth) {
             student.dateOfBirth = buildDate(student.dateOfBirth.toString())
@@ -36,5 +44,5 @@ const ensureValidTypes = (students: Student[]) => {
     })
 
     //return the new array with the types corrected.
-    return studentArray
+    return studentsArray
 }

@@ -1,13 +1,21 @@
 import axios from '@/lib/axios'
 import { Instructor } from '@/structures/users'
 import { buildDate } from '@/utils/dates'
-  
+
+export interface InstructorPagination {
+    currentPage: number,
+    pageSize: number,
+    totalItems: number,
+    totalPages: number,
+    users: Instructor[]
+}
+
 export async function getInstructor(id: number): Promise<Instructor> {
     return axios.get(`instructor/${id}`)
         .then((res) => ensureValidTypes([res.data])[0])
 }
   
-export async function getInstructors(page: number) : Promise<Instructor[]> {
+export async function getInstructors(page: number) : Promise<InstructorPagination> {
     //get all instructors in the system. for right now, return a promise of fake data.
 
     return axios.get(`instructor?pageNumber=${page}`)

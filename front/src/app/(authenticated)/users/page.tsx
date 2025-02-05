@@ -39,19 +39,56 @@ export default function UserPage(props) {
    * Loads the users in from the BE, based on the user view chosen
    */
   const loadData = () => {
-    //this will store the function to load the specific set of users
-    let dataToFetch = null
-
+    
     //load in the correct users for the chosen view
     switch (currentView) {
       case userViews.ADMIN:
-        dataToFetch = () => getAdmins(page)
+        getAdmins(page)
+          .then((data: any) => {
+            console.log("The data: ", data)
+            setPageInfo({
+              pageSize: data.pageSize,
+              totalItems: data.totalItems,
+              totalPages: data.totalPages
+            })
+            setUsers(data.users)
+    
+          })
+          .catch((err: string) => {
+            console.log("ERROR: " + err)
+          })
         break
       case userViews.INSTRUCTOR:
-        dataToFetch = () => getInstructors(page)
+        getInstructors(page)
+          .then((data: any) => {
+            console.log("The data: ", data)
+            setPageInfo({
+              pageSize: data.pageSize,
+              totalItems: data.totalItems,
+              totalPages: data.totalPages
+            })
+            setUsers(data.users)
+    
+          })
+          .catch((err: string) => {
+            console.log("ERROR: " + err)
+          })
         break
       case userViews.STUDENT:
-        dataToFetch = () => getStudents(page)
+        getStudents(page)
+          .then((data: any) => {
+            console.log("The data: ", data)
+            setPageInfo({
+              pageSize: data.pageSize,
+              totalItems: data.totalItems,
+              totalPages: data.totalPages
+            })
+            setUsers(data.users)
+    
+          })
+          .catch((err: string) => {
+            console.log("ERROR: " + err)
+          })
         break
       default:
         //we end up here at least once when the page reloads.
@@ -59,21 +96,6 @@ export default function UserPage(props) {
         //exit the function. it will be called again if the current view changes
         return
     }
-
-    dataToFetch()
-      .then((data: any) => {
-        console.log("The data: ", data)
-        setPageInfo({
-          pageSize: data.pageSize,
-          totalItems: data.totalItems,
-          totalPages: data.totalPages
-        })
-        setUsers(data.users)
-
-      })
-      .catch((err: string) => {
-        console.log("ERROR: " + err)
-      })
   }
 
   useEffect(() => {

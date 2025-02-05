@@ -21,8 +21,15 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
   //this will alert the loadUser function of which endpoint to pull from
   const { currentView } = useUserViews()
   
-  const [user, setUser] = useState<IUser>(new Student(0, "", "", "", new Date(),
-    beltColors.UNKNOWN, ""))
+  const [user, setUser] = useState({
+    id: 0,
+    firstName: "",
+    lastName: "",
+    email: "",
+    dateOfBirth: new Date(),
+    beltColor: beltColors.UNKNOWN,
+    profileImgUrl: ""
+  })
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
   const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false)
 
@@ -32,29 +39,44 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
 
   const loadUser = (id: number) => {
 
-    let loadFunction = null
-
-    switch(currentView) {
-        case userViews.ADMIN:
-          loadFunction = getAdmin
-          break
-        case userViews.INSTRUCTOR:
-          loadFunction = getInstructor
-          break
-        case userViews.STUDENT:
-          loadFunction = getStudent
-          break
-        default:
-          console.error("ERROR: loadUser: " + currentView + " is not a valid view")
-          return
+    switch (currentView) {
+      case userViews.ADMIN:
+        getAdmin(id)
+          .then((data: any) => {
+            console.log("The data: ", data)
+            setUser(data)
+          })
+          .catch((err: string) => {
+            console.log("ERROR: " + err)
+          })
+        break
+      case userViews.INSTRUCTOR:
+        getInstructor(id)
+          .then((data: any) => {
+            console.log("The data: ", data)
+            setUser(data)
+        
+          })
+          .catch((err: string) => {
+            console.log("ERROR: " + err)
+          })
+        break
+      case userViews.STUDENT:
+        getStudent(id)
+          .then((data: any) => {
+            console.log("The data: ", data, data instanceof Student)
+            setUser(data)
+          })
+          .catch((err: string) => {
+            console.log("ERROR: " + err)
+          })
+        break
+      default:
+        //we end up here at least once when the page reloads.
+        console.log("invalid view: ", currentView)
+        //exit the function. it will be called again if the current view changes
+        return
     }
-
-    loadFunction(id)
-      .then((data: IUser) => {
-        // console.log(data)
-        setUser(data)
-      })
-      .catch(err => console.log("ERROR: loadUser: " + err))
   }
 
   useEffect(() => {

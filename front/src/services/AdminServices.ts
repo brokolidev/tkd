@@ -1,13 +1,22 @@
 import axios from '@/lib/axios'
 import { Admin } from '@/structures/users'
 import { buildDate } from '@/utils/dates'
-  
+
+
+export interface AdminPagination {
+    currentPage: number,
+    pageSize: number,
+    totalItems: number,
+    totalPages: number,
+    users: Admin[]
+}
+
 export async function getAdmin(id: number): Promise<Admin> {
     return axios.get(`admin/${id}`)
         .then((res) => ensureValidTypes([res.data])[0])
 }
   
-export async function getAdmins(page: number) : Promise<Admin[]> {
+export async function getAdmins(page: number) : Promise<AdminPagination> {
     //get all admins in the system. for right now, return a promise of fake data.
 
     return axios.get(`admin?pageNumber=${page}`)

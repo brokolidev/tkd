@@ -16,11 +16,13 @@ namespace taekwondo_backend.Controllers
     {
         private readonly AppDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
 
-        public StudentController(AppDbContext context, UserManager<User> userManager)
+        public StudentController(AppDbContext context, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _context = context;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
 
@@ -41,7 +43,30 @@ namespace taekwondo_backend.Controllers
             }
 
             // Get all users with the "Student" role
-            var allStudents = await _userManager.GetUsersInRoleAsync(UserRoles.Student.ToString());
+            var allStudents = (await _userManager.GetUsersInRoleAsync(UserRoles.Student.ToString()))
+                .AsEnumerable()
+                .Select(async user => {
+
+                    //find the first item that is a user role
+                    List<string> userRoles = [.. Enum.GetNames<UserRoles>()];
+                    string role = (await _userManager.GetRolesAsync(user)).First(item => userRoles.Contains(item));
+
+                    _ = Enum.TryParse(role, out UserRoles userRole); //deal with the error if there is on the FE.
+
+
+
+                    return new UserFEDTO
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName ?? "",
+                        LastName = user.LastName ?? "",
+                        DateOfBirth = user.DateOfBirth,
+                        Email = user.Email ?? "",
+                        BeltColor = user.BeltColor,
+                        Role = userRole
+                    };
+                })
+                .OrderBy(s => s.Id);
 
             // If there are no students, return 204 No Content
             if (!allStudents.Any())
@@ -50,7 +75,7 @@ namespace taekwondo_backend.Controllers
             }
 
             // Get the students for the requested page order by ID
-            var pagedStudents = PagedList<User>.Create(allStudents.OrderBy(s => s.Id), pageNumber, pageSize);
+            var pagedStudents = PagedList<UserFEDTO>.Create(allStudents, pageNumber, pageSize);
 
             // Create the response with page details and student data
             var response = new
