@@ -7,6 +7,9 @@ import { DescriptionDetails, DescriptionList, DescriptionTerm } from '@/componen
 import { Divider } from '@/components/divider'
 import { Heading, Subheading } from '@/components/heading'
 import { Link } from '@/components/link'
+import { userViews, useUserViews } from '@/hooks/userViews'
+import { getAdmin } from '@/services/AdminServices'
+import { getInstructor } from '@/services/InstructorServices'
 import { getStudent } from '@/services/StudentServices'
 import { deleteUser } from '@/services/UserServices'
 import { beltColors, IUser, Student } from '@/structures/users'
@@ -15,9 +18,13 @@ import { notFound } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function UserPage({ params }: { params: Promise<{ id: string }> }) {
-  const [user, setUser] = useState<IUser>(new Student(0, "", "", "", new Date(), beltColors.UNKNOWN,
-    ""))
+  //this will alert the loadUser function of which endpoint to pull from
+  const { currentView } = useUserViews()
+  
+  const [user, setUser] = useState<IUser>(new Student(0, "", "", "", new Date(),
+    beltColors.UNKNOWN, ""))
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
+  const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false)
 
   const getId = () => {
     return params.then(data => parseInt(data.id))
@@ -25,10 +32,25 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
 
   const loadUser = (id: number) => {
 
-    //this will use the userViews hook to determine where to pull the user from
+    let loadFunction: (id: number) => Promise<IUser> = null
 
-    getStudent(id)
-      .then(data => {
+    switch(currentView) {
+        case userViews.ADMIN:
+          loadFunction = getAdmin
+          break
+        case userViews.INSTRUCTOR:
+          loadFunction = getInstructor
+          break
+        case userViews.STUDENT:
+          loadFunction = getStudent
+          break
+        default:
+          console.error("ERROR: loadUser: " + currentView + " is not a valid view")
+          return
+    }
+
+    loadFunction(id)
+      .then((data: IUser) => {
         // console.log(data)
         setUser(data)
       })
@@ -84,6 +106,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
     deleteUser(user.id)
         .then(r => {
             console.log("user " + user.id + " deleted successfully")
+            setShowDeleteSuccessAlert(true)
         })
         .catch(err => {
             console.log("ERROR: deleteCurrentUser: " + err)
@@ -100,6 +123,8 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
   return (
     <>
       {/* ALERTS */}
+
+      {/* Confirm Delete */}
       <Alert open={showDeleteAlert} onClose={setShowDeleteAlert}>
           <AlertTitle>Warning</AlertTitle>
           <AlertDescription>
@@ -109,6 +134,18 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
           <AlertActions>
             <Button onClick={deleteCurrentUser}>Delete User</Button>
             <Button onClick={() => setShowDeleteAlert(false)}>Cancel Deletion</Button>
+          </AlertActions>
+      </Alert>
+      
+      {/* Delete Success */}
+      <Alert open={showDeleteSuccessAlert} onClose={setShowDeleteSuccessAlert}>
+          <AlertTitle>Delete Success</AlertTitle>
+          <AlertDescription>
+            {user.firstName + " " + user.lastName} has been deleted
+          </AlertDescription>
+          <AlertActions>
+            {/* this won't need to close anything, as the user is directed to a different screen */}
+            <Button onClick={() => location.pathname = "/users"}>Return To Users Screen</Button>
           </AlertActions>
       </Alert>
 
@@ -149,12 +186,12 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
           <DescriptionTerm>Email</DescriptionTerm>
           <DescriptionDetails>{user?.email ?? ""}</DescriptionDetails>
           <DescriptionTerm>Date of Birth</DescriptionTerm>
-          <DescriptionDetails>{user?.dateOfBirth.toDateString() ?? ""}</DescriptionDetails>
+          <DescriptionDetails>{user?.dateOfBirth?.toDateString() ?? ""}</DescriptionDetails>
           <DescriptionTerm>Belt Color</DescriptionTerm>
           <DescriptionDetails>
             {
               user instanceof Student &&
-              beltColors[user?.beltColor ?? beltColors.UNKNOWN].toLowerCase()
+              beltColors[user?.beltColor ?? beltColors.UNKNOWN]?.toLowerCase()
             }
           </DescriptionDetails>
           <DescriptionTerm>Payment Status</DescriptionTerm>
