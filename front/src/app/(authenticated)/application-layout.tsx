@@ -148,7 +148,7 @@ export function ApplicationLayout({
                 <UsersIcon />
                 <SidebarLabel>Users</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="#">
+              <SidebarItem href="/schedules">
                 <CalendarDaysIcon />
                 <SidebarLabel>Schedules</SidebarLabel>
               </SidebarItem>
