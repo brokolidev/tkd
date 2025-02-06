@@ -43,11 +43,11 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="mx-auto h-screen max-w-screen-sm bg-black px-6 pt-12 lg:mt-24 lg:bg-zinc-100 lg:pt-2">
-        <div className="mx-auto flex h-36 w-36 justify-center lg:rounded-full lg:bg-black">
+      <div className="mx-auto h-screen max-w-screen-sm bg-black px-6 pt-12 lg:mt-24 bg-zinc-100 lg:pt-2">
+        <div className="mx-auto flex h-36 w-36 justify-center rounded-full bg-black">
           <Image src="/logo.svg" width={100} height={77.24} alt="Picture of the author" />
         </div>
-        <div className="mt-2 w-full overflow-hidden rounded-lg bg-white p-8 shadow lg:mt-12 lg:p-16">
+        <div className="mt-8 w-full overflow-hidden rounded-lg bg-white p-8 shadow lg:mt-12 lg:p-16">
           <form action={submitForm}>
             <Fieldset>
               <Heading className="text-lg">Sign in</Heading>
