@@ -23,7 +23,7 @@ namespace taekwondo_backend.Models
             Level = "";
             StudentIds = [];
             Instructors = [];
-            IsOpen = false;
+            IsOpen = IsOpen;
         }
     }
 }

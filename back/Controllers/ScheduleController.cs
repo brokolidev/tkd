@@ -22,10 +22,20 @@ namespace taekwondo_backend.Controllers
 
         // GET: /schedule
         [HttpGet]
-        public ActionResult<IEnumerable<GetSchedulesDTO>> GetSchedules(int pageIndex = 1, int pageSize = 30)
+        public ActionResult<IEnumerable<GetSchedulesDTO>> GetSchedules(
+            int pageIndex = 1, 
+            int pageSize = 30, 
+            bool openOnly = true
+            )
         {
-            var schedules = _context.Schedules
-                .Where(s => s.IsOpen)
+            var schedulesQuery = _context.Schedules.AsQueryable();
+
+            if (openOnly)
+            {
+                schedulesQuery = schedulesQuery.Where(s => s.IsOpen);
+            }
+            
+            var schedules = schedulesQuery
                 .Select(s => new GetSchedulesDTO
                 {
                     Id = s.Id,
@@ -33,7 +43,8 @@ namespace taekwondo_backend.Controllers
                     StudentIds = s.Students.Select(st => st.Id).ToList(),
                     Instructors = s.Instructors,
                     DayOfWeek = s.Day,
-                    Level = s.Level
+                    Level = s.Level,
+                    IsOpen = s.IsOpen,
                 });
             
             var pagedSchedules = PagedList<GetSchedulesDTO>.Create(schedules, pageIndex, pageSize);
@@ -41,62 +52,62 @@ namespace taekwondo_backend.Controllers
             return Ok(pagedSchedules);
         }
 
-        // GET: schedule/5
-        [HttpGet("{id}")]
-        public ActionResult<GetSchedulesDTO> GetSchedule(int id)
-        {
-            var schedule = _context.Schedules
-                .Where(s => s.Id == id)
-                .Select(s => new GetSchedulesDTO
-                {
-                    Id = s.Id,
-                    TimeSlot = s.TimeSlot,
-                    StudentIds = s.Students.Select(st => st.Id).ToList(),
-                    Instructors = s.Instructors,
-                    DayOfWeek = s.Day,
-                    Level = s.Level
-                }).FirstOrDefault();
-
-            if (schedule == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(schedule);
-        }
+        // // GET: schedule/5
+        // [HttpGet("/{id}")]
+        // public ActionResult<GetSchedulesDTO> GetSchedule(int id)
+        // {
+        //     var schedule = _context.Schedules
+        //         .Where(s => s.Id == id)
+        //         .Select(s => new GetSchedulesDTO
+        //         {
+        //             Id = s.Id,
+        //             TimeSlot = s.TimeSlot,
+        //             StudentIds = s.Students.Select(st => st.Id).ToList(),
+        //             Instructors = s.Instructors,
+        //             DayOfWeek = s.Day,
+        //             Level = s.Level
+        //         }).FirstOrDefault();
+        //
+        //     if (schedule == null)
+        //     {
+        //         return NotFound();
+        //     }
+        //
+        //     return Ok(schedule);
+        // }
 
         // POST: schedule
-        [HttpPost]
-        public ActionResult<Schedule> CreateSchedule(GetSchedulesDTO scheduleDTO)
-        {
-            // Map DTO to Schedule model
-            var students = _context.Users.Where(u => scheduleDTO.StudentIds.Contains(u.Id)).ToList();
-            var instructors = scheduleDTO.Instructors;
-
-            // Ensure students and instructors are valid and not empty
-            if (students == null || students.Count == 0 || instructors == null || instructors.Count == 0)
-            {
-                return BadRequest(new[] { "At least one student and one instructor must be assigned." });
-            }
-
-            if (scheduleDTO.TimeSlot == null)
-            {
-                return BadRequest(new[] { "TimeSlot cannot be null." });
-            }
-
-            // Initialize Schedule with Instructors and Students explicitly
-            var schedule = new Schedule
-            {
-                TimeSlot = scheduleDTO.TimeSlot,
-                Students = students,
-                Instructors = instructors
-            };
-
-            _context.Schedules.Add(schedule);
-            _context.SaveChanges();
-
-            return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, schedule);
-        }
+        // [HttpPost]
+        // public ActionResult<Schedule> CreateSchedule(GetSchedulesDTO scheduleDTO)
+        // {
+        //     // Map DTO to Schedule model
+        //     var students = _context.Users.Where(u => scheduleDTO.StudentIds.Contains(u.Id)).ToList();
+        //     var instructors = scheduleDTO.Instructors;
+        //
+        //     // Ensure students and instructors are valid and not empty
+        //     if (students == null || students.Count == 0 || instructors == null || instructors.Count == 0)
+        //     {
+        //         return BadRequest(new[] { "At least one student and one instructor must be assigned." });
+        //     }
+        //
+        //     if (scheduleDTO.TimeSlot == null)
+        //     {
+        //         return BadRequest(new[] { "TimeSlot cannot be null." });
+        //     }
+        //
+        //     // Initialize Schedule with Instructors and Students explicitly
+        //     var schedule = new Schedule
+        //     {
+        //         TimeSlot = scheduleDTO.TimeSlot,
+        //         Students = students,
+        //         Instructors = instructors
+        //     };
+        //
+        //     _context.Schedules.Add(schedule);
+        //     _context.SaveChanges();
+        //
+        //     return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, schedule);
+        // }
 
         // PUT: schedule/5
         [HttpPut("{id}")]
