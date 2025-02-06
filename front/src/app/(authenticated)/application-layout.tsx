@@ -48,6 +48,7 @@ import { redirect, usePathname } from 'next/navigation'
 const logout = async () => {
   localStorage.removeItem('tkd-access-token')
   await setCookie('tkd-access-token', '')
+  await setCookie('tkd-user-role', '')
 
   redirect('/login')
 }

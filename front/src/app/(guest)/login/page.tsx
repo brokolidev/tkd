@@ -28,18 +28,8 @@ export default function LoginPage() {
       .then(() => {
         axios.get('/user')
           .then((res) => {
-
             setCookie('tkd-user-role', res.data.role);
-            
-            switch (res.data.role) {
-              case 'Admin':
-              case 'Instructor':
-                router.push('/')
-                break
-              case 'Student':
-                router.push('/student')
-                break
-            }
+            router.refresh()
           })
       })
       .catch((err) => {

@@ -4,12 +4,21 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   const accessToken = await getCookie('tkd-access-token')
+  const userRole = await getCookie('tkd-user-role')
+  console.log(userRole)
   // const refreshToken = await getCookie('tkd-refresh-token');
   const { pathname } = request.nextUrl
 
   if (pathname === '/login') {
     if (accessToken) {
-      return NextResponse.redirect(new URL('/', request.url))
+      
+      if (userRole === 'Admin' || userRole === 'Instructor') {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+
+      if (userRole === 'Student') {
+        return NextResponse.redirect(new URL('/student', request.url))
+      }
     }
 
     return NextResponse.next()
@@ -19,7 +28,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
   
-  const userRole = await getCookie('tkd-user-role');
+  
   
 
   axios.interceptors.request.use((config) => {
