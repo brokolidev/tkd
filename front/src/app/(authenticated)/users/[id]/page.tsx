@@ -43,7 +43,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
       case userViews.ADMIN:
         getAdmin(id)
           .then((data: any) => {
-            console.log("The data: ", data)
+            console.log("The data 1: ", data)
             setUser(data)
           })
           .catch((err: string) => {
@@ -53,7 +53,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
       case userViews.INSTRUCTOR:
         getInstructor(id)
           .then((data: any) => {
-            console.log("The data: ", data)
+            console.log("The data 2: ", data)
             setUser(data)
         
           })
@@ -64,7 +64,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
       case userViews.STUDENT:
         getStudent(id)
           .then((data: any) => {
-            console.log("The data: ", data, data instanceof Student)
+            console.log("The data 3: ", data)
             setUser(data)
           })
           .catch((err: string) => {

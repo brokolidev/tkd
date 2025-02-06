@@ -41,23 +41,34 @@ namespace taekwondo_backend.Controllers
             }
 
             // Get all users with the "Admin" role
-            var allAdmins = await _userManager.GetUsersInRoleAsync(UserRoles.Admin.ToString());
+            var allAdmins = (await _userManager.GetUsersInRoleAsync(UserRoles.Admin.ToString()))
+                .Select(user => new UserFEDTO
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName ?? "",
+                        LastName = user.LastName ?? "",
+                        DateOfBirth = user.DateOfBirth,
+                        Email = user.Email ?? "",
+                        BeltColor = null,
+                        Role = UserRoles.Admin
+                    }
+                );
 
-            // If there are no admins, return 204 No Content
+            // If there are no students, return 204 No Content
             if (!allAdmins.Any())
             {
                 return NoContent();
             }
 
-            // Get the admins for the requested page order by ID
-            var pagedAdmins = PagedList<User>.Create(allAdmins.OrderBy(s => s.Id), pageNumber, pageSize);
+            // Get the students for the requested page order by ID
+            var pagedAdmins = PagedList<UserFEDTO>.Create(allAdmins, pageNumber, pageSize);
 
-            // Create the response with page details and admin data
+            // Create the response with page details and student data
             var response = new
             {
                 pagedAdmins.CurrentPage, // Current page number requested by user
-                pagedAdmins.PageSize, // Number of admins per page
-                pagedAdmins.TotalItems, // Total number of admins
+                pagedAdmins.PageSize, // Number of students per page
+                pagedAdmins.TotalItems, // Total number of students
                 pagedAdmins.TotalPages, // Total number of pages (by pagesize)
                 Users = pagedAdmins,
             };
@@ -76,20 +87,30 @@ namespace taekwondo_backend.Controllers
         [Authorize]
         public async Task<IActionResult> GetAdminById(int id)
         {
-            // Find the admin with the given ID and role "Admin"
-            User? admin = await _context.Users
-                .Where(user => user.Id == id)
-                .FirstOrDefaultAsync();
+            // Find the student with the given ID and role "Student"
+            User? admin = await _userManager.FindByIdAsync(id.ToString());
 
-            // Check if the admin exists
+            // Check if the student exists
             if (admin == null)
             {
-                // No admin found, return 204 No Content (-1 is the defualt for id above)
+                // No student found, return 204 No Content (-1 is the defualt for id above)
                 return NoContent();
             }
 
-            // Admin found, return the data with 200 OK
-            return Ok(admin);
+            //map the user to a UserFEDTO
+            UserFEDTO user = new()
+            {
+                Id = id,
+                FirstName = admin.FirstName ?? "",
+                LastName = admin.LastName ?? "",
+                Email = admin.Email ?? "",
+                BeltColor = admin.BeltColor,
+                DateOfBirth = admin.DateOfBirth,
+                Role = UserRoles.Admin
+            };
+
+            // Student found, return the data with 200 OK
+            return Ok(user);
         }
 
         [HttpPost]

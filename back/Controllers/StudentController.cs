@@ -44,18 +44,7 @@ namespace taekwondo_backend.Controllers
 
             // Get all users with the "Student" role
             var allStudents = (await _userManager.GetUsersInRoleAsync(UserRoles.Student.ToString()))
-                .AsEnumerable()
-                .Select(async user => {
-
-                    //find the first item that is a user role
-                    List<string> userRoles = [.. Enum.GetNames<UserRoles>()];
-                    string role = (await _userManager.GetRolesAsync(user)).First(item => userRoles.Contains(item));
-
-                    _ = Enum.TryParse(role, out UserRoles userRole); //deal with the error if there is on the FE.
-
-
-
-                    return new UserFEDTO
+                .Select(user => new UserFEDTO
                     {
                         Id = user.Id,
                         FirstName = user.FirstName ?? "",
@@ -63,10 +52,9 @@ namespace taekwondo_backend.Controllers
                         DateOfBirth = user.DateOfBirth,
                         Email = user.Email ?? "",
                         BeltColor = user.BeltColor,
-                        Role = userRole
-                    };
-                })
-                .OrderBy(s => s.Id);
+                        Role = UserRoles.Student
+                    }
+                );
 
             // If there are no students, return 204 No Content
             if (!allStudents.Any())
@@ -102,9 +90,7 @@ namespace taekwondo_backend.Controllers
         public async Task<IActionResult> GetStudentById(int id)
         {
             // Find the student with the given ID and role "Student"
-            User? student = await _context.Users
-                .Where(user => user.Id == id)
-                .FirstOrDefaultAsync();
+            User? student = await _userManager.FindByIdAsync(id.ToString());
 
             // Check if the student exists
             if (student == null)
@@ -113,8 +99,20 @@ namespace taekwondo_backend.Controllers
                 return NoContent();
             }
 
+            //map the user to a UserFEDTO
+            UserFEDTO user = new()
+            {
+                Id = id,
+                FirstName = student.FirstName ?? "",
+                LastName = student.LastName ?? "",
+                Email = student.Email ?? "",
+                BeltColor = student.BeltColor,
+                DateOfBirth = student.DateOfBirth,
+                Role = UserRoles.Student
+            };
+
             // Student found, return the data with 200 OK
-            return Ok(student);
+            return Ok(user);
         }
 
         [HttpPost]
