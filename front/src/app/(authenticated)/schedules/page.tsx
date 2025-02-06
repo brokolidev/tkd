@@ -16,22 +16,17 @@ import {
 import { Link } from "@/components/link";
 
 function Schedules() {
-  const [schedules, setSchedules] = useState<ISchedule[]>([]);
+  const [schedules, setSchedules] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 6;
 
-  useEffect(() => {
-    const fetchSchedules = async () => {
-      try {
-        const data = await getSchedules();
-        setSchedules(data);
-      } catch {
-        console.warn("Falling back to mock schedules.");
-        setSchedules(mockSchedules);
-      }
-    };
+  async function loadSchedules(): Promise<void> {
+    const schedules = await getSchedules();
+    setSchedules(schedules);
+  }
 
-    fetchSchedules();
+  useEffect(() => {
+    loadSchedules();
   }, []);
 
   const totalPages = Math.ceil(schedules.length / ITEMS_PER_PAGE);
@@ -49,8 +44,8 @@ function Schedules() {
   const getPageHref = (page: number) => (page >= 1 && page <= totalPages ? `?page=${page}` : undefined);
 
   return (
-    <div className="p-8 space-y-10">
-      <div className="flex justify-between items-center">
+    <div className="space-y-10 p-8">
+      <div className="flex items-center justify-between">
         <Heading className="text-xl font-bold">Schedules</Heading>
         <Button className="flex items-center gap-2 bg-black">
           <Link href="/schedules/create" className="inline-flex items-center gap-2 text-sm/6 text-white">
@@ -64,16 +59,21 @@ function Schedules() {
       <div>
         {paginatedSchedules.map((item) => (
           <div key={item.id}>
-            <div className="flex items-center mb-8">
+            <div className="mb-8 flex items-center">
               <img
-                src={item.imageUrl}
-                alt={`${item.className} thumbnail`}
-                className="w-[128px] h-[85.33px] rounded object-cover mr-4"
+                src={item && item.levelImageUrl}
+                alt={`${item.level} thumbnail`}
+                className="mr-4 h-[85.33px] w-[128px] rounded object-cover"
               />
               <div className="flex-1">
-                <h2 className="text-lg font-semibold">{item.className}</h2>
-                <p className="text-sm mt-2">{item.description}</p>
-                <p className="text-sm text-gray-600 mt-1">{item.seatsLeft} seats left</p>
+                <h2 className="text-lg font-semibold">{item.level}</h2>
+                <p className="mt-2 text-sm">
+                  {item.dayOfWeekString} {item.timeSlot.startsAt} ~ {item.timeSlot.endsAt}
+                </p>
+                <p className="mt-2 text-sm">
+                  Main Instructor : {item.mainInstructorName}
+                </p>
+                <p className="mt-1 text-sm text-gray-600">{item.classSize} Students in this class</p>
               </div>
               <div className="flex items-center space-x-4">
                 <Button
@@ -84,11 +84,11 @@ function Schedules() {
                       )
                     )
                   }
-                  className={`px-3 py-1 text-sm ${item.isOpen ? "bg-green-200 text-green-500" : "bg-red-200 text-red-500"}`}
+                  className={`px-3 py-1 text-sm ${item.isOpen ? 'bg-green-200 text-green-500' : 'bg-red-200 text-red-500'}`}
                 >
-                  {item.isOpen ? "Open" : "Closed"}
+                  {item.isOpen ? 'Open' : 'Closed'}
                 </Button>
-                <Button className="px-3 py-1 text-sm bg-blue-500 text-white">
+                <Button className="bg-blue-500 px-3 py-1 text-sm text-white">
                   <Link href="/schedules/edit" className="inline-flex items-center gap-2 text-sm/6 text-white">
                     Edit
                   </Link>
@@ -101,7 +101,7 @@ function Schedules() {
       </div>
 
       {/* PAGINATION COMPONENT */}
-      <Pagination className="flex justify-center items-center space-x-2">
+      <Pagination className="flex items-center justify-center space-x-2">
         {/* Previous Button */}
         <button onClick={(e) => handlePageClick(currentPage - 1, e)} disabled={currentPage === 1}>
           <PaginationPrevious href={getPageHref(currentPage - 1)}>Previous</PaginationPrevious>
@@ -124,7 +124,7 @@ function Schedules() {
         </button>
       </Pagination>
     </div>
-  );
+  )
 }
 
 export default Schedules;

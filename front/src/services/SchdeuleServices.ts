@@ -3,13 +3,24 @@ import { ISchedule } from '@/structures/schedule';
 
 
 
-export async function getSchedules(): Promise<ISchedule[]> {
+// export async function getSchedules(): Promise<ISchedule[]> {
+//     try {
+//         const response = await axios.get('/api/schedule');
+//         return response.data.data;
+//     } catch (error) {
+//         console.error('Error fetching schedules:', error);
+//         throw error;
+//     }
+// }
+
+
+export async function getSchedules() {
     try {
-        const response = await axios.get('/api/schedule');
-        return response.data.data;
-    } catch (error) {
-        console.error('Error fetching schedules:', error);
-        throw error;
+        const response = await axios.get('/schedule')
+        return response.data;
+    } catch (e) {
+        console.error('Error fetching schedules:', e);
+        throw e;
     }
 }
 
