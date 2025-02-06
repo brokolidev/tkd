@@ -1,10 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Runtime.Intrinsics.X86;
+using Microsoft.AspNetCore.Mvc;
 using taekwondo_backend.Data;
 using taekwondo_backend.Models;
+using Microsoft.AspNetCore.Authorization;
+using taekwondo_backend.Enums;
+
 
 namespace taekwondo_backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
+    [Authorize(Roles = nameof(UserRoles.Admin) + "," + nameof(UserRoles.Instructor))]
     [ApiController]
     public class ScheduleController : ControllerBase
     {
@@ -17,32 +22,38 @@ namespace taekwondo_backend.Controllers
 
         // GET: api/schedule
         [HttpGet]
-        public ActionResult<IEnumerable<ScheduleControllerDTO>> GetSchedules()
+        public ActionResult<IEnumerable<GetSchedulesDTO>> GetSchedules(int pageIndex = 1, int pageSize = 30)
         {
             var schedules = _context.Schedules
-                .Select(s => new ScheduleControllerDTO
+                .Select(s => new GetSchedulesDTO
                 {
                     Id = s.Id,
                     TimeSlot = s.TimeSlot,
                     StudentIds = s.Students.Select(st => st.Id).ToList(),
-                    InstructorIds = s.Instructors.Select(inst => inst.Id).ToList()
-                }).ToList();
-
-            return Ok(schedules);
+                    Instructors = s.Instructors,
+                    DayOfWeek = s.Day,
+                    Level = s.Level
+                });
+            
+            var pagedSchedules = PagedList<GetSchedulesDTO>.Create(schedules, pageIndex, pageSize);
+            
+            return Ok(pagedSchedules);
         }
 
         // GET: api/schedule/5
         [HttpGet("{id}")]
-        public ActionResult<ScheduleControllerDTO> GetSchedule(int id)
+        public ActionResult<GetSchedulesDTO> GetSchedule(int id)
         {
             var schedule = _context.Schedules
                 .Where(s => s.Id == id)
-                .Select(s => new ScheduleControllerDTO
+                .Select(s => new GetSchedulesDTO
                 {
                     Id = s.Id,
                     TimeSlot = s.TimeSlot,
                     StudentIds = s.Students.Select(st => st.Id).ToList(),
-                    InstructorIds = s.Instructors.Select(inst => inst.Id).ToList()
+                    Instructors = s.Instructors,
+                    DayOfWeek = s.Day,
+                    Level = s.Level
                 }).FirstOrDefault();
 
             if (schedule == null)
@@ -55,11 +66,11 @@ namespace taekwondo_backend.Controllers
 
         // POST: api/schedule
         [HttpPost]
-        public ActionResult<Schedule> CreateSchedule(ScheduleControllerDTO scheduleDTO)
+        public ActionResult<Schedule> CreateSchedule(GetSchedulesDTO scheduleDTO)
         {
             // Map DTO to Schedule model
             var students = _context.Users.Where(u => scheduleDTO.StudentIds.Contains(u.Id)).ToList();
-            var instructors = _context.Users.Where(u => scheduleDTO.InstructorIds.Contains(u.Id)).ToList();
+            var instructors = scheduleDTO.Instructors;
 
             // Ensure students and instructors are valid and not empty
             if (students == null || students.Count == 0 || instructors == null || instructors.Count == 0)
@@ -88,7 +99,7 @@ namespace taekwondo_backend.Controllers
 
         // PUT: api/schedule/5
         [HttpPut("{id}")]
-        public ActionResult UpdateSchedule(int id, ScheduleControllerDTO scheduleDTO)
+        public ActionResult UpdateSchedule(int id, GetSchedulesDTO scheduleDTO)
         {
             var schedule = _context.Schedules.FirstOrDefault(s => s.Id == id);
             if (schedule == null)
@@ -108,7 +119,7 @@ namespace taekwondo_backend.Controllers
 
             // Ensure instructors and students are properly assigned (non-null and valid)
             var students = _context.Users.Where(u => scheduleDTO.StudentIds.Contains(u.Id)).ToList();
-            var instructors = _context.Users.Where(u => scheduleDTO.InstructorIds.Contains(u.Id)).ToList();
+            var instructors = scheduleDTO.Instructors;
 
             // Ensure that Instructors and Students lists are not null or empty
             if (students == null || instructors == null || students.Count == 0 || instructors.Count == 0)

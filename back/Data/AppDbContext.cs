@@ -46,7 +46,7 @@ namespace taekwondo_backend.Data
                 );
             
             
-            // set auto increment
+            // TimeSlots
             modelBuilder.Entity<TimeSlot>()
                 .Property(t => t.Id)
                 .UseIdentityColumn();  
@@ -63,10 +63,20 @@ namespace taekwondo_backend.Data
                 .Property(t => t.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .ValueGeneratedOnAdd();
+            
+            
+            // Schedules
+            modelBuilder.Entity<Schedule>()
+                .Property(t => t.Id)
+                .UseIdentityColumn();  
+            
+            modelBuilder.Entity<Schedule>()
+                .Property(t => t.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .ValueGeneratedOnAdd();
         }
 
         public required DbSet<TimeSlot> TimeSlots { get; set; }
         public required DbSet<Schedule> Schedules { get; set; }
-        
     }
 }

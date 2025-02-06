@@ -1,13 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using taekwondo_backend.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
 using taekwondo_backend.Services;
 using taekwondo_backend.Data;
 using taekwondo_backend.Models.Identity;
-using taekwondo_backend.Enums;
 using taekwondo_backend.Seeder;
 
 namespace taekwondo_backend
@@ -81,11 +78,11 @@ namespace taekwondo_backend
             }
 
             app.MapIdentityApi<User>();
-            
+
             app.UseHttpsRedirection();
 
             app.UseCors();
-            
+
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -100,7 +97,7 @@ namespace taekwondo_backend
                 Console.WriteLine(app.Environment.IsDevelopment());
 
                 // Uncomment this if you need to generate some seed data
-                //if (app.Environment.IsDevelopment())
+                // if (app.Environment.IsDevelopment())
                 // {
                 //     await seeder.TestSeed();
                 // }

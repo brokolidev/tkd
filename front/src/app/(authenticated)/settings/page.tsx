@@ -4,9 +4,7 @@ import { Divider } from '@/components/divider'
 import { Label } from '@/components/fieldset'
 import { Heading, Subheading } from '@/components/heading'
 import { Input } from '@/components/input'
-import { Select } from '@/components/select'
 import { Text } from '@/components/text'
-import { Textarea } from '@/components/textarea'
 import type { Metadata } from 'next'
 import { Address } from './address'
 
@@ -26,10 +24,11 @@ export default function Settings() {
           <Text>This will be displayed on your public profile.</Text>
         </div>
         <div>
-          <Input aria-label="Organization Name" name="name" defaultValue="Catalyst" />
+          <Input aria-label="Organization Name" name="name" defaultValue="Taekwondoon" />
         </div>
       </section>
 
+      {/* 
       <Divider className="my-10" soft />
 
       <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
@@ -40,7 +39,7 @@ export default function Settings() {
         <div>
           <Textarea aria-label="Organization Bio" name="bio" />
         </div>
-      </section>
+      </section> */}
 
       <Divider className="my-10" soft />
 
@@ -50,7 +49,7 @@ export default function Settings() {
           <Text>This is how customers can contact you for support.</Text>
         </div>
         <div className="space-y-4">
-          <Input type="email" aria-label="Organization Email" name="email" defaultValue="info@example.com" />
+          <Input type="email" aria-label="Organization Email" name="email" defaultValue="taekwondoon_yyc@gmail.com" />
           <CheckboxField>
             <Checkbox name="email_is_public" defaultChecked />
             <Label>Show email on public profile</Label>
@@ -72,14 +71,35 @@ export default function Settings() {
 
       <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
         <div className="space-y-1">
-          <Subheading>Currency</Subheading>
-          <Text>The currency that your organization will be collecting.</Text>
+          <Subheading>Maximum class size</Subheading>
+          <Text>The maximum number of students allowed in a single class.</Text>
         </div>
-        <div>
-          <Select aria-label="Currency" name="currency" defaultValue="cad">
-            <option value="cad">CAD - Canadian Dollar</option>
-            <option value="usd">USD - United States Dollar</option>
-          </Select>
+        <div className="space-y-4">
+          <Input type="number" aria-label="Maximum Class Size" name="maximum_class_size" defaultValue={30} />
+        </div>
+      </section>
+
+      <Divider className="my-10" soft />
+
+      <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+        <div className="space-y-1">
+          <Subheading>Absent alerts (count)</Subheading>
+          <Text>The number of missed classes before sending an alert.</Text>
+        </div>
+        <div className="space-y-4">
+          <Input type="number" aria-label="Absent alerts" name="absent_alerts" defaultValue={3} />
+        </div>
+      </section>
+
+      <Divider className="my-10" soft />
+
+      <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+        <div className="space-y-1">
+          <Subheading>Payment alerts (days)</Subheading>
+          <Text>The number of days before payment is due when an alert sends.</Text>
+        </div>
+        <div className="space-y-4">
+          <Input type="number" aria-label="Payment alerts" name="payment_alerts" defaultValue={7} />
         </div>
       </section>
 

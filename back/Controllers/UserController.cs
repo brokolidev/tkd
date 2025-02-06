@@ -17,10 +17,10 @@ namespace taekwondo_backend.Controllers
 		private readonly UserManager<User> _userManager;
 		private readonly RoleManager<Role> _roleManager;
 		private readonly IConfiguration _config;
-		
+
 		public UserController(
-			AppDbContext context, 
-			UserManager<User> userManager, 
+			AppDbContext context,
+			UserManager<User> userManager,
 			IConfiguration config,
 			RoleManager<Role> roleManager)
 		{
@@ -34,28 +34,40 @@ namespace taekwondo_backend.Controllers
 		[Authorize]
 		public IActionResult Get()
 		{
-			
+
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
 			if (userId == null)
 				return NotFound();
-			
+
 			// get user with user id
 			var user = _userManager.FindByIdAsync(userId).GetAwaiter().GetResult();
-			
+
 			if (user == null)
 				return NotFound();
-			
+
 			return Ok(new LoggedInUserDTO
 			{
 				Id = user.Id,
 				Email = user.Email ?? string.Empty,
-				DateOfBirth = user.DateOfBirth ?? DateOnly.MinValue, 
+				DateOfBirth = user.DateOfBirth ?? DateOnly.MinValue,
 				FirstName = user.FirstName ?? string.Empty,
 				LastName = user.LastName ?? string.Empty,
 				BeltColor = user.BeltColor ?? BeltColorType.White,
 				ProfileImage = user.ProfileImage ?? "https://i.pravatar.cc/300",
 			});
+		}
+
+		[HttpGet]
+		[Route("counts")]
+		[Authorize]
+		public IActionResult GetCounts()
+		{
+			var studentCount = _userManager.GetUsersInRoleAsync(UserRoles.Student.ToString()).Result.Count;
+			var instructorCount = _userManager.GetUsersInRoleAsync(UserRoles.Instructor.ToString()).Result.Count;
+			var counts = new List<int> { studentCount, instructorCount };
+
+			return Ok(counts);
 		}
 	}
 }
