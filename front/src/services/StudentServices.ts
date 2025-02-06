@@ -1,21 +1,13 @@
 import axios from '@/lib/axios'
-import { Student } from '@/structures/users'
+import { IUser, UserPagination } from '@/structures/users'
 import { buildDate } from '@/utils/dates'
 
-export interface StudentPagination {
-    currentPage: number,
-    pageSize: number,
-    totalItems: number,
-    totalPages: number,
-    users: Student[]
-}
-
-export async function getStudent(id: number): Promise<Student> {
+export async function getStudent(id: number): Promise<IUser> {
     return axios.get(`student/${id}`)
         .then((res) => ensureValidTypes([res.data])[0])
 }
   
-export async function getStudents(page: number) : Promise<StudentPagination> {
+export async function getStudents(page: number) : Promise<UserPagination> {
     //get all students in the system. for right now, return a promise of fake data.
 
     return axios.get(`student?pageNumber=${page}`)
@@ -23,14 +15,14 @@ export async function getStudents(page: number) : Promise<StudentPagination> {
             console.log(res.data)
 
             //perform a few operations on the data to ensure it matches with the types needed
-            const students: Student[] = ensureValidTypes(res.data.users)
+            const students: IUser[] = ensureValidTypes(res.data.users)
 
             //return the list of students
             return {users: students, ...res.data}
         })
 }
 
-const ensureValidTypes = (students: Student[]) => {
+const ensureValidTypes = (students: IUser[]) => {
     
     //ensure we're not altering the original array
     const studentsArray = [...students]

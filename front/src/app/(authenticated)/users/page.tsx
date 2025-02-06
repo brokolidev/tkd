@@ -11,7 +11,7 @@ import { userViews, useUserViews } from '@/hooks/userViews'
 import { getAdmins } from '@/services/AdminServices'
 import { getInstructors } from '@/services/InstructorServices'
 import { getStudents } from '@/services/StudentServices'
-import { beltColors, IUser, Student } from '@/structures/users'
+import { beltColors, IUser, UserPagination } from '@/structures/users'
 
 // @ts-ignore
 import { use, useEffect, useState } from 'react'
@@ -40,55 +40,19 @@ export default function UserPage(props) {
    */
   const loadData = () => {
     
+    let loadFunction = null
+
     //load in the correct users for the chosen view
     switch (currentView) {
       case userViews.ADMIN:
-        getAdmins(page)
-          .then((data: any) => {
-            console.log("The data: ", data)
-            setPageInfo({
-              pageSize: data.pageSize,
-              totalItems: data.totalItems,
-              totalPages: data.totalPages
-            })
-            setUsers(data.users)
-    
-          })
-          .catch((err: string) => {
-            console.log("ERROR: " + err)
-          })
+        loadFunction = getAdmins
+          
         break
       case userViews.INSTRUCTOR:
-        getInstructors(page)
-          .then((data: any) => {
-            console.log("The data: ", data)
-            setPageInfo({
-              pageSize: data.pageSize,
-              totalItems: data.totalItems,
-              totalPages: data.totalPages
-            })
-            setUsers(data.users)
-    
-          })
-          .catch((err: string) => {
-            console.log("ERROR: " + err)
-          })
+        loadFunction = getInstructors
         break
       case userViews.STUDENT:
-        getStudents(page)
-          .then((data: any) => {
-            console.log("The data: ", data)
-            setPageInfo({
-              pageSize: data.pageSize,
-              totalItems: data.totalItems,
-              totalPages: data.totalPages
-            })
-            setUsers(data.users)
-    
-          })
-          .catch((err: string) => {
-            console.log("ERROR: " + err)
-          })
+        loadFunction = getStudents
         break
       default:
         //we end up here at least once when the page reloads.
@@ -96,6 +60,21 @@ export default function UserPage(props) {
         //exit the function. it will be called again if the current view changes
         return
     }
+
+    loadFunction(page)
+      .then((data: UserPagination) => {
+        console.log("The data: ", data)
+        setPageInfo({
+          pageSize: data.pageSize,
+          totalItems: data.totalItems,
+          totalPages: data.totalPages
+        })
+        setUsers(data.users)
+
+      })
+      .catch((err: string) => {
+        console.log("ERROR: " + err)
+      })
   }
 
   useEffect(() => {
@@ -247,10 +226,11 @@ export default function UserPage(props) {
 
                     {/* The belt color is only needed if the user is a student */}
                     {
-                      user instanceof Student &&
+                      user.role == userViews.STUDENT &&
 
                       <span className='capitalize'>
-                        {Object.values(beltColors)[user.beltColor].toString().toLowerCase()} Belt
+                        {Object.values(beltColors)[user?.beltColor ?? 0].toString().toLowerCase()}
+                        &nbsp;Belt
                       </span>
                     }
 

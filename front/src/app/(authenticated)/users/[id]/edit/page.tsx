@@ -8,7 +8,7 @@ import { Input } from '@/components/input'
 import { Link } from '@/components/link'
 import { Select } from '@/components/select'
 import { userViews, useUserViews } from '@/hooks/userViews'
-import { Admin, beltColors, Instructor, IUser, Student } from '@/structures/users'
+import { beltColors, IUser } from '@/structures/users'
 import { ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { NewUser } from '@/structures/users'
 import { useEffect, useState } from 'react'
@@ -24,8 +24,16 @@ export default function UserEditPage({params}) {
   const { currentView } = useUserViews()
 
   const [isUpdated, setIsUpdated] = useState(false)
-  const [user, setUser] = useState<IUser>(new Student(0, "", "", "", new Date(),
-    beltColors.UNKNOWN, ""))
+  const [user, setUser] = useState<IUser>({
+    id: 0,
+    firstName: "",
+    lastName: "",
+    email: "",
+    dateOfBirth: new Date(),
+    beltColor: beltColors.UNKNOWN,
+    profileImgUrl: "",
+    role: userViews.UNKNOWN
+  })
   const [confirmPassword, setConfirmPassword] = useState("")
 
   const getId = () => {
@@ -105,7 +113,7 @@ export default function UserEditPage({params}) {
       errors.push("The birth date must be filled in")
     }
 
-    if (user instanceof Student && user.beltColor == beltColors.UNKNOWN) {
+    if (user.role == userViews.STUDENT && user.beltColor == beltColors.UNKNOWN) {
       errors.push("The user is a student, but no belt color was specified")
     }
 
@@ -121,7 +129,7 @@ export default function UserEditPage({params}) {
     //ensure the enum values are numbers, not strings
     const updatedUser: IUser = {...user}
 
-    if (updatedUser instanceof Student) {
+    if (updatedUser.role == userViews.STUDENT) {
         updatedUser.beltColor = parseInt(updatedUser.beltColor.toString());
         if (isNaN(updatedUser.beltColor)) {
             alert("invalid belt color chosen.")
@@ -227,7 +235,7 @@ export default function UserEditPage({params}) {
             />
           </div>
           {
-            user instanceof Student &&
+            user.role == userViews.STUDENT &&
             <>
               <div className="space-y-1">
                 <Subheading>Belt Color</Subheading>

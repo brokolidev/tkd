@@ -12,7 +12,7 @@ import { getAdmin } from '@/services/AdminServices'
 import { getInstructor } from '@/services/InstructorServices'
 import { getStudent } from '@/services/StudentServices'
 import { deleteUser } from '@/services/UserServices'
-import { beltColors, IUser, Student } from '@/structures/users'
+import { beltColors, IUser } from '@/structures/users'
 import { CalendarIcon, ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { notFound } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -21,14 +21,15 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
   //this will alert the loadUser function of which endpoint to pull from
   const { currentView } = useUserViews()
   
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<IUser>({
     id: 0,
     firstName: "",
     lastName: "",
     email: "",
     dateOfBirth: new Date(),
     beltColor: beltColors.UNKNOWN,
-    profileImgUrl: ""
+    profileImgUrl: "",
+    role: userViews.UNKNOWN
   })
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
   const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false)
@@ -39,37 +40,17 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
 
   const loadUser = (id: number) => {
 
+    let loadFunction = null
+
     switch (currentView) {
       case userViews.ADMIN:
-        getAdmin(id)
-          .then((data: any) => {
-            console.log("The data 1: ", data)
-            setUser(data)
-          })
-          .catch((err: string) => {
-            console.log("ERROR: " + err)
-          })
+        loadFunction = getAdmin
         break
       case userViews.INSTRUCTOR:
-        getInstructor(id)
-          .then((data: any) => {
-            console.log("The data 2: ", data)
-            setUser(data)
-        
-          })
-          .catch((err: string) => {
-            console.log("ERROR: " + err)
-          })
+        loadFunction = getInstructor
         break
       case userViews.STUDENT:
-        getStudent(id)
-          .then((data: any) => {
-            console.log("The data 3: ", data)
-            setUser(data)
-          })
-          .catch((err: string) => {
-            console.log("ERROR: " + err)
-          })
+        loadFunction = getStudent
         break
       default:
         //we end up here at least once when the page reloads.
@@ -77,6 +58,15 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
         //exit the function. it will be called again if the current view changes
         return
     }
+
+    loadFunction(id)
+      .then((data: any) => {
+        console.log("The data: ", data, userViews)
+        setUser(data)
+      })
+      .catch((err: string) => {
+        console.log("ERROR: " + err)
+      })
   }
 
   useEffect(() => {
@@ -106,7 +96,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
 
     //ensure the function doesn't continue if the user is not a student. Instructors and admins
     //don't have belt colors
-    if (!(user instanceof Student)) {
+    if (!(user.role != userViews.STUDENT)) {
         //this isn't needed if the user isn't a student.
         return
     }
@@ -182,7 +172,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
           <Heading>{((user?.firstName ?? "") + " " + (user?.lastName ?? ""))}</Heading>
 
           {
-            user instanceof Student &&
+            user.role == userViews.STUDENT &&
 
             <Badge {...(user.beltColor ? { color: getColor() } : {})}>
               {beltColors[user?.beltColor ?? beltColors.UNKNOWN].toLowerCase()}
@@ -212,7 +202,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
           
           {/* Student Specifics */}
           {
-            user instanceof Student &&
+            user.role == userViews.STUDENT &&
             <>
               <DescriptionTerm>Belt Color</DescriptionTerm>
               <DescriptionDetails>
