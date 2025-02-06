@@ -20,7 +20,7 @@ namespace taekwondo_backend.Controllers
             _context = context;
         }
 
-        // GET: api/schedule
+        // GET: /schedule
         [HttpGet]
         public ActionResult<IEnumerable<GetSchedulesDTO>> GetSchedules(int pageIndex = 1, int pageSize = 30)
         {
@@ -40,7 +40,7 @@ namespace taekwondo_backend.Controllers
             return Ok(pagedSchedules);
         }
 
-        // GET: api/schedule/5
+        // GET: schedule/5
         [HttpGet("{id}")]
         public ActionResult<GetSchedulesDTO> GetSchedule(int id)
         {
@@ -64,7 +64,7 @@ namespace taekwondo_backend.Controllers
             return Ok(schedule);
         }
 
-        // POST: api/schedule
+        // POST: schedule
         [HttpPost]
         public ActionResult<Schedule> CreateSchedule(GetSchedulesDTO scheduleDTO)
         {
@@ -97,7 +97,7 @@ namespace taekwondo_backend.Controllers
             return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, schedule);
         }
 
-        // PUT: api/schedule/5
+        // PUT: schedule/5
         [HttpPut("{id}")]
         public ActionResult UpdateSchedule(int id, GetSchedulesDTO scheduleDTO)
         {
@@ -137,7 +137,7 @@ namespace taekwondo_backend.Controllers
             return NoContent();
         }
 
-        // DELETE: api/schedule/5
+        // DELETE: schedule/5
         [HttpDelete("{id}")]
         public ActionResult DeleteSchedule(int id)
         {
