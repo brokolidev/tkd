@@ -12,8 +12,8 @@ using taekwondo_backend.Data;
 namespace taekwondo_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250205193745_DbInit")]
-    partial class DbInit
+    [Migration("20250206164311_InitDB")]
+    partial class InitDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -277,7 +277,7 @@ namespace taekwondo_backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
