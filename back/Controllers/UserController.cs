@@ -42,10 +42,12 @@ namespace taekwondo_backend.Controllers
 
 			// get user with user id
 			var user = _userManager.FindByIdAsync(userId).GetAwaiter().GetResult();
-
+			
 			if (user == null)
 				return NotFound();
-
+			
+			var role = _userManager.GetRolesAsync(user).GetAwaiter().GetResult();
+			
 			return Ok(new LoggedInUserDTO
 			{
 				Id = user.Id,
@@ -55,6 +57,7 @@ namespace taekwondo_backend.Controllers
 				LastName = user.LastName ?? string.Empty,
 				BeltColor = user.BeltColor ?? BeltColorType.White,
 				ProfileImage = user.ProfileImage ?? "https://i.pravatar.cc/300",
+				Role = role.FirstOrDefault(),
 			});
 		}
 

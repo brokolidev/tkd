@@ -9,7 +9,6 @@ import { Switch } from '@/components/switch'
 import { Text } from '@/components/text'
 import axios from '@/lib/axios'
 import { setCookie } from '@/lib/cookie'
-import { AxiosHeaders } from 'axios'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -25,8 +24,23 @@ export default function LoginPage() {
       .then((res) => {
         localStorage.setItem('tkd-access-token', res.data.accessToken)
         setCookie('tkd-access-token', res.data.accessToken)
+      })
+      .then(() => {
+        axios.get('/user')
+          .then((res) => {
 
-        router.push('/')
+            setCookie('tkd-user-role', res.data.role);
+            
+            switch (res.data.role) {
+              case 'Admin':
+              case 'Instructor':
+                router.push('/')
+                break
+              case 'Student':
+                router.push('/student')
+                break
+            }
+          })
       })
       .catch((err) => {
         setLoginErrorMsg(err.message)

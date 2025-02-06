@@ -18,6 +18,9 @@ export async function middleware(request: NextRequest) {
   if (!accessToken) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
+  
+  const userRole = await getCookie('tkd-user-role');
+  
 
   axios.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${accessToken}`
@@ -28,5 +31,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/login', '/', '/users', '/schedules', '/events', '/settings'],
+  matcher: ['/login', '/', '/users', '/schedules', '/events', '/settings', '/student'],
 }
