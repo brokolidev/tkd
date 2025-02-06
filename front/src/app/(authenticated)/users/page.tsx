@@ -16,15 +16,21 @@ import { beltColors, IUser, Student } from '@/structures/users'
 // @ts-ignore
 import { use, useEffect, useState } from 'react'
 
+interface PageInfo {
+    pageSize: number,
+    totalItems: number,
+    totalPages: number
+}
+
 export default function UserPage(props) {
   const searchParams: any = use(props.searchParams)
 
   const [users, setUsers] = useState<IUser[]>([])
-  const [page, setPage] = useState<number>(1)
-  const [pageInfo, setPageInfo] = useState<Object>({
-    pageSize: Number,
-    totalItems: Number,
-    totalPages: Number
+  const page = searchParams.page ? parseInt(searchParams.page) : 1
+  const [pageInfo, setPageInfo] = useState<PageInfo>({
+    pageSize: 0,
+    totalItems: 0,
+    totalPages: 0
   })
   const { currentView, setCurrentView } = useUserViews()
 
@@ -54,11 +60,12 @@ export default function UserPage(props) {
       .then((data: any) => {
         console.log("The data: ", data)
         setPageInfo({
-          pageSize: data.PageSize,
-          totalItems: data.TotalItems,
-          totalPages: data.TotalPages
+          pageSize: data.pageSize,
+          totalItems: data.totalItems,
+          totalPages: data.totalPages
         })
         setUsers(data.users)
+
       })
       .catch((err: string) => {
         console.log("ERROR: " + err)
@@ -70,16 +77,63 @@ export default function UserPage(props) {
     loadData()
   }, [page, currentView])
 
-  
-  const conditionalStyle = (expiredAt) => {
-    const currentDate = new Date().valueOf()
-    const expirationDate = new Date(expiredAt).valueOf()
-    const daysUntilExpiration: number = (expirationDate - currentDate) / (1000 * 60 * 60 * 24)
+  /**
+   * 
+   * @returns A list of the pagination buttons for the bottom of the screen
+   */
+  const buildPagination = (): JSX.Element[] => {
+    console.log("pagination building time")
 
-    return {
-      color: daysUntilExpiration <= 5 && daysUntilExpiration >= 0 ? 'red' : '',
+    const elements: JSX.Element[] = []
+
+    //push the previous button
+    if (page > 1) {
+        elements.push(<PaginationPage href="?page=1">Start</PaginationPage>)
+        elements.push(<PaginationPrevious href={"?page=" + (page - 1)} />)
+    } else {
+        elements.push(<span className='grow basis-0'></span>)
     }
+
+    //this should end up showing the current page, and nine pages after that.
+
+    //determine the number to start at (prevents 0 from being added when the page is 1)
+    let start = (page == 1 ? page : page - 1)
+
+    //push the page buttons
+    for (let i = start; i < (pageInfo.totalPages + 1) && i < (page + 10); i++) {
+        elements.push(
+          <PaginationPage
+            key={i}
+            href={"?page=" + (i)}
+            {...(i == page ? { current: true } : {})}
+          >
+            {i}
+          </PaginationPage>
+        )
+    }
+
+    //push the next button
+    if (page < pageInfo.totalPages) {
+        elements.push(<PaginationNext href={"?page=" + (page + 1)} />)
+        elements.push(<PaginationPage href={'?page=' + pageInfo.totalPages}>End</PaginationPage>)
+    } else {
+        elements.push(<span className='grow basis-0'></span>)
+    }
+
+    //return the buttons
+    return elements
   }
+  
+  //This will be needed eventually, but right now, it can probably just be commented out.
+//   const conditionalStyle = (expiredAt) => {
+//     const currentDate = new Date().valueOf()
+//     const expirationDate = new Date(expiredAt).valueOf()
+//     const daysUntilExpiration: number = (expirationDate - currentDate) / (1000 * 60 * 60 * 24)
+
+//     return {
+//       color: daysUntilExpiration <= 5 && daysUntilExpiration >= 0 ? 'red' : '',
+//     }
+//   }
 
   return (
     <>
@@ -194,23 +248,11 @@ export default function UserPage(props) {
       </Table>
 
       {/* add pagination when the backend is connected. */}
-      {/* <Pagination className="mt-10">
-        {links &&
-          links.length > 0 &&
-          links.map((link, idx) =>
-            idx === 0 ? (
-              <PaginationPrevious key={idx} href={link.url} />
-            ) : link.url === null && idx < links.length - 1 ? (
-              <PaginationGap key={idx} />
-            ) : idx === links.length - 1 ? (
-              <PaginationNext key={idx} href={link.url} />
-            ) : (
-              <PaginationPage key={idx} href={link.url} {...(link.active ? { current: true } : {})}>
-                {link.label}
-              </PaginationPage>
-            )
-          )}
-      </Pagination> */}
+      <Pagination className="mt-8">
+        { pageInfo?.totalPages > 1 &&
+          buildPagination()
+        }
+      </Pagination>
     </>
   )
 }

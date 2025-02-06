@@ -173,7 +173,7 @@ export default function SchedulecreatePage() {
       </div>
 
       <form onSubmit={handleSubmit} className="mt-4 lg:mt-8">
-        <Heading>Create a new schedule</Heading>
+        <Heading>Edit Schedule</Heading>
         <Divider className="my-10 w-full" />
 
         <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
