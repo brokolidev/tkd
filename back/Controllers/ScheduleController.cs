@@ -25,6 +25,7 @@ namespace taekwondo_backend.Controllers
         public ActionResult<IEnumerable<GetSchedulesDTO>> GetSchedules(int pageIndex = 1, int pageSize = 30)
         {
             var schedules = _context.Schedules
+                .Where(s => s.IsOpen)
                 .Select(s => new GetSchedulesDTO
                 {
                     Id = s.Id,

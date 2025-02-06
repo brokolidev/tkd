@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/button";
 import { Divider } from "@/components/divider";
 import { Heading } from "@/components/heading";
-import { ISchedule } from "@/structures/schedule";
-import { mockSchedules, getSchedules } from "@/services/SchdeuleServices";
+import { getSchedules } from "@/services/SchdeuleServices";
 import {
   Pagination,
   PaginationList,
