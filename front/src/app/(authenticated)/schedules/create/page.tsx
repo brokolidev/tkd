@@ -159,14 +159,14 @@ export default function SchedulecreatePage() {
         <AlertTitle>Congratulations!</AlertTitle>
         <AlertDescription>A new schedule has been created</AlertDescription>
         <AlertActions>
-          <Link href="/schedule">
+          <Link href="/schedules">
             <Button onClick={() => setIsCreated(false)}>Sounds Good!</Button>
           </Link>
         </AlertActions>
       </Alert>
 
       <div className="max-lg:hidden">
-        <Link href="/schedule" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500 ">
+        <Link href="/schedules" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500 ">
           <ChevronLeftIcon className="size-4 fill-zinc-400 " />
           Schedule
         </Link>

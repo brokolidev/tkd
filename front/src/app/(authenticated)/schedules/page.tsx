@@ -14,7 +14,6 @@ import {
   PaginationPrevious,
 } from "@/components/pagination";
 import { Link } from "@/components/link";
-import { ChevronLeftIcon, PlusIcon, MinusIcon } from "@heroicons/react/16/solid";
 
 function Schedules() {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
@@ -54,7 +53,7 @@ function Schedules() {
       <div className="flex justify-between items-center">
         <Heading className="text-xl font-bold">Schedules</Heading>
         <Button className="flex items-center gap-2 bg-black">
-          <Link href="/schedule/create" className="inline-flex items-center gap-2 text-sm/6 text-white">
+          <Link href="/schedules/create" className="inline-flex items-center gap-2 text-sm/6 text-white">
             Create New
           </Link>
         </Button>
@@ -90,7 +89,7 @@ function Schedules() {
                   {item.isOpen ? "Open" : "Closed"}
                 </Button>
                 <Button className="px-3 py-1 text-sm bg-blue-500 text-white">
-                  <Link href="/schedule/edit" className="inline-flex items-center gap-2 text-sm/6 text-white">
+                  <Link href="/schedules/edit" className="inline-flex items-center gap-2 text-sm/6 text-white">
                     Edit
                   </Link>
                 </Button>
