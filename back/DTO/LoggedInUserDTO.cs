@@ -11,6 +11,6 @@ namespace taekwondo_backend.DTO
         public required string LastName { get; set; }
         public BeltColorType? BeltColor { get; set; }
         public string? ProfileImage { get; set; }
-        public string Role { get; set; }
+        public required string Role { get; set; }
     }
 }

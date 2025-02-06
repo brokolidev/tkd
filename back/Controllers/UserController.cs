@@ -57,7 +57,7 @@ namespace taekwondo_backend.Controllers
 				LastName = user.LastName ?? string.Empty,
 				BeltColor = user.BeltColor ?? BeltColorType.White,
 				ProfileImage = user.ProfileImage ?? "https://i.pravatar.cc/300",
-				Role = role.FirstOrDefault(),
+				Role = role.FirstOrDefault() ?? string.Empty,
 			});
 		}
 
