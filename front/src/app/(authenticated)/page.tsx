@@ -27,6 +27,7 @@ function Stat({ title, value, change }: { title: string; value: string; change: 
 export default function Home() {
   
   const [schedules, setSchedules] = useState([])
+  const [userCounts, setUserCounts] = useState([])
 
   const { user, isError, isLoading } = useUser()
   
@@ -43,13 +44,20 @@ export default function Home() {
   }
   
   async function loadSchedules(): Promise<void> {
-    await axios.get('/api/schedule').then((response) => {
+    await axios.get('/schedule').then((response) => {
       setSchedules(response.data);
+    });
+  }
+
+  async function loadUserCounts(): Promise<void> {
+    await axios.get('/user/counts').then((response) => {
+      setUserCounts([response.data[0], response.data[1]]);
     });
   }
 
   useEffect(() => {
     loadSchedules();
+    loadUserCounts();
   }, []);
   
   return (
@@ -70,8 +78,8 @@ export default function Home() {
       </div>
       <div className="mt-4 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
         <Stat title="Total revenue" value="$2.6M" change="+4.5%" />
-        <Stat title="Total Customers" value="488" change="-0.5%" />
-        <Stat title="Employees" value="8" change="+30%" />
+        <Stat title="Total Students" value={userCounts[0]} change="-0.5%" />
+        <Stat title="Total Instructors" value={userCounts[1]} change="+30%" />
       </div>
       <Subheading className="mt-14">Registered Schedules</Subheading>
       <Table className="mt-4 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">

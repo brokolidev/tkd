@@ -57,5 +57,17 @@ namespace taekwondo_backend.Controllers
 				ProfileImage = user.ProfileImage ?? "https://i.pravatar.cc/300",
 			});
 		}
+
+		[HttpGet]
+		[Route("counts")]
+		[Authorize]
+		public IActionResult GetCounts()
+		{
+			var studentCount = _userManager.GetUsersInRoleAsync(UserRoles.Student.ToString()).Result.Count;
+			var instructorCount = _userManager.GetUsersInRoleAsync(UserRoles.Instructor.ToString()).Result.Count;
+			var counts = new List<int> { studentCount, instructorCount };
+
+			return Ok(counts);
+		}
 	}
 }
