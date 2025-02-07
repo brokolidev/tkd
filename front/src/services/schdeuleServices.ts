@@ -14,9 +14,9 @@ import { ISchedule } from '@/structures/schedule';
 // }
 
 
-export async function getSchedules() {
+export async function getSchedules(page: number = 1, pageSize = 30, openOnly: boolean = true) {
     try {
-        const response = await axios.get('/schedule')
+        const response = await axios.get('/schedule?page=' + page + '&pageSize=' + pageSize + '&openOnly=' + openOnly);
         return response.data;
     } catch (e) {
         console.error('Error fetching schedules:', e);

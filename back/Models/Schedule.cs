@@ -23,6 +23,9 @@ namespace taekwondo_backend.Models
         [Required]
         public string Level { get; set; }
         
+        [Required]
+        public bool IsOpen { get; set; }
+        
         public DateTime? CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
@@ -35,6 +38,7 @@ namespace taekwondo_backend.Models
             Instructors = [];
             Day = 0;
             Level = "Beginner Class";
+            IsOpen = false;
         }
 
         public Schedule(
@@ -42,13 +46,15 @@ namespace taekwondo_backend.Models
             List<User> students, 
             List<User> instructors,
             DayOfWeek day,
-            string level)
+            string level,
+            bool isOpen)
         {
             TimeSlot = timeSlot;
             Students = students;
             Instructors = instructors;
             Day = day;
             Level = level;
+            IsOpen = isOpen;
         }
     }
 }
