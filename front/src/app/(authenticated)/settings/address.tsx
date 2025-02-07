@@ -19,7 +19,13 @@ export function Address({ value, onChange }) {
         value={value.street}
         onChange={(e) => onChange({ ...value, street: e.target.value })}
       />
-      <Input aria-label="City" name="city" value={value.city} className="col-span-2" />
+      <Input
+        aria-label="City"
+        name="city"
+        value={value.city}
+        onChange={(e) => onChange({ ...value, city: e.target.value })}
+        className="col-span-2"
+      />
       <Listbox
         aria-label="Region"
         name="region"
