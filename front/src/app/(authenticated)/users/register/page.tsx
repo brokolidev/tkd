@@ -12,7 +12,7 @@ import { beltColors } from '@/structures/users'
 import { ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { NewUser } from '@/structures/users'
 import { useState } from 'react'
-import { createUser } from '@/services/UserServices'
+import { createUser } from '@/services/userServices'
 
 export default function UserRegisterPage() {
 

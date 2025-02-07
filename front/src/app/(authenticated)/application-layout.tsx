@@ -25,7 +25,6 @@ import { SidebarLayout } from '@/components/sidebar-layout'
 import { Spinner } from '@/components/spinner'
 import { getEvents } from '@/data'
 import useUser from '@/hooks/swrHooks'
-import axios from '@/lib/axios'
 import { setCookie } from '@/lib/cookie'
 import {
   ArrowRightStartOnRectangleIcon,
@@ -152,7 +151,7 @@ export function ApplicationLayout({
                 <CalendarDaysIcon />
                 <SidebarLabel>Schedules</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="#">
+              <SidebarItem href="/events">
                 <Square2StackIcon />
                 <SidebarLabel>Events</SidebarLabel>
               </SidebarItem>

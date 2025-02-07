@@ -5,11 +5,9 @@ import { Button } from '@/components/button';
 import { Divider } from '@/components/divider';
 import { Heading } from '@/components/heading';
 import { ISchedule } from '@/structures/schedule';
-import { mockSchedules, getSchedules } from '@/services/SchdeuleServices';
+import { mockSchedules, getSchedules } from '@/services/schdeuleServices';
 import {Pagination,PaginationList,PaginationNext,PaginationPage,PaginationPrevious} from '@/components/pagination';
-import { BadgeButton } from '@/components/badge'
 import { Link } from '@/components/link'
-import { ChevronLeftIcon, PlusIcon, MinusIcon } from '@heroicons/react/16/solid'
 function EditEvents() {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
   const [currentPage, setCurrentPage] = useState(1);

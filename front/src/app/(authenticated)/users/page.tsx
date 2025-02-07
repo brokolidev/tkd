@@ -8,9 +8,9 @@ import { Link } from '@/components/link'
 import { Pagination, PaginationGap, PaginationNext, PaginationPage, PaginationPrevious } from '@/components/pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
 import { userViews, useUserViews } from '@/hooks/userViews'
-import { getAdmins } from '@/services/AdminServices'
-import { getInstructors } from '@/services/InstructorServices'
-import { getStudents } from '@/services/StudentServices'
+import { getAdmins } from '@/services/adminServices'
+import { getInstructors } from '@/services/instructorServices'
+import { getStudents } from '@/services/studentServices'
 import { beltColors, IUser, Student } from '@/structures/users'
 
 // @ts-ignore

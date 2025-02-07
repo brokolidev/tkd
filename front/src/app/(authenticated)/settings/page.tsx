@@ -33,7 +33,6 @@ export default function Settings() {
       city: 'Calgary',
       province: 'Alberta',
       postalCode: 'A1A 1A1',
-      country: 'Canada',
     },
     maximum_class_size: '30',
     absent_alerts: '3',
