@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useEffect, useState } from 'react'
 import useUser from "@/hooks/swrHooks";
 import axios from "@/lib/axios";
-import { getSchedules } from '@/services/SchdeuleServices'
+import { getSchedules } from '@/services/schdeuleServices'
 
 function Stat({ title, value, change }: { title: string; value: string; change: string }) {
   return (
