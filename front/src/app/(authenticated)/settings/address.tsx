@@ -46,22 +46,7 @@ export function Address({ value, onChange }) {
         value={value.postalCode}
         onChange={(e) => onChange({ ...value, postalCode: e.target.value })}
       />
-      <Listbox
-        aria-label="Country"
-        name="country"
-        placeholder="Country"
-        by="code"
-        value={value.country}
-        onChange={(country) => onChange({ ...value, country })}
-        className="col-span-2"
-      >
-        {countries.map((country) => (
-          <ListboxOption key={country.code} value={country}>
-            <img className="w-5 sm:w-4" src={country.flagUrl} alt="" />
-            <ListboxLabel>{country.name}</ListboxLabel>
-          </ListboxOption>
-        ))}
-      </Listbox>
+      <Input aria-label="Country" name="country" placeholder="Country" value="Canada" readOnly />
     </div>
   )
 }
