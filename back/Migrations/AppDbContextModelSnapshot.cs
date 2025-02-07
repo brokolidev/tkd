@@ -282,6 +282,9 @@ namespace taekwondo_backend.Migrations
                     b.Property<int>("Day")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsOpen")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Level")
                         .IsRequired()
                         .HasColumnType("text");

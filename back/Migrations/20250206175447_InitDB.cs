@@ -104,6 +104,7 @@ namespace taekwondo_backend.Migrations
                     TimeSlotId = table.Column<int>(type: "integer", nullable: false),
                     Day = table.Column<int>(type: "integer", nullable: false),
                     Level = table.Column<string>(type: "text", nullable: false),
+                    IsOpen = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },

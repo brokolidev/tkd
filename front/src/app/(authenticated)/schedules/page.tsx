@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/button";
 import { Divider } from "@/components/divider";
 import { Heading } from "@/components/heading";
-import { ISchedule } from "@/structures/schedule";
-import { mockSchedules, getSchedules } from "@/services/SchdeuleServices";
+import { getSchedules } from "@/services/schdeuleServices";
 import {
   Pagination,
   PaginationList,
@@ -21,7 +20,7 @@ function Schedules() {
   const ITEMS_PER_PAGE = 6;
 
   async function loadSchedules(): Promise<void> {
-    const schedules = await getSchedules();
+    const schedules = await getSchedules(1, 30, false);
     setSchedules(schedules);
   }
 

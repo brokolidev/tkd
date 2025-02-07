@@ -64,6 +64,7 @@ public class DataSeeder(
                 Instructors = randomInstructors,
                 Day = (DayOfWeek)random.Next(0, 7),
                 Level = classLevels[random.Next(classLevels.Length)],
+                IsOpen = true,
             };
             schedules.Add(schedule);
         }

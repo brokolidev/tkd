@@ -12,7 +12,7 @@ using taekwondo_backend.Data;
 namespace taekwondo_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250206164311_InitDB")]
+    [Migration("20250206175447_InitDB")]
     partial class InitDB
     {
         /// <inheritdoc />
@@ -284,6 +284,9 @@ namespace taekwondo_backend.Migrations
 
                     b.Property<int>("Day")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("IsOpen")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Level")
                         .IsRequired()
