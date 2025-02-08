@@ -28,6 +28,24 @@ namespace taekwondo_backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Settings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    OrganizationName = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: false),
+                    MaximumClassSize = table.Column<int>(type: "integer", nullable: false),
+                    AbsentAlert = table.Column<int>(type: "integer", nullable: false),
+                    PaymentAlert = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Settings", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TimeSlots",
                 columns: table => new
                 {
@@ -328,6 +346,9 @@ namespace taekwondo_backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "ScheduleStudentUser");
+
+            migrationBuilder.DropTable(
+                name: "Settings");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
