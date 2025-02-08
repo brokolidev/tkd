@@ -12,7 +12,7 @@ using taekwondo_backend.Data;
 namespace taekwondo_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250208080734_InitDB")]
+    [Migration("20250208085219_InitDB")]
     partial class InitDB
     {
         /// <inheritdoc />
@@ -316,7 +316,11 @@ namespace taekwondo_backend.Migrations
                     b.Property<int>("AbsentAlert")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Address")
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -333,6 +337,18 @@ namespace taekwondo_backend.Migrations
 
                     b.Property<int>("PaymentAlert")
                         .HasColumnType("integer");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Province")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

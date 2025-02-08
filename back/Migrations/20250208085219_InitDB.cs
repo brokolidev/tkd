@@ -35,7 +35,11 @@ namespace taekwondo_backend.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     OrganizationName = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
-                    Address = table.Column<string>(type: "text", nullable: false),
+                    Street = table.Column<string>(type: "text", nullable: false),
+                    City = table.Column<string>(type: "text", nullable: false),
+                    Province = table.Column<string>(type: "text", nullable: false),
+                    PostalCode = table.Column<string>(type: "text", nullable: false),
+                    Country = table.Column<string>(type: "text", nullable: false),
                     MaximumClassSize = table.Column<int>(type: "integer", nullable: false),
                     AbsentAlert = table.Column<int>(type: "integer", nullable: false),
                     PaymentAlert = table.Column<int>(type: "integer", nullable: false)
