@@ -11,11 +11,11 @@ namespace taekwondo_backend.Controllers
     [Route("[controller]")]
     [Authorize(Roles = nameof(UserRoles.Admin) + "," + nameof(UserRoles.Instructor))]
     [ApiController]
-    public class ScheduleController : ControllerBase
+    public class SchedulesController : ControllerBase
     {
         private readonly AppDbContext _context;
 
-        public ScheduleController(AppDbContext context)
+        public SchedulesController(AppDbContext context)
         {
             _context = context;
         }

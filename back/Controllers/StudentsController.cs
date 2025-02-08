@@ -12,12 +12,12 @@ namespace taekwondo_backend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class StudentController : ControllerBase
+    public class StudentsController : ControllerBase
     {
         private readonly AppDbContext _context;
         private readonly UserManager<User> _userManager;
 
-        public StudentController(AppDbContext context, UserManager<User> userManager)
+        public StudentsController(AppDbContext context, UserManager<User> userManager)
         {
             _context = context;
             _userManager = userManager;
