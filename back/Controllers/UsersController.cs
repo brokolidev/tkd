@@ -31,6 +31,7 @@ namespace taekwondo_backend.Controllers
 		}
 
 		[HttpGet]
+		[Route("/user")]
 		[Authorize]
 		public IActionResult Get()
 		{

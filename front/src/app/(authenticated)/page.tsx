@@ -46,12 +46,12 @@ export default function Home() {
   
   
   async function loadSchedules(): Promise<void> {
-    const schedules = await getSchedules();
-    setSchedules(schedules);
+    const schedules = await getSchedules(1, 100, true);
+    setSchedules(schedules.data);
   }
 
   async function loadUserCounts(): Promise<void> {
-    await axios.get('/user/counts').then((response) => {
+    await axios.get('/users/counts').then((response) => {
       setUserCounts([response.data[0], response.data[1]]);
     });
   }
