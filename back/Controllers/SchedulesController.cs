@@ -23,33 +23,37 @@ namespace taekwondo_backend.Controllers
         // GET: /schedule
         [HttpGet]
         public ActionResult<IEnumerable<GetSchedulesDTO>> GetSchedules(
-            int pageIndex = 1, 
+            int pageNumber = 1, 
             int pageSize = 30, 
             bool openOnly = true
             )
         {
-            var schedulesQuery = _context.Schedules.AsQueryable();
-
-            if (openOnly)
+            var pagedSchedules = 
+                PagedList<GetSchedulesDTO>.Create(
+                    _context.Schedules.AsQueryable()
+                        .Where(s => !openOnly || s.IsOpen)
+                        .OrderByDescending(s => s.CreatedAt)
+                        .Select(s => new GetSchedulesDTO
+                        {
+                            Id = s.Id,
+                            TimeSlot = s.TimeSlot,
+                            StudentIds = s.Students.Select(st => st.Id).ToList(),
+                            Instructors = s.Instructors,
+                            DayOfWeek = s.Day,
+                            Level = s.Level,
+                            CreatedAt = s.CreatedAt,
+                        }), 
+                    pageNumber, 
+                    pageSize);
+            
+            return Ok(new
             {
-                schedulesQuery = schedulesQuery.Where(s => s.IsOpen);
-            }
-            
-            var schedules = schedulesQuery
-                .Select(s => new GetSchedulesDTO
-                {
-                    Id = s.Id,
-                    TimeSlot = s.TimeSlot,
-                    StudentIds = s.Students.Select(st => st.Id).ToList(),
-                    Instructors = s.Instructors,
-                    DayOfWeek = s.Day,
-                    Level = s.Level,
-                    IsOpen = s.IsOpen,
-                });
-            
-            var pagedSchedules = PagedList<GetSchedulesDTO>.Create(schedules, pageIndex, pageSize);
-            
-            return Ok(pagedSchedules);
+                pagedSchedules.CurrentPage,
+                pagedSchedules.PageSize,
+                pagedSchedules.TotalItems,
+                pagedSchedules.TotalPages,
+                Data = pagedSchedules
+            });
         }
 
         // // GET: schedule/5
