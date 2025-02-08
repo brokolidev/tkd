@@ -143,9 +143,9 @@ export function ApplicationLayout({
                 <HomeIcon />
                 <SidebarLabel>Home</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/users" current={pathname.startsWith('/users')}>
+              <SidebarItem href="/students" current={pathname.startsWith('/students')}>
                 <UsersIcon />
-                <SidebarLabel>Users</SidebarLabel>
+                <SidebarLabel>Students</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/schedules">
                 <CalendarDaysIcon />
