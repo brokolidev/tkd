@@ -53,16 +53,7 @@ namespace taekwondo_backend.Controllers
             var pagedInstructors = PagedList<User>.Create(allInstructors.OrderBy(s => s.Id), pageNumber, pageSize);
 
             // Create the response with page details and instructor data
-            var response = new
-            {
-                pagedInstructors.CurrentPage, // Current page number requested by user
-                pagedInstructors.PageSize, // Number of instructors per page
-                pagedInstructors.TotalItems, // Total number of instructors
-                pagedInstructors.TotalPages, // Total number of pages (by pagesize)
-                Users = pagedInstructors,
-            };
-
-            return Ok(response);
+            return Ok(pagedInstructors);
         }
 
 

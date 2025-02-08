@@ -1,46 +1,49 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/button";
-import { Divider } from "@/components/divider";
-import { Heading } from "@/components/heading";
-import { getSchedules } from "@/services/schdeuleServices";
+import React, {useState, useEffect} from "react";
+import {Button} from "@/components/button";
+import {Divider} from "@/components/divider";
+import {Heading} from "@/components/heading";
+import {getSchedules} from "@/services/schdeuleServices";
 import {
-  Pagination,
+  Pagination, PaginationGap,
   PaginationList,
   PaginationNext,
   PaginationPage,
   PaginationPrevious,
 } from "@/components/pagination";
-import { Link } from "@/components/link";
+import {Link} from "@/components/link";
+import {useSearchParams} from 'next/navigation'
 
-function Schedules() {
+function SchedulesPage({pageQuery}) {
+  const searchParams = useSearchParams()
+
+  const page: number = Number(searchParams.get('page')) || pageQuery
+
   const [schedules, setSchedules] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
+
+  // pagination state vars
+  const [currentPage, setCurrentPage] = useState(1)
+  const [lastPage, setLastPage] = useState(1)
+  const [nextPageUrl, setNextPageUrl] = useState('')
+  const [prevPageUrl, setPrevPageUrl] = useState('')
 
   async function loadSchedules(): Promise<void> {
-    const schedules = await getSchedules(1, 30, false);
-    setSchedules(schedules);
+    const schedules = await getSchedules(page, 6, false);
+    setSchedules(schedules.data)
+    setPaginate(schedules)
+  }
+
+  function setPaginate(meta) {
+    setCurrentPage(meta.currentPage);
+    setLastPage(meta.lastPage);
+    setNextPageUrl(meta.nextPageUrl);
+    setPrevPageUrl(meta.prevPageUrl);
   }
 
   useEffect(() => {
     loadSchedules();
-  }, []);
-
-  const totalPages = Math.ceil(schedules.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedSchedules = schedules.slice(startIndex, endIndex);
-
-  /** ✅ Function to handle page changes */
-  const handlePageClick = (page: number, e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-  const getPageHref = (page: number) => (page >= 1 && page <= totalPages ? `?page=${page}` : undefined);
+  }, [page]);
 
   return (
     <div className="space-y-10 p-8">
@@ -53,10 +56,10 @@ function Schedules() {
         </Button>
       </div>
 
-      <Divider className="my-8 border-gray-300" />
+      <Divider className="my-8 border-gray-300"/>
 
       <div>
-        {paginatedSchedules.map((item) => (
+        {schedules.map((item) => (
           <div key={item.id}>
             <div className="mb-8 flex items-center">
               <img
@@ -75,55 +78,80 @@ function Schedules() {
                 <p className="mt-1 text-sm text-gray-600">{item.classSize} Students in this class</p>
               </div>
               <div className="flex items-center space-x-4">
-                <Button
-                  onClick={() =>
-                    setSchedules((prev) =>
-                      prev.map((schedule) =>
-                        schedule.id === item.id ? { ...schedule, isOpen: !schedule.isOpen } : schedule
-                      )
-                    )
-                  }
-                  className={`px-3 py-1 text-sm ${item.isOpen ? 'bg-green-200 text-green-500' : 'bg-red-200 text-red-500'}`}
-                >
-                  {item.isOpen ? 'Open' : 'Closed'}
-                </Button>
-                <Button className="bg-blue-500 px-3 py-1 text-sm text-white">
-                  <Link href="/schedules/edit" className="inline-flex items-center gap-2 text-sm/6 text-white">
-                    Edit
-                  </Link>
-                </Button>
               </div>
             </div>
-            <Divider className="my-8 border-gray-300" />
+            <Divider className="my-8 border-gray-300"/>
           </div>
         ))}
       </div>
 
-      {/* PAGINATION COMPONENT */}
-      <Pagination className="flex items-center justify-center space-x-2">
-        {/* Previous Button */}
-        <button onClick={(e) => handlePageClick(currentPage - 1, e)} disabled={currentPage === 1}>
-          <PaginationPrevious href={getPageHref(currentPage - 1)}>Previous</PaginationPrevious>
-        </button>
+      <Pagination aria-label="Page Navigation">
+        <PaginationPrevious href={prevPageUrl || undefined}/>
+        <PaginationList>
 
-        {/* Pagination List */}
-        <PaginationList className="flex space-x-2">
-          {[...Array(totalPages)].map((_, index) => (
-            <button key={index + 1} onClick={(e) => handlePageClick(index + 1, e)}>
-              <PaginationPage href={getPageHref(index + 1)} current={index + 1 === currentPage}>
-                {index + 1}
-              </PaginationPage>
-            </button>
-          ))}
+          {currentPage > 3 && (
+            <>
+              <PaginationPage href="?page=1">1</PaginationPage>
+              {currentPage > 4 && (
+                <>
+                  <PaginationPage href="?page=2">2</PaginationPage>
+                </>
+              )}
+              {currentPage > 5 && <PaginationGap />}
+            </>
+          )}
+          
+          {currentPage > 1 && (
+            <>
+              {Array.from({ length: Math.min(2, currentPage - 1) }, (_, i) => {
+                const page = currentPage - (i + 1);
+                return page > 0 ? (
+                  <PaginationPage key={page} href={`?page=${page}`}>
+                    {page}
+                  </PaginationPage>
+                ) : null;
+              }).reverse()}
+            </>
+          )}
+
+          <PaginationPage href={`?page=${currentPage}`} current>{currentPage}</PaginationPage>
+
+          {currentPage < lastPage && (
+            <>
+              {Array.from({ length: Math.min(2, lastPage - currentPage) }, (_, i) => {
+                const nextPage = currentPage + (i + 1);
+                return nextPage <= lastPage ? (
+                  <PaginationPage key={nextPage} href={`?page=${nextPage}`}>
+                    {nextPage}
+                  </PaginationPage>
+                ) : null;
+              })}
+
+              {(lastPage - currentPage - 2) > 2 && <PaginationGap />}
+            </>
+          )}
+
+          {currentPage < lastPage && (
+            <>
+              {Array.from({ length: Math.min(2, lastPage - (currentPage + 2)) }, (_, i) => {
+                const nextPage = lastPage - i;
+                if (nextPage > currentPage + 2) {
+                  return (
+                    <PaginationPage key={nextPage} href={`?page=${nextPage}`}>
+                      {nextPage}
+                    </PaginationPage>
+                  );
+                }
+                return null;
+              }).reverse()}
+            </>
+          )}
+
         </PaginationList>
-
-        {/* Next Button */}
-        <button onClick={(e) => handlePageClick(currentPage + 1, e)} disabled={currentPage === totalPages}>
-          <PaginationNext href={getPageHref(currentPage + 1)}>Next</PaginationNext>
-        </button>
+        <PaginationNext href={nextPageUrl || undefined}/>
       </Pagination>
     </div>
   )
 }
 
-export default Schedules;
+export default SchedulesPage;

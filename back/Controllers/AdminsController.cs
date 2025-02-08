@@ -53,16 +53,7 @@ namespace taekwondo_backend.Controllers
             var pagedAdmins = PagedList<User>.Create(allAdmins.OrderBy(s => s.Id), pageNumber, pageSize);
 
             // Create the response with page details and admin data
-            var response = new
-            {
-                pagedAdmins.CurrentPage, // Current page number requested by user
-                pagedAdmins.PageSize, // Number of admins per page
-                pagedAdmins.TotalItems, // Total number of admins
-                pagedAdmins.TotalPages, // Total number of pages (by pagesize)
-                Users = pagedAdmins,
-            };
-
-            return Ok(response);
+            return Ok(pagedAdmins);
         }
 
 

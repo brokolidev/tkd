@@ -46,14 +46,7 @@ namespace taekwondo_backend.Controllers
                     pageNumber, 
                     pageSize);
             
-            return Ok(new
-            {
-                pagedSchedules.CurrentPage,
-                pagedSchedules.PageSize,
-                pagedSchedules.TotalItems,
-                pagedSchedules.TotalPages,
-                Data = pagedSchedules
-            });
+            return Ok(pagedSchedules);
         }
 
         // // GET: schedule/5
