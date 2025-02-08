@@ -14,7 +14,19 @@ namespace taekwondo_backend.Models
         public string Email { get; set; }
 
         [Required]
-        public string Address { get; set; }
+        public string Street { get; set; }
+
+        [Required]
+        public string City { get; set; }
+
+        [Required]
+        public string Province { get; set; }
+
+        [Required]
+        public string PostalCode { get; set; }
+
+        [Required]
+        public string Country { get; set; } = "Canada";
 
         [Required]
         public int MaximumClassSize { get; set; }
@@ -29,7 +41,11 @@ namespace taekwondo_backend.Models
         {
             OrganizationName = string.Empty;
             Email = string.Empty;
-            Address = string.Empty;
+            Street = string.Empty;
+            City = string.Empty;
+            Province = string.Empty;
+            PostalCode = string.Empty;
+            Country = "Canada";
             MaximumClassSize = 0;
             AbsentAlert = 0;
             PaymentAlert = 0;
@@ -38,7 +54,11 @@ namespace taekwondo_backend.Models
         public Setting(
             string organizationName,
             string email,
-            string address,
+            string street,
+            string city,
+            string province,
+            string postalCode,
+            string country,
             int maximumClassSize,
             int absentAlert,
             int paymentAlert
@@ -46,7 +66,11 @@ namespace taekwondo_backend.Models
         {
             OrganizationName = organizationName;
             Email = email;
-            Address = address;
+            Street = street;
+            City = city;
+            Province = province;
+            PostalCode = postalCode;
+            Country = country;
             MaximumClassSize = maximumClassSize;
             AbsentAlert = absentAlert;
             PaymentAlert = paymentAlert;
