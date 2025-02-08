@@ -11,11 +11,11 @@ namespace taekwondo_backend.Controllers
     [Route("[controller]")]
     [Authorize(Roles = nameof(UserRoles.Admin) + "," + nameof(UserRoles.Instructor))]
     [ApiController]
-    public class ScheduleController : ControllerBase
+    public class SchedulesController : ControllerBase
     {
         private readonly AppDbContext _context;
 
-        public ScheduleController(AppDbContext context)
+        public SchedulesController(AppDbContext context)
         {
             _context = context;
         }
@@ -23,31 +23,28 @@ namespace taekwondo_backend.Controllers
         // GET: /schedule
         [HttpGet]
         public ActionResult<IEnumerable<GetSchedulesDTO>> GetSchedules(
-            int pageIndex = 1, 
+            int pageNumber = 1, 
             int pageSize = 30, 
             bool openOnly = true
             )
         {
-            var schedulesQuery = _context.Schedules.AsQueryable();
-
-            if (openOnly)
-            {
-                schedulesQuery = schedulesQuery.Where(s => s.IsOpen);
-            }
-            
-            var schedules = schedulesQuery
-                .Select(s => new GetSchedulesDTO
-                {
-                    Id = s.Id,
-                    TimeSlot = s.TimeSlot,
-                    StudentIds = s.Students.Select(st => st.Id).ToList(),
-                    Instructors = s.Instructors,
-                    DayOfWeek = s.Day,
-                    Level = s.Level,
-                    IsOpen = s.IsOpen,
-                });
-            
-            var pagedSchedules = PagedList<GetSchedulesDTO>.Create(schedules, pageIndex, pageSize);
+            var pagedSchedules = 
+                PagedList<GetSchedulesDTO>.Create(
+                    _context.Schedules.AsQueryable()
+                        .Where(s => !openOnly || s.IsOpen)
+                        .OrderByDescending(s => s.CreatedAt)
+                        .Select(s => new GetSchedulesDTO
+                        {
+                            Id = s.Id,
+                            TimeSlot = s.TimeSlot,
+                            StudentIds = s.Students.Select(st => st.Id).ToList(),
+                            Instructors = s.Instructors,
+                            DayOfWeek = s.Day,
+                            Level = s.Level,
+                            CreatedAt = s.CreatedAt,
+                        }), 
+                    pageNumber, 
+                    pageSize);
             
             return Ok(pagedSchedules);
         }

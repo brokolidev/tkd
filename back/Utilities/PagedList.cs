@@ -1,20 +1,32 @@
-public class PagedList<T> : List<T>
+public class PagedList<T>
 {
-    public int CurrentPage { get; private set; } // Current page number requested by user
-    public int PageSize { get; private set; } // Number of items per page
-    public int TotalItems { get; private set; } // Total number of items in db
-    public int TotalPages { get; private set; } // Total number of pages (by pagesize)
+    public int Total { get; set; }
+    public int PerPage { get; set; }
+    public int CurrentPage { get; set; }
+    public int LastPage { get; private set; }
+    public string FirstPageUrl { get; set; }
+    public string LastPageUrl { get; set; }
+    public string NextPageUrl { get; set; }
+    public string PrevPageUrl { get; set; }
+    public int From { get; set; }
+    public int To { get; set; }
+    public List<T> Data { get; set; }
 
-    // Set the paginated data 
-    public PagedList(List<T> items, int count, int pageNumber, int pageSize)
+    private PagedList(List<T> items, int count, int pageNumber, int pageSize)
     {
-        TotalItems = count;
-        PageSize = pageSize;
+        Total = count;
+        PerPage = pageSize;
         CurrentPage = pageNumber;
-        TotalPages = (int)Math.Ceiling(count / (double)pageSize);
-        AddRange(items);
+        LastPage = (int)Math.Ceiling(count / (double)pageSize);
+        FirstPageUrl = "?page=1";
+        LastPageUrl = $"?page={LastPage}";
+        NextPageUrl = pageNumber < LastPage ? $"?page={pageNumber + 1}" : "";
+        PrevPageUrl = pageNumber > 1 ? $"?page={pageNumber - 1}" : "";
+        From = count == 0 ? 0 : (pageNumber - 1) * pageSize + 1;
+        To = Math.Min(pageNumber * pageSize, count);
+        Data = items;
     }
-    // Method to create a paginated list
+
     public static PagedList<T> Create(IEnumerable<T> source, int pageNumber, int pageSize)
     {
         var count = source.Count();
@@ -23,7 +35,6 @@ public class PagedList<T> : List<T>
             .Take(pageSize)
             .ToList();
 
-        // Create and return a new PagedList with current data for pagination
         return new PagedList<T>(items, count, pageNumber, pageSize);
     }
 }
