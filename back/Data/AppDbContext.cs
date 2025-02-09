@@ -44,32 +44,32 @@ namespace taekwondo_backend.Data
                     userCol => userCol.HasOne<User>().WithMany().HasForeignKey("userId"), //Foreign key col for the user
                     scheduleCol => scheduleCol.HasOne<Schedule>().WithMany().HasForeignKey("studentId") //Foreign key col for the schedule
                 );
-            
-            
+
+
             // TimeSlots
             modelBuilder.Entity<TimeSlot>()
                 .Property(t => t.Id)
-                .UseIdentityColumn();  
-            
+                .UseIdentityColumn();
+
             modelBuilder.Entity<TimeSlot>()
                 .Property(t => t.StartsAt)
                 .HasConversion(v => v.ToString(), v => TimeOnly.Parse(v));
-            
+
             modelBuilder.Entity<TimeSlot>()
                 .Property(t => t.EndsAt)
                 .HasConversion(v => v.ToString(), v => TimeOnly.Parse(v));
-            
+
             modelBuilder.Entity<TimeSlot>()
                 .Property(t => t.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .ValueGeneratedOnAdd();
-            
-            
+
+
             // Schedules
             modelBuilder.Entity<Schedule>()
                 .Property(t => t.Id)
-                .UseIdentityColumn();  
-            
+                .UseIdentityColumn();
+
             modelBuilder.Entity<Schedule>()
                 .Property(t => t.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -78,5 +78,6 @@ namespace taekwondo_backend.Data
 
         public required DbSet<TimeSlot> TimeSlots { get; set; }
         public required DbSet<Schedule> Schedules { get; set; }
+        public required DbSet<Setting> Settings { get; set; }
     }
 }
