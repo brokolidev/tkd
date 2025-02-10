@@ -22,6 +22,7 @@ public class DataSeeder(
     public async Task ProductionSeed()
     {
         await SeedRoles();
+        await SeedSettings();
     }
 
     public async Task TestSeed()
@@ -30,7 +31,6 @@ public class DataSeeder(
         await SeedInstructorsAndStudents();
         await SeedTimeSlots();
         await SeedSchedules();
-        await SeedSettings();
     }
 
     private async Task SeedSchedules()
