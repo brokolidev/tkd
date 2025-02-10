@@ -32,56 +32,51 @@ namespace taekwondo_backend.Controllers
             return Ok(settings);
         }
 
-        // PUT /settings
-        // Update settings if they exist, or create new settings if none exist
-        [HttpPut]
-        public IActionResult UpdateSettings([FromBody] Setting updatedSettings)
+        // PATCH /settings
+        // Update settings if they exist
+        [HttpPatch]
+        public IActionResult UpdateSettings([FromBody] UpdateSettingDTO updatedSettings)
         {
+            // Get the first settings record from the database
             var existingSettings = _context.Settings.FirstOrDefault();
 
-            // Check if there is existing settings db
+            // If no settings exist, return a 503 Service Unavailable response
             if (existingSettings == null)
             {
-                var newSettings = new Setting
-                {
-                    // If no setting exist, create a new one
-                    OrganizationName = updatedSettings.OrganizationName,
-                    Email = updatedSettings.Email,
-                    Street = updatedSettings.Street,
-                    City = updatedSettings.City,
-                    Province = updatedSettings.Province,
-                    PostalCode = updatedSettings.PostalCode,
-                    Country = updatedSettings.Country,
-                    MaximumClassSize = updatedSettings.MaximumClassSize,
-                    AbsentAlert = updatedSettings.AbsentAlert,
-                    PaymentAlert = updatedSettings.PaymentAlert
-                };
-
-                // Save the new settings to the db
-                _context.Settings.Add(newSettings);
-                _context.SaveChanges();
-
-                // Return HTTP 201 Created with the new settings
-                return CreatedAtAction(nameof(GetSettings), new { }, newSettings);
+                return StatusCode(503, "Update Settings unavailable.");
             }
 
-            // If settings exist, update with new values
-            existingSettings.OrganizationName = updatedSettings.OrganizationName;
-            existingSettings.Email = updatedSettings.Email;
-            existingSettings.Street = updatedSettings.Street;
-            existingSettings.City = updatedSettings.City;
-            existingSettings.Province = updatedSettings.Province;
-            existingSettings.PostalCode = updatedSettings.PostalCode;
-            existingSettings.Country = updatedSettings.Country;
-            existingSettings.MaximumClassSize = updatedSettings.MaximumClassSize;
-            existingSettings.AbsentAlert = updatedSettings.AbsentAlert;
-            existingSettings.PaymentAlert = updatedSettings.PaymentAlert;
+            // Get all properties from DTO
+            var properties = typeof(UpdateSettingDTO).GetProperties();
 
-            // Save the updated settings to the database
-            _context.SaveChanges();
+            // To check if any changes are made
+            bool hasChanges = false;
 
-            // Return HTTP 200 OK with updated settings
+            foreach (var property in properties)
+            {
+                // Get the value from input
+                var newValue = property.GetValue(updatedSettings);
+                if (newValue != null)
+                {
+                    // Find the matching property
+                    var entityProperty = typeof(Setting).GetProperty(property.Name);
+                    if (entityProperty != null)
+                    {
+                        // Update the value with new values
+                        entityProperty.SetValue(existingSettings, newValue);
+                        hasChanges = true;
+                    }
+                }
+            }
+            // Save changes to the database only if there are updates
+            if (hasChanges)
+            {
+                _context.SaveChanges();
+            }
+
+            // Return 200 with updated settings
             return Ok(existingSettings);
         }
+
     }
 }
