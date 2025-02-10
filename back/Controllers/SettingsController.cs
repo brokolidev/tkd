@@ -32,56 +32,57 @@ namespace taekwondo_backend.Controllers
             return Ok(settings);
         }
 
-        // PUT /settings
-        // Update settings if they exist, or create new settings if none exist
-        [HttpPut]
-        public IActionResult UpdateSettings([FromBody] Setting updatedSettings)
+        // PATCH /settings
+        // Update settings if they exist
+        [HttpPatch]
+        public IActionResult UpdateSettings([FromBody] UpdateSettingDTO updatedSettings)
         {
+            // Get the first settings record from the database
             var existingSettings = _context.Settings.FirstOrDefault();
 
-            // Check if there is existing settings db
+            // If no settings exist, return a 503 Service Unavailable response
             if (existingSettings == null)
             {
-                var newSettings = new Setting
-                {
-                    // If no setting exist, create a new one
-                    OrganizationName = updatedSettings.OrganizationName,
-                    Email = updatedSettings.Email,
-                    Street = updatedSettings.Street,
-                    City = updatedSettings.City,
-                    Province = updatedSettings.Province,
-                    PostalCode = updatedSettings.PostalCode,
-                    Country = updatedSettings.Country,
-                    MaximumClassSize = updatedSettings.MaximumClassSize,
-                    AbsentAlert = updatedSettings.AbsentAlert,
-                    PaymentAlert = updatedSettings.PaymentAlert
-                };
-
-                // Save the new settings to the db
-                _context.Settings.Add(newSettings);
-                _context.SaveChanges();
-
-                // Return HTTP 201 Created with the new settings
-                return CreatedAtAction(nameof(GetSettings), new { }, newSettings);
+                return StatusCode(503, "Update Settings unavailable.");
             }
 
-            // If settings exist, update with new values
-            existingSettings.OrganizationName = updatedSettings.OrganizationName;
-            existingSettings.Email = updatedSettings.Email;
-            existingSettings.Street = updatedSettings.Street;
-            existingSettings.City = updatedSettings.City;
-            existingSettings.Province = updatedSettings.Province;
-            existingSettings.PostalCode = updatedSettings.PostalCode;
-            existingSettings.Country = updatedSettings.Country;
-            existingSettings.MaximumClassSize = updatedSettings.MaximumClassSize;
-            existingSettings.AbsentAlert = updatedSettings.AbsentAlert;
-            existingSettings.PaymentAlert = updatedSettings.PaymentAlert;
+            // Update the settings value if there is data.
+            if (updatedSettings.OrganizationName != null)
+                existingSettings.OrganizationName = updatedSettings.OrganizationName;
 
-            // Save the updated settings to the database
+            if (updatedSettings.Email != null)
+                existingSettings.Email = updatedSettings.Email;
+
+            if (updatedSettings.Street != null)
+                existingSettings.Street = updatedSettings.Street;
+
+            if (updatedSettings.City != null)
+                existingSettings.City = updatedSettings.City;
+
+            if (updatedSettings.Province != null)
+                existingSettings.Province = updatedSettings.Province;
+
+            if (updatedSettings.PostalCode != null)
+                existingSettings.PostalCode = updatedSettings.PostalCode;
+
+            if (updatedSettings.Country != null)
+                existingSettings.Country = updatedSettings.Country;
+
+            if (updatedSettings.MaximumClassSize.HasValue)
+                existingSettings.MaximumClassSize = updatedSettings.MaximumClassSize.Value;
+
+            if (updatedSettings.AbsentAlert.HasValue)
+                existingSettings.AbsentAlert = updatedSettings.AbsentAlert.Value;
+
+            if (updatedSettings.PaymentAlert.HasValue)
+                existingSettings.PaymentAlert = updatedSettings.PaymentAlert.Value;
+
+            // Save the updated values
             _context.SaveChanges();
 
-            // Return HTTP 200 OK with updated settings
+            // And return 200 with update data
             return Ok(existingSettings);
         }
+
     }
 }
