@@ -46,41 +46,35 @@ namespace taekwondo_backend.Controllers
                 return StatusCode(503, "Update Settings unavailable.");
             }
 
-            // Update the settings value if there is data.
-            if (updatedSettings.OrganizationName != null)
-                existingSettings.OrganizationName = updatedSettings.OrganizationName;
+            // Get all properties from DTO
+            var properties = typeof(UpdateSettingDTO).GetProperties();
 
-            if (updatedSettings.Email != null)
-                existingSettings.Email = updatedSettings.Email;
+            // To check if any changes are made
+            bool hasChanges = false;
 
-            if (updatedSettings.Street != null)
-                existingSettings.Street = updatedSettings.Street;
+            foreach (var property in properties)
+            {
+                // Get the value from input
+                var newValue = property.GetValue(updatedSettings);
+                if (newValue != null)
+                {
+                    // Find the matching property
+                    var entityProperty = typeof(Setting).GetProperty(property.Name);
+                    if (entityProperty != null)
+                    {
+                        // Update the value with new values
+                        entityProperty.SetValue(existingSettings, newValue);
+                        hasChanges = true;
+                    }
+                }
+            }
+            // Save changes to the database only if there are updates
+            if (hasChanges)
+            {
+                _context.SaveChanges();
+            }
 
-            if (updatedSettings.City != null)
-                existingSettings.City = updatedSettings.City;
-
-            if (updatedSettings.Province != null)
-                existingSettings.Province = updatedSettings.Province;
-
-            if (updatedSettings.PostalCode != null)
-                existingSettings.PostalCode = updatedSettings.PostalCode;
-
-            if (updatedSettings.Country != null)
-                existingSettings.Country = updatedSettings.Country;
-
-            if (updatedSettings.MaximumClassSize.HasValue)
-                existingSettings.MaximumClassSize = updatedSettings.MaximumClassSize.Value;
-
-            if (updatedSettings.AbsentAlert.HasValue)
-                existingSettings.AbsentAlert = updatedSettings.AbsentAlert.Value;
-
-            if (updatedSettings.PaymentAlert.HasValue)
-                existingSettings.PaymentAlert = updatedSettings.PaymentAlert.Value;
-
-            // Save the updated values
-            _context.SaveChanges();
-
-            // And return 200 with update data
+            // Return 200 with updated settings
             return Ok(existingSettings);
         }
 
