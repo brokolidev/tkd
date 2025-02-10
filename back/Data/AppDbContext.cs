@@ -74,10 +74,21 @@ namespace taekwondo_backend.Data
                 .Property(t => t.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .ValueGeneratedOnAdd();
+            
+            // Events
+            modelBuilder.Entity<Event>()
+                .Property(t => t.Id)
+                .UseIdentityColumn();
+
+            modelBuilder.Entity<Event>()
+                .Property(t => t.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .ValueGeneratedOnAdd();
         }
 
         public required DbSet<TimeSlot> TimeSlots { get; set; }
         public required DbSet<Schedule> Schedules { get; set; }
+        public required DbSet<Event> Events { get; set; }
         public required DbSet<Setting> Settings { get; set; }
     }
 }
