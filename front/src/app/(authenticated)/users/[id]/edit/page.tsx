@@ -12,11 +12,11 @@ import { beltColors, IUser } from '@/structures/users'
 import { ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { NewUser } from '@/structures/users'
 import { useEffect, useState } from 'react'
-import { updateUser } from '@/services/UserServices'
-import { formatDate } from '@/utils/dates'
-import { getAdmin } from '@/services/AdminServices'
-import { getInstructor } from '@/services/InstructorServices'
-import { getStudent } from '@/services/StudentServices'
+import { updateUser } from '@/services/userServices'
+import { buildDate, formatDate } from '@/utils/dates'
+import { getAdmin } from '@/services/adminServices'
+import { getInstructor } from '@/services/instructorServices'
+import { getStudent } from '@/services/studentServices'
 import { notFound } from 'next/navigation'
 
 export default function UserEditPage({params}) {
@@ -24,6 +24,10 @@ export default function UserEditPage({params}) {
   const { currentView } = useUserViews()
 
   const [isUpdated, setIsUpdated] = useState(false)
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [dateOfBirth, setDateOfBirth] = useState(new Date())
+  const [beltColor, setBeltColor] = useState(beltColors.UNKNOWN)
   const [user, setUser] = useState<IUser>({
     id: 0,
     firstName: "",
@@ -34,7 +38,6 @@ export default function UserEditPage({params}) {
     profileImgUrl: "",
     role: userViews.UNKNOWN
   })
-  const [confirmPassword, setConfirmPassword] = useState("")
 
   const getId = () => {
     return params.then(data => parseInt(data.id))
@@ -60,9 +63,13 @@ export default function UserEditPage({params}) {
     }
 
     loadFunction(id)
-      .then((data) => {
+      .then((data: IUser) => {
         console.log(data)
         setUser(data)
+        setFirstName(data.firstName)
+        setLastName(data.lastName)
+        setDateOfBirth(data.dateOfBirth)
+        setBeltColor(data.beltColor)
       })
       .catch(err => console.log("ERROR: loadUser: " + err))
   }
@@ -71,7 +78,7 @@ export default function UserEditPage({params}) {
 
     //pull out the id from the parameters
     getId()
-      .then(id => {
+      .then((id: number) => {
 
         //ensure the id is a number
         if (isNaN(id)) {
@@ -95,11 +102,11 @@ export default function UserEditPage({params}) {
 
     //alert the user if there are errors that exist
 
-    if (!user.firstName) {
+    if (!firstName) {
       errors.push("The first name must be filled in")
     }
 
-    if (!user.lastName) {
+    if (!lastName) {
       errors.push("The last name must be filled in")
     }
 
@@ -109,7 +116,7 @@ export default function UserEditPage({params}) {
     //   errors.push("The email must be filled in")
     // }
 
-    if (!user.dateOfBirth) {
+    if (!dateOfBirth) {
       errors.push("The birth date must be filled in")
     }
 
@@ -127,7 +134,7 @@ export default function UserEditPage({params}) {
     }
 
     //ensure the enum values are numbers, not strings
-    const updatedUser: IUser = {...user}
+    const updatedUser: IUser = {firstName, lastName, dateOfBirth, beltColor, ...user}
 
     if (updatedUser.role == userViews.STUDENT) {
         updatedUser.beltColor = parseInt(updatedUser.beltColor.toString());
@@ -147,18 +154,6 @@ export default function UserEditPage({params}) {
       .catch(err => {
         console.log("ERROR: formAction: " + err)
       })
-  }
-
-
-  const setIndividualPropertForUser = (event) => {
-    //copy the user so we're not changing user directly
-    const updatedUser = {...user}
-    //update the property
-    user[event.target.name] = event.target.value
-
-    console.log(event)
-    //finally update the user
-    setUser(updatedUser)
   }
 
   return (
@@ -193,8 +188,8 @@ export default function UserEditPage({params}) {
           </div>
           <div>
             <Input
-              onChange={setIndividualPropertForUser}
-              value={user.firstName}
+              onChange={(event) => setFirstName(event.target.value)}
+              value={firstName}
               aria-label="FirstName"
               placeholder="John"
             />
@@ -204,8 +199,8 @@ export default function UserEditPage({params}) {
           </div>
           <div>
             <Input
-              onChange={setIndividualPropertForUser}
-              value={user.lastName}
+              onChange={(event) => setLastName(event.target.value)}
+              value={lastName}
               aria-label="LastName"
               placeholder="Doe"
             />
@@ -228,8 +223,8 @@ export default function UserEditPage({params}) {
           </div>
           <div>
             <Input
-              onChange={setIndividualPropertForUser}
-              value={formatDate(user.dateOfBirth)}
+              onChange={(event) => setDateOfBirth(buildDate(event.target.value))}
+              value={formatDate(dateOfBirth)}
               aria-label="dateofBirth"
               placeholder="YYYY-MM-DD"
             />
@@ -243,9 +238,8 @@ export default function UserEditPage({params}) {
               <div>
                 <Select
                   aria-label="beltColor"
-                  value={user.beltColor}
-                  defaultValue="1"
-                  onChange={setIndividualPropertForUser}
+                  value={beltColor}
+                  onChange={(event) => setBeltColor(parseInt(event.target.value))}
                 >
                   {
                     //looping refind from https://chatgpt.com/share/6793ebed-e188-800c-8126-8f22d0ae64af

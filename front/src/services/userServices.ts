@@ -10,13 +10,13 @@ export function createUser(newUser: NewUser) {
 
     switch (newUser.Role) {
         case userViews.ADMIN:
-            endpoint = "admin"
+            endpoint = "admins"
             break
         case userViews.INSTRUCTOR:
-            endpoint = "instructor"
+            endpoint = "instructors"
             break
         case userViews.STUDENT:
-            endpoint = "student"
+            endpoint = "students"
             break
         default:
             throw new Error("ERROR: user role was not valid")
@@ -35,7 +35,7 @@ export function createUser(newUser: NewUser) {
 export function updateUser(updatedUser: IUser) {
 
     //send the user off to be created at the backend
-    return axios.post("/user/" + updatedUser.id, JSON.stringify(updatedUser))
+    return axios.put("users/" + updatedUser.id, JSON.stringify(updatedUser))
       .then(r => r.data)
       .catch(err => {
         const msg = "ERROR: updateUser: " + err
@@ -46,7 +46,7 @@ export function updateUser(updatedUser: IUser) {
 
 export function deleteUser(id: number) {
     //send the user off to be deleted
-    return axios.delete("user/" + id)
+    return axios.delete("users/" + id)
         .catch(err => {
             console.log("ERROR: deleteUser: " + err)
             throw new Error("ERROR: deleteUser: " + err)

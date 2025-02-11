@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useEffect, useState } from 'react'
 import useUser from "@/hooks/swrHooks";
 import axios from "@/lib/axios";
-import { getSchedules } from '@/services/SchdeuleServices'
+import { getSchedules } from '@/services/schdeuleServices'
 
 function Stat({ title, value, change }: { title: string; value: string; change: string }) {
   return (
@@ -46,12 +46,12 @@ export default function Home() {
   
   
   async function loadSchedules(): Promise<void> {
-    const schedules = await getSchedules();
-    setSchedules(schedules);
+    const schedules = await getSchedules(1, 100, true);
+    setSchedules(schedules.data);
   }
 
   async function loadUserCounts(): Promise<void> {
-    await axios.get('/user/counts').then((response) => {
+    await axios.get('/users/counts').then((response) => {
       setUserCounts([response.data[0], response.data[1]]);
     });
   }

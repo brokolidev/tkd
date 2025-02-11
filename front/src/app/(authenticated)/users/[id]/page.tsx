@@ -8,11 +8,11 @@ import { Divider } from '@/components/divider'
 import { Heading, Subheading } from '@/components/heading'
 import { Link } from '@/components/link'
 import { userViews, useUserViews } from '@/hooks/userViews'
-import { getAdmin } from '@/services/AdminServices'
-import { getInstructor } from '@/services/InstructorServices'
-import { getStudent } from '@/services/StudentServices'
-import { deleteUser } from '@/services/UserServices'
+import { getAdmin } from '@/services/adminServices'
+import { getInstructor } from '@/services/instructorServices'
+import { deleteUser } from '@/services/userServices'
 import { beltColors, IUser } from '@/structures/users'
+import { getStudent } from '@/services/studentServices'
 import { CalendarIcon, ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { notFound } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -60,7 +60,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
     }
 
     loadFunction(id)
-      .then((data: any) => {
+      .then((data: IUser ) => {
         console.log("The data: ", data, userViews)
         setUser(data)
       })
@@ -113,7 +113,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
 
   const deleteCurrentUser = () => {
     //ask the user if they are sure they want to continue
-    console.log("Deleting this user")
+    console.log("Deleting this user", user)
 
     deleteUser(user.id)
         .then(r => {
@@ -206,7 +206,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
             <>
               <DescriptionTerm>Belt Color</DescriptionTerm>
               <DescriptionDetails>
-                beltColors[user?.beltColor ?? beltColors.UNKNOWN]?.toLowerCase()
+                { beltColors[user?.beltColor ?? beltColors.UNKNOWN]?.toLowerCase() }
               </DescriptionDetails>
               <DescriptionTerm>Payment Status</DescriptionTerm>
               <DescriptionDetails>

@@ -3,19 +3,19 @@ import { IUser, UserPagination } from '@/structures/users'
 import { buildDate } from '@/utils/dates'
 
 export async function getAdmin(id: number): Promise<IUser> {
-    return axios.get(`admin/${id}`)
+    return axios.get(`admins/${id}`)
         .then((res) => ensureValidTypes([res.data])[0])
 }
   
 export async function getAdmins(page: number) : Promise<UserPagination> {
     //get all admins in the system. for right now, return a promise of fake data.
 
-    return axios.get(`admin?pageNumber=${page}`)
+    return axios.get(`admins?pageNumber=${page}`)
         .then((res) => {
             console.log(res.data)
 
             //perform a few operations on the data to ensure it matches with the types needed
-            const admins: IUser[] = ensureValidTypes(res.data.users)
+            const admins: IUser[] = ensureValidTypes(res.data.data)
 
             //return the list of admins
             return {users: admins, ...res.data}

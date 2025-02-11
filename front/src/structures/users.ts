@@ -12,11 +12,18 @@ export interface IUser {
 }
 
 export interface UserPagination {
+    
+    total: number,
+    perPage: number,
     currentPage: number,
-    pageSize: number,
-    totalItems: number,
-    totalPages: number,
-    users: IUser[]
+    lastPage: number,
+    firstPageUrl: string,
+    lastPageUrl: string,
+    nextPageUrl: string,
+    prevPageUrl: string,
+    from: number,
+    to: number,
+    data: IUser[]
 }
 
 export interface NewUser {
