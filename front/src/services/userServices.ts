@@ -34,8 +34,13 @@ export function createUser(newUser: NewUser) {
 
 export function updateUser(updatedUser: IUser) {
 
+    console.log(updatedUser.dateOfBirth)
+
     //send the user off to be created at the backend
-    return axios.put("users/" + updatedUser.id, JSON.stringify(updatedUser))
+    return axios.put("users/" + updatedUser.id, JSON.stringify({
+        ...updatedUser,
+        dateOfBirth: updatedUser.dateOfBirth.toISOString().split('T')[0] 
+    }))
       .then(r => r.data)
       .catch(err => {
         const msg = "ERROR: updateUser: " + err

@@ -84,7 +84,7 @@ namespace taekwondo_backend.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateUser(int id, RegisterUserDTO userDTO)
+        public async Task<IActionResult> UpdateUser(int id, UserFEDTO userDTO)
         {
             if (ModelState.IsValid)
             {

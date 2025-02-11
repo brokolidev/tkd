@@ -26,7 +26,7 @@ export default function UserEditPage({params}) {
   const [isUpdated, setIsUpdated] = useState(false)
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
-  const [dateOfBirth, setDateOfBirth] = useState(new Date())
+  const [dateOfBirth, setDateOfBirth] = useState("")
   const [beltColor, setBeltColor] = useState(beltColors.UNKNOWN)
   const [user, setUser] = useState<IUser>({
     id: 0,
@@ -68,7 +68,7 @@ export default function UserEditPage({params}) {
         setUser(data)
         setFirstName(data.firstName)
         setLastName(data.lastName)
-        setDateOfBirth(data.dateOfBirth)
+        setDateOfBirth(formatDate(data.dateOfBirth))
         setBeltColor(data.beltColor)
       })
       .catch(err => console.log("ERROR: loadUser: " + err))
@@ -134,7 +134,13 @@ export default function UserEditPage({params}) {
     }
 
     //ensure the enum values are numbers, not strings
-    const updatedUser: IUser = {firstName, lastName, dateOfBirth, beltColor, ...user}
+    const updatedUser: IUser = {
+        ...user,
+        firstName: firstName,
+        lastName: lastName,
+        dateOfBirth: buildDate(dateOfBirth),
+        beltColor: beltColor
+    }
 
     if (updatedUser.role == userViews.STUDENT) {
         updatedUser.beltColor = parseInt(updatedUser.beltColor.toString());
@@ -159,10 +165,10 @@ export default function UserEditPage({params}) {
   return (
     <>
       <Alert open={isUpdated} onClose={setIsUpdated}>
-        <AlertTitle>Registration Success</AlertTitle>
-        <AlertDescription>New User Registered Successfully</AlertDescription>
+        <AlertTitle>Update Success</AlertTitle>
+        <AlertDescription>User Updated Successfully</AlertDescription>
         <AlertActions>
-          <Link href="/users">
+          <Link href={"/users/" + user.id}>
             <Button onClick={() => setIsUpdated(false)}>Ok</Button>
           </Link>
         </AlertActions>
@@ -223,8 +229,8 @@ export default function UserEditPage({params}) {
           </div>
           <div>
             <Input
-              onChange={(event) => setDateOfBirth(buildDate(event.target.value))}
-              value={formatDate(dateOfBirth)}
+              onChange={(event) => setDateOfBirth(event.target.value)}
+              value={dateOfBirth}
               aria-label="dateofBirth"
               placeholder="YYYY-MM-DD"
             />
