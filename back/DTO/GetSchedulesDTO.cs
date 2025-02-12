@@ -5,11 +5,11 @@ namespace taekwondo_backend.Models
     public class GetSchedulesDTO
     {
         public int Id { get; set; }
-        public TimeSlot TimeSlot { get; set; } // Make TimeSlot nullable
-        public List<int> StudentIds { get; set; }
-        public List<User> Instructors { get; set; }
+        public required TimeSlot TimeSlot { get; set; } // Make TimeSlot nullable
+        public required List<int> StudentIds { get; set; }
+        public required List<User> Instructors { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
-        public string Level { get; set; }
+        public required string Level { get; set; }
         public DateTime? CreatedAt { get; set; }
         
         public string DayOfWeekString => DayOfWeek.ToString();
