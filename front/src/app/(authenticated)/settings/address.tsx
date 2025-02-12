@@ -3,11 +3,19 @@
 import { Input } from '@/components/input'
 import { Listbox, ListboxLabel, ListboxOption } from '@/components/listbox'
 import { getCountries } from '@/data'
-import { useState } from 'react'
 
-export function Address({ value, onChange }) {
+interface AddressProps {
+  street: string
+  city: string
+  province: string
+  postalCode: string
+  country: string
+  onChange: (field: string, value: string) => void
+}
+
+export function Address({ street, city, province, postalCode, country, onChange }: AddressProps) {
   let countries = getCountries()
-  let [country, setCountry] = useState(countries[0])
+  const selectedCountry = countries.find((c) => c.name === country) || countries[0]
 
   return (
     <div className="grid grid-cols-2 gap-6">
@@ -16,24 +24,24 @@ export function Address({ value, onChange }) {
         className="col-span-2"
         name="address"
         placeholder="Street Address"
-        value={value.street}
-        onChange={(e) => onChange({ ...value, street: e.target.value })}
+        value={street}
+        onChange={(e) => onChange('street', e.target.value)}
       />
       <Input
         aria-label="City"
         name="city"
-        value={value.city}
-        onChange={(e) => onChange({ ...value, city: e.target.value })}
+        value={city}
+        onChange={(e) => onChange('city', e.target.value)}
         className="col-span-2"
       />
       <Listbox
         aria-label="Region"
-        name="region"
+        name="province"
         placeholder="Region"
-        value={value.province}
-        onChange={(province) => onChange({ ...value, province })}
+        value={province}
+        onChange={(value) => onChange('province', value)}
       >
-        {country.regions.map((region) => (
+        {selectedCountry.regions.map((region) => (
           <ListboxOption key={region} value={region}>
             <ListboxLabel>{region}</ListboxLabel>
           </ListboxOption>
@@ -43,10 +51,16 @@ export function Address({ value, onChange }) {
         aria-label="Postal code"
         name="postal_code"
         placeholder="Postal Code"
-        value={value.postalCode}
-        onChange={(e) => onChange({ ...value, postalCode: e.target.value })}
+        value={postalCode}
+        onChange={(e) => onChange('postalCode', e.target.value)}
       />
-      <Input aria-label="Country" name="country" placeholder="Country" value="Canada" readOnly />
+      <Listbox aria-label="Country" name="country" value={country} onChange={(value) => onChange('country', value)}>
+        {countries.map((c) => (
+          <ListboxOption key={c.name} value={c.name}>
+            <ListboxLabel>{c.name}</ListboxLabel>
+          </ListboxOption>
+        ))}
+      </Listbox>
     </div>
   )
 }

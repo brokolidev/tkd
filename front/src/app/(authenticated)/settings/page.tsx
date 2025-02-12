@@ -6,55 +6,46 @@ import { Divider } from '@/components/divider'
 import { Heading, Subheading } from '@/components/heading'
 import { Input } from '@/components/input'
 import { Text } from '@/components/text'
-import { useState } from 'react'
+import { getSettings, updateSettings } from '@/services/settingServices'
+import { ISettings, IUpdateSetting } from '@/structures/setting'
+import { useEffect, useState } from 'react'
 import { Address } from './address'
 
 export default function Settings() {
-  const initialData = {
-    name: '',
-    email: '',
-    address: {
-      street: '',
-      city: '',
-      province: '',
-      postalCode: '',
-      country: '',
-    },
-    maximum_class_size: '',
-    absent_alerts: '',
-    payment_alerts: '',
-  }
-
-  const hardcodedData = {
-    name: 'Taekwondoon',
-    email: 'taekwondoon_yyc@gmail.com',
-    address: {
-      street: '1515 Centre Avenue',
-      city: 'Calgary',
-      province: 'Alberta',
-      postalCode: 'A1A 1A1',
-    },
-    maximum_class_size: '30',
-    absent_alerts: '3',
-    payment_alerts: '7',
-  }
-
-  const [formData, setFormData] = useState(hardcodedData)
+  const [settingValues, setSettingValues] = useState<ISettings | null>(null)
+  const [formData, setFormData] = useState<IUpdateSetting>({} as IUpdateSetting)
   const [isResetOpen, setIsResetOpen] = useState(false)
   const [isSaveOpen, setIsSaveOpen] = useState(false)
   const [isSuccessOpen, setIsSuccessOpen] = useState(false)
 
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const data = await getSettings()
+        setSettingValues(data)
+        setFormData(data)
+      } catch (error) {
+        console.error('Failed to fetch settings:', error)
+      }
+    }
+    fetchSettings()
+  }, [])
+
   const handleReset = () => {
-    setFormData(initialData)
+    setFormData(settingValues)
     setIsResetOpen(false)
-    console.log('Reset Done!')
+    console.log('Default value is ', settingValues)
   }
 
-  const handleSubmit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
-    console.log('Saving data:', formData)
+  const handleSubmit = async (event?: React.FormEvent) => {
+    if (event) event.preventDefault()
+    try {
+      await updateSettings(formData)
+      setIsSuccessOpen(true)
+    } catch (error) {
+      console.error('Failed to submit updated information: ', error)
+    }
     setIsSaveOpen(false)
-    setIsSuccessOpen(true)
   }
 
   return (
@@ -71,8 +62,8 @@ export default function Settings() {
           <Input
             aria-label="Organization Name"
             name="name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            value={formData?.organizationName || ''}
+            onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
           />
         </div>
       </section>
@@ -89,7 +80,7 @@ export default function Settings() {
             type="email"
             aria-label="Organization Email"
             name="email"
-            value={formData.email}
+            value={formData?.email || ''}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
         </div>
@@ -103,8 +94,12 @@ export default function Settings() {
           <Text>This is where your organization is registered.</Text>
         </div>
         <Address
-          value={formData.address}
-          onChange={(newAddress) => setFormData({ ...formData, address: newAddress })}
+          street={formData?.street || ''}
+          city={formData?.city || ''}
+          province={formData?.province || ''}
+          postalCode={formData?.postalCode || ''}
+          country={formData?.country || ''}
+          onChange={(field, value) => setFormData({ ...formData, [field]: value })}
         />
       </section>
 
@@ -119,8 +114,8 @@ export default function Settings() {
           <Input
             type="number"
             name="maximum_class_size"
-            value={formData.maximum_class_size}
-            onChange={(e) => setFormData({ ...formData, maximum_class_size: e.target.value })}
+            value={formData.maximumClassSize ?? 0}
+            onChange={(e) => setFormData({ ...formData, maximumClassSize: Number(e.target.value) })}
           />
         </div>
       </section>
@@ -136,8 +131,8 @@ export default function Settings() {
           <Input
             type="number"
             name="absent_alerts"
-            value={formData.absent_alerts}
-            onChange={(e) => setFormData({ ...formData, absent_alerts: e.target.value })}
+            value={formData.absentAlert ?? 0}
+            onChange={(e) => setFormData({ ...formData, absentAlert: Number(e.target.value) })}
           />
         </div>
       </section>
@@ -153,8 +148,8 @@ export default function Settings() {
           <Input
             type="number"
             name="payment_alerts"
-            value={formData.payment_alerts}
-            onChange={(e) => setFormData({ ...formData, payment_alerts: e.target.value })}
+            value={formData.paymentAlert ?? 0}
+            onChange={(e) => setFormData({ ...formData, paymentAlert: Number(e.target.value) })}
           />
         </div>
       </section>

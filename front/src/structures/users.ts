@@ -5,13 +5,28 @@ export interface IUser {
     firstName: string
     lastName: string
     email: string
-    birthDate: Date
+    dateOfBirth: Date
+    beltColor: beltColors
     profileImgUrl: string
-
-    getFullName(): string
+    role: userViews
 }
 
-export class NewUser {
+export interface UserPagination {
+    
+    total: number,
+    perPage: number,
+    currentPage: number,
+    lastPage: number,
+    firstPageUrl: string,
+    lastPageUrl: string,
+    nextPageUrl: string,
+    prevPageUrl: string,
+    from: number,
+    to: number,
+    data: IUser[]
+}
+
+export interface NewUser {
   FirstName: string
   LastName: string
   Email: string
@@ -19,110 +34,6 @@ export class NewUser {
   BeltColor: beltColors | null //not needed for instructors/admins
   Password: string
   Role: userViews
-}
-
-export class Student implements IUser {
-    id: number
-    firstName: string
-    lastName: string
-    email: string
-    birthDate: Date //birthdate is more descriptive and less likely to run into issues than dob
-    beltColor: beltColors
-    profileImgUrl: string
-
-    constructor(
-        id: number,
-        firstName: string,
-        lastName: string,
-        email: string,
-        birthDate: Date,
-        beltColor: beltColors,
-        profileImgUrl: string
-    ) {
-        this.id = id
-        this.firstName = firstName
-        this.lastName = lastName
-        this.email = email
-        this.birthDate = birthDate
-        this.beltColor = beltColor
-        this.profileImgUrl = profileImgUrl
-    }
-
-    /**
-     * Gets the fullname of the student
-     * @returns The full name of the student
-     */
-    getFullName(): string {
-        return this.firstName + " " + this.lastName
-    }
-}
-
-
-export class Instructor implements IUser {
-    id: number
-    firstName: string
-    lastName: string
-    email: string
-    birthDate: Date //birthdate is more descriptive and less likely to run into issues than dob
-    profileImgUrl: string
-
-    constructor(
-        id: number,
-        firstName: string,
-        lastName: string,
-        email: string,
-        birthDate: Date,
-        profileImgUrl: string
-    ) {
-        this.id = id
-        this.firstName = firstName
-        this.lastName = lastName
-        this.email = email
-        this.birthDate = birthDate
-        this.profileImgUrl = profileImgUrl
-    }
-
-    /**
-     * Gets the fullname of the student
-     * @returns The full name of the student
-     */
-    getFullName(): string {
-        return this.firstName + " " + this.lastName
-    }
-}
-
-
-export class Admin implements IUser {
-    id: number
-    firstName: string
-    lastName: string
-    email: string
-    birthDate: Date //birthdate is more descriptive and less likely to run into issues than dob
-    profileImgUrl: string
-
-    constructor(
-        id: number,
-        firstName: string,
-        lastName: string,
-        email: string,
-        birthDate: Date,
-        profileImgUrl: string
-    ) {
-        this.id = id
-        this.firstName = firstName
-        this.lastName = lastName
-        this.email = email
-        this.birthDate = birthDate
-        this.profileImgUrl = profileImgUrl
-    }
-
-    /**
-     * Gets the fullname of the student
-     * @returns The full name of the student
-     */
-    getFullName(): string {
-        return this.firstName + " " + this.lastName
-    }
 }
 
 /**
