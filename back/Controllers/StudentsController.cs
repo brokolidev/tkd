@@ -16,7 +16,7 @@ namespace taekwondo_backend.Controllers
     {
         private readonly AppDbContext _context;
         private readonly UserManager<User> _userManager;
-
+        
         public StudentsController(AppDbContext context, UserManager<User> userManager)
         {
             _context = context;
@@ -41,7 +41,18 @@ namespace taekwondo_backend.Controllers
             }
 
             // Get all users with the "Student" role
-            var allStudents = await _userManager.GetUsersInRoleAsync(UserRoles.Student.ToString());
+            var allStudents = (await _userManager.GetUsersInRoleAsync(UserRoles.Student.ToString()))
+                .Select(user => new UserFEDTO
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName ?? "",
+                        LastName = user.LastName ?? "",
+                        DateOfBirth = user.DateOfBirth,
+                        Email = user.Email ?? "",
+                        BeltColor = user.BeltColor,
+                        Role = UserRoles.Student
+                    }
+                );
 
             // If there are no students, return 204 No Content
             if (!allStudents.Any())
@@ -50,7 +61,7 @@ namespace taekwondo_backend.Controllers
             }
 
             // Get the students for the requested page order by ID
-            var pagedStudents = PagedList<User>.Create(allStudents.OrderBy(s => s.Id), pageNumber, pageSize);
+            var pagedStudents = PagedList<UserFEDTO>.Create(allStudents, pageNumber, pageSize);
 
             return Ok(pagedStudents);
         }
@@ -67,9 +78,7 @@ namespace taekwondo_backend.Controllers
         public async Task<IActionResult> GetStudentById(int id)
         {
             // Find the student with the given ID and role "Student"
-            User? student = await _context.Users
-                .Where(user => user.Id == id)
-                .FirstOrDefaultAsync();
+            User? student = await _userManager.FindByIdAsync(id.ToString());
 
             // Check if the student exists
             if (student == null)
@@ -78,8 +87,20 @@ namespace taekwondo_backend.Controllers
                 return NoContent();
             }
 
+            //map the user to a UserFEDTO
+            UserFEDTO user = new()
+            {
+                Id = id,
+                FirstName = student.FirstName ?? "",
+                LastName = student.LastName ?? "",
+                Email = student.Email ?? "",
+                BeltColor = student.BeltColor,
+                DateOfBirth = student.DateOfBirth,
+                Role = UserRoles.Student
+            };
+
             // Student found, return the data with 200 OK
-            return Ok(student);
+            return Ok(user);
         }
 
         [HttpPost]
@@ -98,6 +119,7 @@ namespace taekwondo_backend.Controllers
                     FirstName = userDTO.FirstName,
                     LastName = userDTO.LastName,
                     DateOfBirth = userDTO.DateOfBirth,
+                    BeltColor = userDTO.BeltColor
                 };
 
                 //create the  user

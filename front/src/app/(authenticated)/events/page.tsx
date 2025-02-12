@@ -4,47 +4,42 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/button';
 import { Divider } from '@/components/divider';
 import { Heading } from '@/components/heading';
-import { ISchedule } from '@/structures/schedule';
-import { mockSchedules, getSchedules } from '@/services/schdeuleServices';
+import { ISchedule, SchedulePagination } from '@/structures/schedule';
+import { getSchedules } from '@/services/schdeuleServices';
 import {Pagination,PaginationList,PaginationNext,PaginationPage,PaginationPrevious} from '@/components/pagination';
 import { Link } from '@/components/link'
 function EditEvents() {
-  const [schedules, setSchedules] = useState<ISchedule[]>([]);
+  const [schedules, setSchedules] = useState<ISchedule[]>([])
+  const [pageInfo, setPageInfo] = useState<SchedulePagination>({
+      total: 0,
+      perPage: 0,
+      currentPage: 0,
+      lastPage: 0,
+      firstPageUrl: "",
+      lastPageUrl: "",
+      nextPageUrl: "",
+      prevPageUrl: "",
+      from: 0,
+      to: 0,
+      data: [] //THIS SHOULD NEVER BE USED. USE SCHEDULES INSTEAD
+    })
   const [currentPage, setCurrentPage] = useState(1);
 
-  const ITEMS_PER_PAGE = 6;
+  const fetchSchedules = async () => {
+    try {
+      const data = await getSchedules();
+      console.log(data)
+      setPageInfo(data);
+    } catch(err) {
+      console.log('ERROR: fetchSchedules: ' + err);
+    }
+  };
 
   useEffect(() => {
-    const fetchSchedules = async () => {
-      try {
-        const data = await getSchedules();
-        setSchedules(data);
-      } catch {
-        console.warn('Falling back to mock schedules.');
-        setSchedules(mockSchedules);
-      }
-    };
-
     fetchSchedules();
   }, []);
 
-  const totalPages = Math.ceil(schedules.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedSchedules = schedules.slice(startIndex, endIndex);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-  const handlePageClick = (page: number, e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-  const getPageHref = (page: number) => (page >= 1 && page <= totalPages ? `?page=${page}` : undefined);
+  const getPageHref = (page: number) => (page >= 1 && page <= pageInfo.lastPage ? `?page=${page}` : undefined);
 
   return (
     <div className="p-8 space-y-10">
@@ -58,7 +53,7 @@ function EditEvents() {
       </div>
       <Divider className="my-8 border-gray-300" />
       <div>
-        {paginatedSchedules.map((item) => (
+        {pageInfo.data.map((item) => (
           <div key={item.id}>
             <div className="flex items-center mb-8">
               <img
@@ -87,10 +82,9 @@ function EditEvents() {
                   {item.isOpen ? 'Open' : 'Closed'}
                 </Button>
                 <Button className="px-3 py-1 text-sm bg-blue-500 text-white">
-                <Link href="/events/edit" className="inline-flex items-center gap-2 text-sm/6 text-white ">
-          
+                  <Link href="/events/edit" className="inline-flex items-center gap-2 text-sm/6 text-white ">
                    Edit
-                       </Link>
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -101,25 +95,19 @@ function EditEvents() {
     {/* PAGINATION COMPONENT */}
     <Pagination className="flex justify-center items-center space-x-2">
         {/* Previous Button */}
-        <button onClick={(e) => handlePageClick(currentPage - 1, e)} disabled={currentPage === 1}>
-          <PaginationPrevious href={getPageHref(currentPage - 1)}>Previous</PaginationPrevious>
-        </button>
+        <PaginationPrevious href={getPageHref(currentPage - 1)}>Previous</PaginationPrevious>
 
         {/* Pagination List */}
         <PaginationList className="flex space-x-2">
-          {[...Array(totalPages)].map((_, index) => (
-            <button key={index + 1} onClick={(e) => handlePageClick(index + 1, e)}>
-              <PaginationPage href={getPageHref(index + 1)} current={index + 1 === currentPage}>
-                {index + 1}
-              </PaginationPage>
-            </button>
+          {[...Array(pageInfo.lastPage)].map((_, i) => (
+            <PaginationPage key={i} href={getPageHref(i + 1)} current={i + 1 === currentPage}>
+              {i + 1}
+            </PaginationPage>
           ))}
         </PaginationList>
 
         {/* Next Button */}
-        <button onClick={(e) => handlePageClick(currentPage + 1, e)} disabled={currentPage === totalPages}>
-          <PaginationNext href={getPageHref(currentPage + 1)}>Next</PaginationNext>
-        </button>
+        <PaginationNext href={getPageHref(currentPage + 1)}>Next</PaginationNext>
       </Pagination>
 
       

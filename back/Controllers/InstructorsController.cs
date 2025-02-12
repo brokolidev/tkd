@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using taekwondo_backend.Models.Identity;
 using taekwondo_backend.Enums;
 using Microsoft.AspNetCore.Authorization;
+using System.Runtime.InteropServices;
 
 
 namespace taekwondo_backend.Controllers
@@ -41,16 +42,27 @@ namespace taekwondo_backend.Controllers
             }
 
             // Get all users with the "Instructor" role
-            var allInstructors = await _userManager.GetUsersInRoleAsync(UserRoles.Instructor.ToString());
+            var allInstructors = (await _userManager.GetUsersInRoleAsync(UserRoles.Instructor.ToString()))
+                .Select(user => new UserFEDTO
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName ?? "",
+                        LastName = user.LastName ?? "",
+                        DateOfBirth = user.DateOfBirth,
+                        Email = user.Email ?? "",
+                        BeltColor = null,
+                        Role = UserRoles.Instructor
+                    }
+                );
 
-            // If there are no instructors, return 204 No Content
+            // If there are no students, return 204 No Content
             if (!allInstructors.Any())
             {
                 return NoContent();
             }
 
-            // Get the instructors for the requested page order by ID
-            var pagedInstructors = PagedList<User>.Create(allInstructors.OrderBy(s => s.Id), pageNumber, pageSize);
+            // Get the students for the requested page order by ID
+            var pagedInstructors = PagedList<UserFEDTO>.Create(allInstructors, pageNumber, pageSize);
 
             // Create the response with page details and instructor data
             return Ok(pagedInstructors);
@@ -67,20 +79,30 @@ namespace taekwondo_backend.Controllers
         [Authorize]
         public async Task<IActionResult> GetInstructorById(int id)
         {
-            // Find the instructor with the given ID and role "Instructor"
-            User? instructor = await _context.Users
-                .Where(user => user.Id == id)
-                .FirstOrDefaultAsync();
+            // Find the student with the given ID and role "Student"
+            User? instructor = await _userManager.FindByIdAsync(id.ToString());
 
-            // Check if the instructor exists
+            // Check if the student exists
             if (instructor == null)
             {
-                // No instructor found, return 204 No Content (-1 is the defualt for id above)
+                // No student found, return 204 No Content (-1 is the defualt for id above)
                 return NoContent();
             }
 
-            // Instructor found, return the data with 200 OK
-            return Ok(instructor);
+            //map the user to a UserFEDTO
+            UserFEDTO user = new()
+            {
+                Id = id,
+                FirstName = instructor.FirstName ?? "",
+                LastName = instructor.LastName ?? "",
+                Email = instructor.Email ?? "",
+                BeltColor = instructor.BeltColor,
+                DateOfBirth = instructor.DateOfBirth,
+                Role = UserRoles.Instructor
+            };
+
+            // Student found, return the data with 200 OK
+            return Ok(user);
         }
 
         [HttpPost]

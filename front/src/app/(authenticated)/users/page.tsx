@@ -11,43 +11,50 @@ import { userViews, useUserViews } from '@/hooks/userViews'
 import { getAdmins } from '@/services/adminServices'
 import { getInstructors } from '@/services/instructorServices'
 import { getStudents } from '@/services/studentServices'
-import { beltColors, IUser, Student } from '@/structures/users'
+import { beltColors, IUser, UserPagination } from '@/structures/users'
 
 // @ts-ignore
 import { use, useEffect, useState } from 'react'
 
-interface PageInfo {
-    pageSize: number,
-    totalItems: number,
-    totalPages: number
-}
-
 export default function UserPage(props) {
   const searchParams: any = use(props.searchParams)
+  const page = searchParams.page ? parseInt(searchParams.page) : 1
 
   const [users, setUsers] = useState<IUser[]>([])
-  const page = searchParams.page ? parseInt(searchParams.page) : 1
-  const [pageInfo, setPageInfo] = useState<PageInfo>({
-    pageSize: 0,
-    totalItems: 0,
-    totalPages: 0
+  const [pageInfo, setPageInfo] = useState<UserPagination>({
+    total: 0,
+    perPage: 0,
+    currentPage: 0,
+    lastPage: 0,
+    firstPageUrl: "",
+    lastPageUrl: "",
+    nextPageUrl: "",
+    prevPageUrl: "",
+    from: 0,
+    to: 0,
+    data: []
   })
+
   const { currentView, setCurrentView } = useUserViews()
 
+  /**
+   * Loads the users in from the BE, based on the user view chosen
+   */
   const loadData = () => {
-
-    let dataToFetch = null
+    
+    let loadFunction = null
 
     //load in the correct users for the chosen view
     switch (currentView) {
       case userViews.ADMIN:
-        dataToFetch = () => getAdmins(page)
+        loadFunction = getAdmins
+          
         break
       case userViews.INSTRUCTOR:
-        dataToFetch = () => getInstructors(page)
+        loadFunction = getInstructors
         break
       case userViews.STUDENT:
-        dataToFetch = () => getStudents(page)
+        loadFunction = getStudents
         break
       default:
         //we end up here at least once when the page reloads.
@@ -56,15 +63,11 @@ export default function UserPage(props) {
         return
     }
 
-    dataToFetch()
-      .then((data: any) => {
+    loadFunction(page)
+      .then((data: UserPagination) => {
         console.log("The data: ", data)
-        setPageInfo({
-          pageSize: data.pageSize,
-          totalItems: data.totalItems,
-          totalPages: data.totalPages
-        })
-        setUsers(data.users)
+        setPageInfo(data)
+        setUsers(data.data)
 
       })
       .catch((err: string) => {
@@ -78,6 +81,8 @@ export default function UserPage(props) {
   }, [page, currentView])
 
   /**
+   * Builds the pagination element list for the page. This way, it's not a whole bunch of stuff
+   * trying to be done in the map function down below.
    * 
    * @returns A list of the pagination buttons for the bottom of the screen
    */
@@ -88,10 +93,12 @@ export default function UserPage(props) {
 
     //push the previous button
     if (page > 1) {
-        elements.push(<PaginationPage href="?page=1">Start</PaginationPage>)
-        elements.push(<PaginationPrevious href={"?page=" + (page - 1)} />)
+        elements.push(
+          <PaginationPage key={'start'} href={pageInfo.firstPageUrl}>Start</PaginationPage>
+        )
+        elements.push(<PaginationPrevious key={'prev'} href={pageInfo.prevPageUrl} />)
     } else {
-        elements.push(<span className='grow basis-0'></span>)
+        elements.push(<span key={'prev'} className='grow basis-0'></span>)
     }
 
     //this should end up showing the current page, and nine pages after that.
@@ -100,7 +107,7 @@ export default function UserPage(props) {
     let start = (page == 1 ? page : page - 1)
 
     //push the page buttons
-    for (let i = start; i < (pageInfo.totalPages + 1) && i < (page + 10); i++) {
+    for (let i = start; i < (pageInfo.lastPage + 1) && i < (page + 10); i++) {
         elements.push(
           <PaginationPage
             key={i}
@@ -113,11 +120,13 @@ export default function UserPage(props) {
     }
 
     //push the next button
-    if (page < pageInfo.totalPages) {
-        elements.push(<PaginationNext href={"?page=" + (page + 1)} />)
-        elements.push(<PaginationPage href={'?page=' + pageInfo.totalPages}>End</PaginationPage>)
+    if (page < pageInfo.lastPage) {
+        elements.push(<PaginationNext key={'next'} href={pageInfo.nextPageUrl} />)
+        elements.push(
+          <PaginationPage key={'end'} href={pageInfo.lastPageUrl}>End</PaginationPage>
+        )
     } else {
-        elements.push(<span className='grow basis-0'></span>)
+        elements.push(<span key={'next'} className='grow basis-0'></span>)
     }
 
     //return the buttons
@@ -217,10 +226,11 @@ export default function UserPage(props) {
 
                     {/* The belt color is only needed if the user is a student */}
                     {
-                      user instanceof Student &&
+                      user.role == userViews.STUDENT &&
 
                       <span className='capitalize'>
-                        {Object.values(beltColors)[user.beltColor].toString().toLowerCase()} Belt
+                        {Object.values(beltColors)[user?.beltColor ?? 0].toString().toLowerCase()}
+                        &nbsp;Belt
                       </span>
                     }
 
@@ -247,9 +257,8 @@ export default function UserPage(props) {
 
       </Table>
 
-      {/* add pagination when the backend is connected. */}
       <Pagination className="mt-8">
-        { pageInfo?.totalPages > 1 &&
+        { pageInfo?.lastPage > 1 &&
           buildPagination()
         }
       </Pagination>
