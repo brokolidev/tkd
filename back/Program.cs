@@ -94,7 +94,7 @@ namespace taekwondo_backend
                 var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
                 await seeder.ProductionSeed();
 
-                Console.WriteLine(app.Environment.IsDevelopment());
+                // Console.WriteLine(app.Environment.IsDevelopment());
 
                 // Uncomment this if you need to generate some seed data
                 // if (app.Environment.IsDevelopment())
