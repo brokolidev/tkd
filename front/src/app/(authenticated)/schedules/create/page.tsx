@@ -49,32 +49,50 @@ export default function SchedulecreatePage() {
   const fetchCustomers = async () => {
     try {
       const response = await getStudents(1);
-      const formattedCustomers = response.map((student: any) => ({
-        id: student.id,
-        name: student.getFullName(),
-        email: student.email,
-        profileImgUrl: student.profileImgUrl,
-      }));
-      setCustomers(formattedCustomers);
+      
+      // Extract the actual student list from 'users'
+      const studentData = response.data;
+  
+      if (Array.isArray(studentData)) {
+        const formattedCustomers = studentData.map((student: any) => ({
+          id: student.id,
+          name: student.getFullName ? student.getFullName() : `${student.firstName} ${student.lastName}`,
+          email: student.email || "",
+          profileImgUrl: student.profileImgUrl || "",
+        }));
+        setCustomers(formattedCustomers);
+      } else {
+        console.error("Unexpected response format: Missing 'users' array", response);
+      }
     } catch (error) {
       console.error("Error fetching customers:", error);
     }
   };
+  
+  
 
   const fetchInstructors = async () => {
     try {
       const response = await getInstructors(1);
-      const formattedInstructors = response.map((instructor: any) => ({
-        id: instructor.id,
-        name: `${instructor.firstName} ${instructor.lastName}`,
-        profileImgUrl: instructor.profileImgUrl,
-      }));
-      setInstructors(formattedInstructors);
+      
+      // Extract the actual instructor list from 'users'
+      const instructorData = response.data;
+  
+      if (Array.isArray(instructorData)) {
+        const formattedInstructors = instructorData.map((instructor: any) => ({
+          id: instructor.id,
+          name: `${instructor.firstName} ${instructor.lastName}`,
+          profileImgUrl: instructor.profileImgUrl || "",
+        }));
+        setInstructors(formattedInstructors);
+      } else {
+        console.error("Unexpected response format: Missing 'users' array", response);
+      }
     } catch (error) {
       console.error("Error fetching instructors:", error);
     }
   };
-
+  
   const handleAddTimeSlot = () => {
     setTimeSlots([...timeSlots, { day: "", startTime: "", endTime: "" }]);
   };
