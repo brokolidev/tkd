@@ -14,6 +14,7 @@ import { getStudents } from '@/services/studentServices'
 import axios from "axios"
 import { Avatar } from '@/components/avatar'
 import ImageUpload from '@/components/image'
+import { getSchedules } from '@/services/schdeuleServices'
 // using enum for days of the week
 enum DaysOfWeek {
   Monday = "Monday",
@@ -40,10 +41,15 @@ export default function SchedulecreatePage() {
   const [selectedCustomers, setSelectedCustomers] = useState<any[]>([]);
   const [instructors, setInstructors] = useState<any[]>([]);
   const [selectedInstructors, setSelectedInstructors] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [schedule, setSchedule] = useState<any>({});
+
 
   useEffect(() => {
     fetchCustomers();
     fetchInstructors();
+    fetchTimeSlots();
   }, []);
 
   const fetchCustomers = async () => {
@@ -92,6 +98,33 @@ export default function SchedulecreatePage() {
       console.error("Error fetching instructors:", error);
     }
   };
+
+  const fetchTimeSlots = async () => {
+    try {
+      // Make sure the endpoint is correct. If your backend uses /Schedules, you might need to change this.
+      const response = await axios.get("/schedules");
+      const scheduleData = response.data;
+  
+      // Extract the actual schedule array from the paginated object
+      const schedules = scheduleData.items; // Adjust the property name if it's different
+  
+      if (Array.isArray(schedules)) {
+        const formattedSlots = schedules.map((schedule: any) => ({
+          day: schedule.dayOfWeekString, // Using the computed property from your DTO
+          startTime: schedule.timeSlot.startTime,
+          endTime: schedule.timeSlot.endTime,
+        }));
+        setTimeSlots(formattedSlots);
+      } else {
+        console.error("Unexpected response format: Missing schedule array", response);
+        setError("Invalid data format received from API");
+      }
+    } catch (error) {
+      console.error("Error fetching time slots:", error);
+      setError("Failed to fetch time slots");
+    }
+  };
+  
   
   const handleAddTimeSlot = () => {
     setTimeSlots([...timeSlots, { day: "", startTime: "", endTime: "" }]);
@@ -231,46 +264,38 @@ export default function SchedulecreatePage() {
           <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2 items-start">
             <div className="flex items-center gap-3">
               <Subheading>Time Slots</Subheading>
-              <Button type="button" onClick={handleAddTimeSlot} className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+              <Button type="button" className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
                 <PlusIcon className="h-4 w-4" />
               </Button>
             </div>
-            <div className="max-h-[300px] overflow-y-auto">
-              {timeSlots.map((timeSlot, index) => (
-                <div key={index} className="grid grid-cols-4 gap-4 items-center mb-4">
-                  <Select
-                    aria-label="Day"
-                    value={timeSlot.day}
-                    onChange={(e) => handleTimeSlotChange(index, "day", e.target.value)}
-                  >
-                    <option value="">Select Day</option>
-                    {daysArray.map((day) => (
-                      <option key={day} value={day}>
-                        {day}
-                      </option>
-                    ))}
-                  </Select>
 
-                  <Input
-                    type="time"
-                    aria-label="Start Time"
-                    value={timeSlot.startTime}
-                    onChange={(e) => handleTimeSlotChange(index, "startTime", e.target.value)}
-                  />
-                  <Input
-                    type="time"
-                    aria-label="End Time"
-                    value={timeSlot.endTime}
-                    onChange={(e) => handleTimeSlotChange(index, "endTime", e.target.value)}
-                  />
-                  <Button type="button" onClick={() => handleRemoveTimeSlot(index)} className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
-                    <MinusIcon className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
+            {/* Show Loading or Error */}
+            {loading && <p>Loading time slots...</p>}
+            {error && <p className="text-red-500">{error}</p>}
+
+            {/* Show Time Slots Only if Data Exists */}
+            {!loading && !error && timeSlots.length > 0 && (
+              <div className="max-h-[300px] overflow-y-auto">
+                {timeSlots.map((slot, index) => (
+                  <div key={index} className="grid grid-cols-4 gap-4 items-center mb-4">
+                    <Select aria-label="Day" value={slot.day}>
+                      <option value="">Select Day</option>
+                      {daysArray.map((day) => (
+                        <option key={day} value={day}>
+                          {day}
+                        </option>
+                      ))}
+                    </Select>
+                    <Input type="time" aria-label="Start Time" value={slot.startTime} />
+                    <Input type="time" aria-label="End Time" value={slot.endTime} />
+                    <Button type="button" className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                      <MinusIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
-
 
 
         <Divider className="my-10 w-full" />

@@ -5,7 +5,7 @@ namespace taekwondo_backend.Models
     public class GetSchedulesDTO
     {
         public int Id { get; set; }
-        public required TimeSlot TimeSlot { get; set; } // Make TimeSlot nullable
+        public required TimeSlot TimeSlot { get; set; } 
         public required List<int> StudentIds { get; set; }
         public required List<User> Instructors { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
