@@ -13,6 +13,8 @@ import { ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { NewUser } from '@/structures/users'
 import { useState } from 'react'
 import { createUser } from '@/services/userServices'
+import WebcamCapture from '@/components/webcapture'
+import ImageUpload from '@/components/image'
 
 export default function UserRegisterPage() {
 
@@ -158,6 +160,19 @@ export default function UserRegisterPage() {
               placeholder="Doe"
             />
           </div>
+
+          <div className="space-y-1">
+            <Subheading>Profile Picture</Subheading>
+            </div>
+            <div>
+              <ImageUpload/>
+             <WebcamCapture />
+            </div>
+            
+            
+            
+
+
           <div className="space-y-1">
             <Subheading>Email</Subheading>
           </div>
