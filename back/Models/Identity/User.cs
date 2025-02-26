@@ -15,5 +15,7 @@ namespace taekwondo_backend.Models.Identity
         [PersonalData]
         public string? ProfileImage { get; set; }
         public BeltColorType? BeltColor { get; set; }
+
+
     }
 }

@@ -4,14 +4,14 @@ import React, { useRef, useState, useCallback } from "react";
 import Webcam from "react-webcam";
 import { Button } from "@/components/button";
 
-const WebcamCapture: React.FC = () => {
+const WebcamCapture: React.FC<{ onImageUploaded?: (url: string) => void }> = ({ onImageUploaded }) => {
   const webcamRef = useRef<Webcam>(null);
   const [isWebcamOpen, setIsWebcamOpen] = useState(false);
   const [image, setImage] = useState<string | null>(null);
 
   const handleOpenWebcam = () => {
     setIsWebcamOpen(true);
-    setImage(null); // Clear previous image when reopening
+    setImage(null);
   };
 
   const handleCloseWebcam = () => {
@@ -30,26 +30,30 @@ const WebcamCapture: React.FC = () => {
     if (!image) return;
 
     try {
-      const response = await fetch("http://localhost:5000/upload", {
+      const response = await fetch("https://localhost:7183/api/images/upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image }),
       });
 
       const data = await response.json();
-      alert(data.message);
+      alert("Image uploaded successfully. URL: " + data.fileUrl);
+      
+      // Pass the uploaded image URL back to the parent component if a callback is provided.
+      if (onImageUploaded) {
+        onImageUploaded(data.fileUrl);
+      }
     } catch (error) {
       console.error("Error uploading image:", error);
     }
   };
 
   const videoConstraints = {
-    facingMode: { ideal: "environment" }, // Use the back camera on mobile devices
+    facingMode: { ideal: "environment" },
   };
 
   return (
     <div className="w-full max-w-md mx-auto p-4 bg-white rounded-lg shadow">
-      {/* Show "Open Webcam" button only if webcam is closed and no image is captured */}
       {!isWebcamOpen && !image ? (
         <div className="flex justify-center">
           <Button
@@ -66,7 +70,6 @@ const WebcamCapture: React.FC = () => {
               ref={webcamRef}
               screenshotFormat="image/jpeg"
               videoConstraints={videoConstraints}
-              mirrored={false} // Ensure the image is not inverted
               className="w-full rounded-lg border border-gray-300"
             />
           </div>

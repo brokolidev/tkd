@@ -248,9 +248,7 @@ export default function SchedulecreatePage() {
     />
   </div>
 
-  <div> {/*OpenAI, "Custom implementation for image upload 
-            in a user management system,"
-          ChatGPT-generated response, Jan. 27, 2025.  */}
+  <div>
     <Subheading>Class Image</Subheading>
   </div>
   <div>
