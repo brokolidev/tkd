@@ -9,17 +9,13 @@ import { Link } from '@/components/link'
 import { Select } from '@/components/select'
 import { ChevronLeftIcon, PlusIcon, MinusIcon } from '@heroicons/react/16/solid'
 import { useState, useEffect } from 'react'
-import { getInstructors } from '@/services/instructorServices'
-import { getStudents } from '@/services/studentServices'
-import axios from "axios"
-import { Avatar } from '@/components/avatar'
 import ImageUpload from '@/components/image'
-import {updateSettings} from "@/services/settingServices";
-import {Text} from "@/components/text";
-import {ISettings, IUpdateSetting} from "@/structures/setting";
 import {ISchedule} from "@/structures/schedule";
 import {BadgeButton} from "@/components/badge";
 import {Dialog, DialogActions, DialogDescription, DialogTitle} from "@/components/dialog";
+import {Field, Label} from "@/components/fieldset";
+import * as Headless from '@headlessui/react'
+import {Listbox, ListboxLabel, ListboxOption} from "@/components/listbox";
 
 
 export default function CreateSchedulePage() {
@@ -102,6 +98,41 @@ export default function CreateSchedulePage() {
           <BadgeButton color="blue" onClick={() => null}>
             + Add
           </BadgeButton>
+        </div>
+        <div>
+          <Headless.Field className="flex items-baseline justify-center gap-6">
+              <Listbox name="status" defaultValue="active" className="max-w-48">
+                <ListboxOption value="active">
+                  <ListboxLabel>Active</ListboxLabel>
+                </ListboxOption>
+                <ListboxOption value="paused">
+                  <ListboxLabel>Paused</ListboxLabel>
+                </ListboxOption>
+                <ListboxOption value="delayed">
+                  <ListboxLabel>Delayed</ListboxLabel>
+                </ListboxOption>
+                <ListboxOption value="canceled">
+                  <ListboxLabel>Canceled</ListboxLabel>
+                </ListboxOption>
+              </Listbox>
+            
+              <Listbox name="status" defaultValue="active" className="max-w-48">
+                <ListboxOption value="active">
+                  <ListboxLabel>Active</ListboxLabel>
+                </ListboxOption>
+                <ListboxOption value="paused">
+                  <ListboxLabel>Paused</ListboxLabel>
+                </ListboxOption>
+                <ListboxOption value="delayed">
+                  <ListboxLabel>Delayed</ListboxLabel>
+                </ListboxOption>
+                <ListboxOption value="canceled">
+                  <ListboxLabel>Canceled</ListboxLabel>
+                </ListboxOption>
+              </Listbox>
+            
+            <BadgeButton color="red">Remove</BadgeButton>
+          </Headless.Field>
         </div>
       </section>
 
