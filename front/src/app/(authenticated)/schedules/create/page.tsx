@@ -11,11 +11,13 @@ import { ChevronLeftIcon, PlusIcon, MinusIcon } from '@heroicons/react/16/solid'
 import { useState, useEffect } from 'react'
 import ImageUpload from '@/components/image'
 import {ISchedule} from "@/structures/schedule";
-import {BadgeButton} from "@/components/badge";
+import {Badge, BadgeButton} from "@/components/badge";
 import {Dialog, DialogActions, DialogDescription, DialogTitle} from "@/components/dialog";
 import {Field, Label} from "@/components/fieldset";
 import * as Headless from '@headlessui/react'
 import {Listbox, ListboxLabel, ListboxOption} from "@/components/listbox";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/table";
+import {Avatar} from "@/components/avatar";
 
 
 export default function CreateSchedulePage() {
@@ -23,6 +25,7 @@ export default function CreateSchedulePage() {
   const [formData, setFormData] = useState<ISchedule | null>(null)
   const [isResetOpen, setIsResetOpen] = useState(false)
   const [isSaveOpen, setIsSaveOpen] = useState(false)
+  const [users, setUsers] = useState([])
 
   useEffect(() => {
     
@@ -173,6 +176,31 @@ export default function CreateSchedulePage() {
         <div className="flex items-center gap-3">
           <Subheading>Students</Subheading>
         </div>
+        <Table className="[--gutter:--spacing(6)] sm:[--gutter:--spacing(8)]">
+          <TableHead>
+            <TableRow>
+              <TableHeader>Name</TableHeader>
+              <TableHeader>Status</TableHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.handle}>
+                <TableCell>
+                  <div className="flex items-center gap-4">
+                    <Avatar src={user.avatarUrl} className="size-12" />
+                    <div>
+                      <div className="font-medium">{user.name}</div>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {user.online ? <Badge color="lime">Online</Badge> : <Badge color="zinc">Offline</Badge>}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </section>
 
       <Divider className="my-10" />
