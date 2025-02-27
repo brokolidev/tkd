@@ -9,18 +9,3 @@ export interface ISchedule {
     isOpen: boolean;
     imageUrl: string;
 }
-
-export interface SchedulePagination {
-    
-    total: number,
-    perPage: number,
-    currentPage: number,
-    lastPage: number,
-    firstPageUrl: string,
-    lastPageUrl: string,
-    nextPageUrl: string,
-    prevPageUrl: string,
-    from: number,
-    to: number,
-    data: ISchedule[]
-}
