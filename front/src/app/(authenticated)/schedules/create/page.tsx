@@ -145,6 +145,26 @@ export default function CreateSchedulePage() {
             + Add
           </BadgeButton>
         </div>
+        <div>
+          <Headless.Field className="flex items-baseline justify-center gap-6">
+            <Listbox name="status" defaultValue="active" className="max-w-96">
+              <ListboxOption value="active">
+                <ListboxLabel>Active</ListboxLabel>
+              </ListboxOption>
+              <ListboxOption value="paused">
+                <ListboxLabel>Paused</ListboxLabel>
+              </ListboxOption>
+              <ListboxOption value="delayed">
+                <ListboxLabel>Delayed</ListboxLabel>
+              </ListboxOption>
+              <ListboxOption value="canceled">
+                <ListboxLabel>Canceled</ListboxLabel>
+              </ListboxOption>
+            </Listbox>
+
+            <BadgeButton color="red">Remove</BadgeButton>
+          </Headless.Field>
+        </div>
       </section>
 
       <Divider className="my-10" />
