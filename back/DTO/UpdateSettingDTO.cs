@@ -1,5 +1,5 @@
-namespace taekwondo_backend.Models
-{
+    namespace taekwondo_backend.DTO;
+
     public class UpdateSettingDTO
     {
         public string? OrganizationName { get; set; }
@@ -13,4 +13,3 @@ namespace taekwondo_backend.Models
         public int? AbsentAlert { get; set; }
         public int? PaymentAlert { get; set; }
     }
-}

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using taekwondo_backend.Data;
 using taekwondo_backend.Models;
 using Microsoft.AspNetCore.Authorization;
+using taekwondo_backend.DTO;
 using taekwondo_backend.Enums;
 
 namespace taekwondo_backend.Controllers

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using taekwondo_backend.Data;
 using taekwondo_backend.Models;
 using Microsoft.AspNetCore.Authorization;
+using taekwondo_backend.DTO;
 using taekwondo_backend.Enums;
+using GetSchedulesDTO = taekwondo_backend.DTO.GetSchedulesDTO;
 
 
 namespace taekwondo_backend.Controllers
@@ -106,44 +108,45 @@ namespace taekwondo_backend.Controllers
         //     return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, schedule);
         // }
 
-        // PUT: schedule/5
-        [HttpPut("{id}")]
-        public ActionResult UpdateSchedule(int id, GetSchedulesDTO scheduleDTO)
+        // PATCH: schedule/5
+        [HttpPatch("{id:int}")]
+        public ActionResult UpdateSchedule(int id, UpdateSchedulesDTO updateScheduleDTO)
         {
-            var schedule = _context.Schedules.FirstOrDefault(s => s.Id == id);
-            if (schedule == null)
+            var selectedSchedule = _context.Schedules.FirstOrDefault(s => s.Id == id);
+            if (selectedSchedule == null)
             {
                 return NotFound(new[] { $"Schedule with id {id} could not be found." });
             }
+            
+            // Get all properties from DTO
+            var properties = typeof(UpdateSchedulesDTO).GetProperties();
+            
+            // To check if any changes are made
+            var hasChanges = false;
 
             // Check if TimeSlot is provided and update it (null check)
-            if (scheduleDTO.TimeSlot != null)
+            foreach (var property in properties)
             {
-                schedule.TimeSlot = scheduleDTO.TimeSlot;
+                // Get the value from input
+                var newValue = property.GetValue(updateScheduleDTO);
+                if (newValue == null) continue;
+                
+                // Find the matching property
+                var entityProperty = typeof(Schedule).GetProperty(property.Name);
+                if (entityProperty == null) continue;
+                
+                // Update the value with new values
+                entityProperty.SetValue(selectedSchedule, newValue);
+                hasChanges = true;
             }
-            else
+            
+            // Save changes to the database only if there are updates
+            if (hasChanges)
             {
-                return BadRequest(new[] { "TimeSlot cannot be null." });
+                _context.SaveChanges();
             }
-
-            // Ensure instructors and students are properly assigned (non-null and valid)
-            var students = _context.Users.Where(u => scheduleDTO.StudentIds.Contains(u.Id)).ToList();
-            var instructors = scheduleDTO.Instructors;
-
-            // Ensure that Instructors and Students lists are not null or empty
-            if (students == null || instructors == null || students.Count == 0 || instructors.Count == 0)
-            {
-                return BadRequest(new[] { "At least one student and one instructor must be assigned." });
-            }
-
-            // Update the schedule
-            schedule.Students = students;
-            schedule.Instructors = instructors;
-
-            // Save changes to the database
-            _context.SaveChanges();
-
-            return NoContent();
+            
+            return Ok(selectedSchedule);
         }
 
         // DELETE: schedule/5
