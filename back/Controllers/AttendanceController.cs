@@ -87,10 +87,20 @@ namespace taekwondo_backend.Controllers
 				return BadRequest(JsonSerializer.Serialize("The Time inputted was not within a half an hour of a schedule start time for the user"));
 			}
 
-			//Here, check that the user hasn't already checked into this class
-			if (HasAlreadyCheckedIn(scheduleId, userId, recordTime))
+			//if the schedule cannot be found in the HasAlreadyCheckedIn method, it throws an exception. catch it here and return.
+			try
 			{
-				return BadRequest(JsonSerializer.Serialize("The user has already checked into this class."));
+				//Here, check that the user hasn't already checked into this class
+				if (HasAlreadyCheckedIn(scheduleId, userId, recordTime))
+				{
+					return BadRequest(JsonSerializer.Serialize("The user has already checked into this class."));
+				}
+			} catch (InvalidOperationException ex)
+			{
+				//return a not found. the schedule was not found in the database.
+				//realistically, this should never run. if the schedule doesn't exist, it should be caught earlier in the
+				//program. this is just to make c# happy
+				return NotFound(JsonSerializer.Serialize(ex.Message));
 			}
 
 			//create the record
