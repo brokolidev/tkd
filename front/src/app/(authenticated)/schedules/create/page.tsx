@@ -18,6 +18,8 @@ import * as Headless from '@headlessui/react'
 import {Listbox, ListboxLabel, ListboxOption} from "@/components/listbox";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/table";
 import {Avatar} from "@/components/avatar";
+import {getTimeSlots} from "@/services/tmeSlotServices";
+import {Monda} from "next/dist/compiled/@next/font/dist/google";
 
 export default function CreateSchedulePage() {
   const [isCreated, setIsCreated] = useState(false)
@@ -25,6 +27,18 @@ export default function CreateSchedulePage() {
   const [isResetOpen, setIsResetOpen] = useState(false)
   const [isSaveOpen, setIsSaveOpen] = useState(false)
   const [users, setUsers] = useState([])
+  const [timeslots, setTimeslots] = useState([]);
+  const [timeslotComponents, setTimeslotComponents] = useState([])
+
+  async function loadTimeslots(): Promise<void> {
+    const timeslots = await getTimeSlots();
+    setTimeslots(timeslots)
+    setTimeslotComponents([{
+      id: 0,
+      day: "Monday",
+      timeslotId: timeslots.length > 0 ? timeslots[0].id : null
+    }])
+  }
 
   const daysOfWeek = [
     'Monday',
@@ -37,7 +51,7 @@ export default function CreateSchedulePage() {
   ]
 
   useEffect(() => {
-    
+    loadTimeslots();
   }, [])
 
 
@@ -45,6 +59,17 @@ export default function CreateSchedulePage() {
     setFormData(null)
     setIsResetOpen(false)
   }
+  
+  const addTimeslotComponent = () => {
+    setTimeslotComponents([
+      ...timeslotComponents,
+      {
+        id: timeslotComponents.length + 1,
+        day: "Monday",
+        timeslotId: timeslots.length > 0 ? timeslots[0].id : null
+      }
+    ])
+  } 
 
   const handleSubmit = async (event?: React.FormEvent) => {
     return false;
@@ -107,37 +132,31 @@ export default function CreateSchedulePage() {
       <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2 items-start">
         <div className="flex items-center gap-3">
           <Subheading>Time Slots</Subheading>
-          <BadgeButton color="blue" onClick={() => null}>
+          <BadgeButton color="blue" onClick={addTimeslotComponent}>
             + Add
           </BadgeButton>
         </div>
         <div>
-          <Headless.Field className="flex items-baseline justify-center gap-6">
-              <Listbox name="status" defaultValue="Monday" className="max-w-48">
-                {daysOfWeek.map((day, index: number) => (
-                  <ListboxOption<string> value={day} key={index}>
-                    <ListboxLabel>{day}</ListboxLabel>
-                  </ListboxOption>
+            {timeslotComponents.map((comp) => (
+              <Headless.Field className="flex items-baseline justify-center gap-6 mb-4" key={comp.id}>
+                <Listbox name="dows[]" defaultValue={comp.day} className="max-w-48">
+                  {daysOfWeek.map((day, index: number) => (
+                    <ListboxOption<string> value={day} key={index}>
+                      <ListboxLabel>{day}</ListboxLabel>
+                    </ListboxOption>
                   ))}
-              </Listbox>
-            
-              <Listbox name="status" defaultValue="active" className="max-w-48">
-                <ListboxOption value="active">
-                  <ListboxLabel>Active</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="paused">
-                  <ListboxLabel>Paused</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="delayed">
-                  <ListboxLabel>Delayed</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="canceled">
-                  <ListboxLabel>Canceled</ListboxLabel>
-                </ListboxOption>
-              </Listbox>
-            
-            <BadgeButton color="red">Remove</BadgeButton>
-          </Headless.Field>
+                </Listbox>
+                <Listbox name="timeslots[]" onChange={(e) => { console.log(e); }}
+                         defaultValue={comp.timeslotId} className="max-w-48">
+                  {timeslots.map((timeslot) => (
+                    <ListboxOption value={timeslot.id} key={timeslot.id}>
+                      <ListboxLabel>{timeslot?.startsAt.replace(/:00$/, '')} ~ {timeslot?.endsAt.replace(/:00$/, '')}</ListboxLabel>
+                    </ListboxOption>
+                  ))}
+                </Listbox>
+                <BadgeButton color="red">Remove</BadgeButton>
+              </Headless.Field>
+            ))}
         </div>
       </section>
 
