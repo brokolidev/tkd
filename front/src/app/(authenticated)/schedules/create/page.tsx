@@ -18,7 +18,8 @@ import * as Headless from '@headlessui/react'
 import {Listbox, ListboxLabel, ListboxOption} from "@/components/listbox";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/table";
 import {Avatar} from "@/components/avatar";
-
+import {getTimeSlots} from "@/services/tmeSlotServices";
+import {Monda} from "next/dist/compiled/@next/font/dist/google";
 
 export default function CreateSchedulePage() {
   const [isCreated, setIsCreated] = useState(false)
@@ -26,15 +27,70 @@ export default function CreateSchedulePage() {
   const [isResetOpen, setIsResetOpen] = useState(false)
   const [isSaveOpen, setIsSaveOpen] = useState(false)
   const [users, setUsers] = useState([])
+  const [timeslots, setTimeslots] = useState([]);
+  const [timeslotComponents, setTimeslotComponents] = useState([])
+  const [selectedTimeslots, setSelectedTimeslots] = useState([])
+
+  async function loadTimeslots(): Promise<void> {
+    const timeslots = await getTimeSlots();
+    setTimeslots(timeslots)
+    setTimeslotComponents([
+      [ "Monday", timeslots.length > 0 ? timeslots[0].id : null]
+    ])
+    setSelectedTimeslots([
+      ["Monday", 1],
+    ]);
+  }
+
+  const daysOfWeek = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday'
+  ]
 
   useEffect(() => {
-    
-  }, []);
+    loadTimeslots();
+  }, [])
 
+  const handleDOWSelect = (e, idx) => {
+    selectedTimeslots[idx][0] = e
+    setSelectedTimeslots(selectedTimeslots)
+  }
+
+  const handleTimeslotSelect = (e, idx) => {
+    selectedTimeslots[idx][1] = e
+    setSelectedTimeslots(selectedTimeslots)
+  }
 
   const handleReset = () => {
     setFormData(null)
     setIsResetOpen(false)
+  }
+  
+  const addTimeslotComponent = () => {
+    setTimeslotComponents([
+      ...timeslotComponents,
+      [
+        "Monday",
+        timeslots.length > 0 ? timeslots[0].id : null
+      ]
+    ])
+    setSelectedTimeslots([
+      ...selectedTimeslots,
+      ["Monday", 1]
+    ])
+  }
+
+  const removeTimeslotComponent = (componentId) => {
+    const components = timeslotComponents.filter((val, idx) => idx !== componentId)
+    setTimeslotComponents(components)
+    const selected = selectedTimeslots.filter((val, idx) => idx !== componentId)
+    setSelectedTimeslots(selected)
+    console.table(selectedTimeslots)
   }
 
   const handleSubmit = async (event?: React.FormEvent) => {
@@ -98,44 +154,33 @@ export default function CreateSchedulePage() {
       <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2 items-start">
         <div className="flex items-center gap-3">
           <Subheading>Time Slots</Subheading>
-          <BadgeButton color="blue" onClick={() => null}>
+          <BadgeButton color="blue" onClick={addTimeslotComponent}>
             + Add
           </BadgeButton>
         </div>
         <div>
-          <Headless.Field className="flex items-baseline justify-center gap-6">
-              <Listbox name="status" defaultValue="active" className="max-w-48">
-                <ListboxOption value="active">
-                  <ListboxLabel>Active</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="paused">
-                  <ListboxLabel>Paused</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="delayed">
-                  <ListboxLabel>Delayed</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="canceled">
-                  <ListboxLabel>Canceled</ListboxLabel>
-                </ListboxOption>
-              </Listbox>
-            
-              <Listbox name="status" defaultValue="active" className="max-w-48">
-                <ListboxOption value="active">
-                  <ListboxLabel>Active</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="paused">
-                  <ListboxLabel>Paused</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="delayed">
-                  <ListboxLabel>Delayed</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="canceled">
-                  <ListboxLabel>Canceled</ListboxLabel>
-                </ListboxOption>
-              </Listbox>
-            
-            <BadgeButton color="red">Remove</BadgeButton>
-          </Headless.Field>
+            {timeslotComponents.map((value, compIdx) => (
+              <Headless.Field className="flex items-baseline justify-center gap-6 mb-4" key={compIdx}>
+                <Listbox name="dows[]" 
+                         onChange={(e) => handleDOWSelect(e, compIdx)} 
+                         defaultValue={value[0]} className="max-w-48">
+                  {daysOfWeek.map((day, index: number) => (
+                    <ListboxOption<string> value={day} key={index}>
+                      <ListboxLabel>{day}</ListboxLabel>
+                    </ListboxOption>
+                  ))}
+                </Listbox>
+                <Listbox name="timeslots[]" onChange={(e) => handleTimeslotSelect(e, compIdx)}
+                         defaultValue={value[1]} className="max-w-48">
+                  {timeslots.map((timeslot) => (
+                    <ListboxOption value={timeslot.id} key={timeslot.id}>
+                      <ListboxLabel>{timeslot?.startsAt.replace(/:00$/, '')} ~ {timeslot?.endsAt.replace(/:00$/, '')}</ListboxLabel>
+                    </ListboxOption>
+                  ))}
+                </Listbox>
+                <BadgeButton color="red" onClick={() => removeTimeslotComponent(compIdx)}>Remove</BadgeButton>
+              </Headless.Field>
+            ))}
         </div>
       </section>
 
