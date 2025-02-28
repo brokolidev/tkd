@@ -1,7 +1,7 @@
 import { useState } from "react";
 import clsx from "clsx";
 
-export default function ImageUpload() {
+export default function ImageUpload1() {
   const [imagePreview, setImagePreview] = useState('');
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
