@@ -18,7 +18,8 @@ namespace taekwondo_backend
             builder.Services.AddHealthChecks();
 
             //add config files for settings not meant to be pushed to git
-            builder.Configuration.AddJsonFile("secretSettings.json");
+            //we don't want it to be optional, but we do want it to reload on change.
+            builder.Configuration.AddJsonFile("secretSettings.json", optional: false, reloadOnChange: true);
 
             builder.Services.AddCors(options =>
             {
