@@ -114,6 +114,8 @@ namespace taekwondo_backend.Controllers
         [HttpGet("{id}/qr")]
         public IActionResult GetUserQR(int id)
         {
+            //qr code generation adapted from: https://github.com/codebude/QRCoder/wiki/
+
             //so this here is going to have to build a qr code and return it to the user
             QRCodeGenerator qRCodeGenerator = new();
 
@@ -121,7 +123,7 @@ namespace taekwondo_backend.Controllers
             string idToken = _jwtService.GenerateTokenForQR(id);
 
             //found here: https://chatgpt.com/share/67c1dc7c-2dc8-800c-ba64-fa7668c05b8b
-            string? url = Url.Action("CreateAttendanceRecordFromQR", "AttendanceController", idToken);
+            string? url = Url.Action("CreateAttendanceRecordFromQR", "Attendance", new { token = idToken});
 
             if (url == null)
             {
@@ -132,7 +134,7 @@ namespace taekwondo_backend.Controllers
             QRCodeData qrCodeData = qRCodeGenerator.CreateQrCode(payloadUrl, QRCodeGenerator.ECCLevel.Q);
             Base64QRCode qrCode = new(qrCodeData);
 
-            return Ok(JsonSerializer.Serialize(qrCode));
+            return Ok(qrCode.GetGraphic(20));
         }
 
         [HttpPost]
