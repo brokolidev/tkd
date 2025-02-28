@@ -116,3 +116,9 @@ const WebcamCapture: React.FC<{ onImageUploaded?: (url: string) => void }> = ({ 
 };
 
 export default WebcamCapture;
+
+
+
+///  refernces 
+//  [Syed zano], “Access Webcam in ReactJS. Camera access in React,” YouTube, Feb. 25, 2025. [Online]. 
+// Available: https://www.youtube.com/watch?v=0HJ1cMBkWJ4.
