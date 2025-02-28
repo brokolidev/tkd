@@ -66,9 +66,7 @@ namespace taekwondo_backend
             builder.Services.AddScoped<JwtService>();
             builder.Services.AddTransient<DataSeeder>();
 
-            builder.Configuration.AddJsonFile("secretSettings.json", optional: true, reloadOnChange: true);
             builder.Services.AddHttpClient<EmailService>();
-
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
