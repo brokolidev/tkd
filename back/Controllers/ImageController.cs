@@ -31,11 +31,11 @@ namespace taekwondo_backend.Controllers
 
             try
             {
-                // Remove any data URL metadata if present.
-                var base64Data = dto.Image.Contains(",")
-                    ? dto.Image.Substring(dto.Image.IndexOf(",") + 1)
-                    : dto.Image;
-                byte[] imageBytes = Convert.FromBase64String(base64Data);
+                // Remove any data URL metadata if present.basically remove the first part of the string data:image/png;base64
+                var base64Data = dto.Image.Contains(",") // to check if the image is base64 encoded or if there is a prefix , 
+                    ? dto.Image.Substring(dto.Image.IndexOf(",") + 1) // if there is a prefix then remove it
+                    : dto.Image; // if there is no prefix then just use the image data as it is
+                byte[] imageBytes = Convert.FromBase64String(base64Data); // convert the base64 string to byte array
 
                 // Generate a unique file name.
                 var fileName = $"{Guid.NewGuid()}.jpg";

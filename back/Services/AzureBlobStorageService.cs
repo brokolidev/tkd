@@ -13,7 +13,7 @@ public class AzureBlobStorageService
         string connectionString = configuration["AzureBlobStorage:ConnectionString"];
         string containerName = configuration["AzureBlobStorage:ContainerName"];
 
-        var blobServiceClient = new BlobServiceClient(connectionString);
+        var blobServiceClient = new BlobServiceClient(connectionString); // Create a new BlobServiceClient
         _containerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
         // Create the container if it doesn't exist and set public access level
