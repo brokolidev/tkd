@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using QRCoder;
 using taekwondo_backend.Services;
 using System.Reflection.Emit;
+using System.Text.Json;
 
 
 namespace taekwondo_backend.Controllers
@@ -131,7 +132,7 @@ namespace taekwondo_backend.Controllers
             QRCodeData qrCodeData = qRCodeGenerator.CreateQrCode(payloadUrl, QRCodeGenerator.ECCLevel.Q);
             Base64QRCode qrCode = new(qrCodeData);
 
-            return Ok(qrCode);
+            return Ok(JsonSerializer.Serialize(qrCode));
         }
 
         [HttpPost]
