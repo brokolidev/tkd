@@ -17,6 +17,9 @@ namespace taekwondo_backend
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddHealthChecks();
 
+            //add config files for settings not meant to be pushed to git
+            builder.Configuration.AddJsonFile("secretSettings.json");
+            
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(policy =>
