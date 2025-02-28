@@ -90,5 +90,6 @@ namespace taekwondo_backend.Data
         public required DbSet<Schedule> Schedules { get; set; }
         public required DbSet<Event> Events { get; set; }
         public required DbSet<Setting> Settings { get; set; }
+        public required DbSet<AttendanceRecord> AttendanceRecords { get; set; }
     }
 }

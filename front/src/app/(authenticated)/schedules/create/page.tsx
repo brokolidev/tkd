@@ -18,7 +18,7 @@ import * as Headless from '@headlessui/react'
 import {Listbox, ListboxLabel, ListboxOption} from "@/components/listbox";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/table";
 import {Avatar} from "@/components/avatar";
-//import {getTimeSlots} from "@/services/tmeSlotServices";
+import {getTimeSlots} from "@/services/tmeSlotServices";
 import {Monda} from "next/dist/compiled/@next/font/dist/google";
 
 export default function CreateSchedulePage() {
