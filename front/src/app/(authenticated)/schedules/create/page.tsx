@@ -34,11 +34,9 @@ export default function CreateSchedulePage() {
   async function loadTimeslots(): Promise<void> {
     const timeslots = await getTimeSlots();
     setTimeslots(timeslots)
-    setTimeslotComponents([{
-      id: 0,
-      day: "Monday",
-      timeslotId: timeslots.length > 0 ? timeslots[0].id : null
-    }])
+    setTimeslotComponents([
+      [ "Monday", timeslots.length > 0 ? timeslots[0].id : null]
+    ])
     setSelectedTimeslots([
       ["Monday", 1],
     ]);
@@ -59,19 +57,14 @@ export default function CreateSchedulePage() {
   }, [])
 
   const handleDOWSelect = (e, idx) => {
-    const selected = selectedTimeslots
-    selected[idx][0] = e
-    setSelectedTimeslots(selected)
-    console.log(selectedTimeslots)
+    selectedTimeslots[idx][0] = e
+    setSelectedTimeslots(selectedTimeslots)
   }
 
   const handleTimeslotSelect = (e, idx) => {
-    const selected = selectedTimeslots
-    selected[idx][1] = e
-    setSelectedTimeslots(selected)
-    console.log(selectedTimeslots)
+    selectedTimeslots[idx][1] = e
+    setSelectedTimeslots(selectedTimeslots)
   }
-
 
   const handleReset = () => {
     setFormData(null)
@@ -81,17 +74,24 @@ export default function CreateSchedulePage() {
   const addTimeslotComponent = () => {
     setTimeslotComponents([
       ...timeslotComponents,
-      {
-        id: timeslotComponents.length,
-        day: "Monday",
-        timeslotId: timeslots.length > 0 ? timeslots[0].id : null
-      }
+      [
+        "Monday",
+        timeslots.length > 0 ? timeslots[0].id : null
+      ]
     ])
     setSelectedTimeslots([
       ...selectedTimeslots,
       ["Monday", 1]
     ])
-  } 
+  }
+
+  const removeTimeslotComponent = (componentId) => {
+    const components = timeslotComponents.filter((val, idx) => idx !== componentId)
+    setTimeslotComponents(components)
+    const selected = selectedTimeslots.filter((val, idx) => idx !== componentId)
+    setSelectedTimeslots(selected)
+    console.table(selectedTimeslots)
+  }
 
   const handleSubmit = async (event?: React.FormEvent) => {
     return false;
@@ -159,26 +159,26 @@ export default function CreateSchedulePage() {
           </BadgeButton>
         </div>
         <div>
-            {timeslotComponents.map((comp) => (
-              <Headless.Field className="flex items-baseline justify-center gap-6 mb-4" key={comp.id}>
+            {timeslotComponents.map((value, compIdx) => (
+              <Headless.Field className="flex items-baseline justify-center gap-6 mb-4" key={compIdx}>
                 <Listbox name="dows[]" 
-                         onChange={(e) => handleDOWSelect(e, comp.id)} 
-                         defaultValue={comp.day} className="max-w-48">
+                         onChange={(e) => handleDOWSelect(e, compIdx)} 
+                         defaultValue={value[0]} className="max-w-48">
                   {daysOfWeek.map((day, index: number) => (
                     <ListboxOption<string> value={day} key={index}>
                       <ListboxLabel>{day}</ListboxLabel>
                     </ListboxOption>
                   ))}
                 </Listbox>
-                <Listbox name="timeslots[]" onChange={(e) => handleTimeslotSelect(e, comp.id)}
-                         defaultValue={comp.timeslotId} className="max-w-48">
+                <Listbox name="timeslots[]" onChange={(e) => handleTimeslotSelect(e, compIdx)}
+                         defaultValue={value[1]} className="max-w-48">
                   {timeslots.map((timeslot) => (
                     <ListboxOption value={timeslot.id} key={timeslot.id}>
                       <ListboxLabel>{timeslot?.startsAt.replace(/:00$/, '')} ~ {timeslot?.endsAt.replace(/:00$/, '')}</ListboxLabel>
                     </ListboxOption>
                   ))}
                 </Listbox>
-                <BadgeButton color="red">Remove</BadgeButton>
+                <BadgeButton color="red" onClick={() => removeTimeslotComponent(compIdx)}>Remove</BadgeButton>
               </Headless.Field>
             ))}
         </div>
