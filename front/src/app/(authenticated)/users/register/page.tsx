@@ -14,7 +14,7 @@ import { NewUser } from '@/structures/users'
 import { useState } from 'react'
 import { createUser } from '@/services/userServices'
 import WebcamCapture from '@/components/webcapture'
-import ImageUpload from '@/components/image'
+import ImageUpload from '@/components/imageupload'
 
 export default function UserRegisterPage() {
 

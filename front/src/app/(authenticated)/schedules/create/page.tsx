@@ -13,7 +13,7 @@ import { getInstructors } from '@/services/instructorServices'
 import { getStudents } from '@/services/studentServices'
 import axios from "axios"
 import { Avatar } from '@/components/avatar'
-import ImageUpload from '@/components/image'
+import ImageUpload from '@/components/imageupload'
 import { getSchedules } from '@/services/schdeuleServices'
 // using enum for days of the week
 enum DaysOfWeek {
