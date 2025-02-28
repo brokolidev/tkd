@@ -11,17 +11,12 @@ public class EmailService
 
     // Reference: Mailtrap API integration and HTML template processing with placeholders
     // Source: https://mailtrap.io/blog/asp-net-core-send-email/#Send-HTML-email1
-    public EmailService(HttpClient httpClient)
+    public EmailService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
 
         // Load configuration from secretSettings.json
-        // adapted from https://chatgpt.com/c/67c1f535-e088-8008-8ea4-c2ad2d405afa
-        var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory()) // Ensure it looks in the project root
-            .AddJsonFile("secretSettings.json", optional: false, reloadOnChange: true)
-            .Build();
-
+        // adapted from https://chatgpt.com/c/67c1fd1c-6920-8008-8115-c6b48c3c352e
         var mailtrapSettings = configuration.GetSection("EmailSettings");
 
         _apiUrl = mailtrapSettings["ApiUrl"] ?? throw new ArgumentNullException("Mailtrap API URL is missing.");
@@ -42,7 +37,6 @@ public class EmailService
         // Get the file path of the email template
         string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", fileName);
 
-        // Check if the file exists, if not, throw an error
         if (!File.Exists(filePath))
             throw new FileNotFoundException($"Email template '{fileName}' not found.");
 
@@ -60,10 +54,10 @@ public class EmailService
         // Create the email data in JSON format for Mailtrap API
         var emailData = new
         {
-            from = new { email = _fromEmail }, // Sender email
-            to = new[] { new { email = toEmail } }, // Recipient email
+            from = new { email = _fromEmail },
+            to = new[] { new { email = toEmail } },
             subject,  // Email subject
-            html = emailTemplateText // The processed HTML email content
+            html = emailTemplateText
         };
 
         // Convert the email data to JSON
