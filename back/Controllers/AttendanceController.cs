@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using taekwondo_backend.Models;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Text.Json;
+using System;
 
 namespace taekwondo_backend.Controllers
 {
@@ -78,12 +79,18 @@ namespace taekwondo_backend.Controllers
 			}
 
 			//attempt to find the schedule that this is for.
-			int? scheduleId = await GetScheduleId(user, recordTime);
+			int scheduleId = await GetScheduleId(user, recordTime);
 			
 			//if scheduleId is null, then that means that the date inputted wasn't close to one of the user's schedules.
-			if (scheduleId == null)
+			if (scheduleId == -1)
 			{
 				return BadRequest(JsonSerializer.Serialize("The Time inputted was not within a half an hour of a schedule start time for the user"));
+			}
+
+			//Here, check that the user hasn't already checked into this class
+			if (HasAlreadyCheckedIn(scheduleId, userId, recordTime))
+			{
+				return BadRequest(JsonSerializer.Serialize("The user has already checked into this class."));
 			}
 
 			//create the record
@@ -92,7 +99,7 @@ namespace taekwondo_backend.Controllers
 				Id = 0,
 				UserId = userId,
 				//the above type is nullable, but it will never be null here
-				ScheduleId = (int)scheduleId,
+				ScheduleId = scheduleId,
 				DateRecorded = recordTime,
 			};
 
@@ -127,7 +134,7 @@ namespace taekwondo_backend.Controllers
 		}
 	
 
-		private async Task<int?> GetScheduleId(Models.Identity.User user, DateTime timeOfRecord)
+		private async Task<int> GetScheduleId(Models.Identity.User user, DateTime timeOfRecord)
 		{
 			DateTime localRecordTime = timeOfRecord.Kind == DateTimeKind.Utc ? timeOfRecord.ToLocalTime() : timeOfRecord;
 
@@ -150,12 +157,15 @@ namespace taekwondo_backend.Controllers
 			{
 
 				double difference = 0;
-				
-				if (timeOnlyOfRecord < schedule.TimeSlot.StartsAt)
+
+                //depending on if the time is before or after the start time, the subtraction needs to be flipped.
+                if (timeOnlyOfRecord < schedule.TimeSlot.StartsAt)
 				{
+					//the start time is after the recorded time, so timeslot time first
 					difference = Math.Abs((schedule.TimeSlot.StartsAt - timeOnlyOfRecord).TotalMinutes);
                 } else
 				{
+					//the start time is before the recorded time, so timeslot time last
 					difference = Math.Abs((timeOnlyOfRecord - schedule.TimeSlot.StartsAt).TotalMinutes);
                 }
 
@@ -167,7 +177,65 @@ namespace taekwondo_backend.Controllers
 				return false;
             })?.Id;
 
-			return scheduleId;
+			return (scheduleId ?? -1);
+		}
+	
+		private bool HasAlreadyCheckedIn(int scheduleId, int UserId, DateTime recordTime)
+		{
+			bool hasCheckedIn = false;
+
+			//convert to local time
+            DateTime localRecordTime = recordTime.Kind == DateTimeKind.Utc ? recordTime.ToLocalTime() : recordTime;
+
+            //first, pull out the record that belong to this user and schedule
+            var records = _context.AttendanceRecords
+				.Where(record => record.UserId == UserId && record.ScheduleId == scheduleId)
+				.Where(record => record.DateRecorded.Year == localRecordTime.Year &&
+					record.DateRecorded.Month == localRecordTime.Month &&
+					record.DateRecorded.Day == localRecordTime.Day);
+
+			//check if there are any. If so, continue on.
+			if (records.Any())
+			{
+                //exception determined from here: https://chatgpt.com/share/67c1dc7c-2dc8-800c-ba64-fa7668c05b8b
+                //pull out the schedule. it will be needed here
+                var schedule = _context.Schedules.FirstOrDefault(schedule => schedule.Id == scheduleId) 
+					?? throw new InvalidOperationException("The schedule could not be found in the database");
+
+                //now, check the time of each record
+
+                foreach ( var record in records )
+				{
+                    double difference = 0;
+
+					//convert to local timeOnly
+                    DateTime curRecordLocalTime = record.DateRecorded.Kind == DateTimeKind.Utc ? record.DateRecorded.ToLocalTime() : record.DateRecorded;
+                    TimeOnly recordTimeOnly = new(curRecordLocalTime.Hour, curRecordLocalTime.Minute, curRecordLocalTime.Second);
+
+					//depending on if the time is before or after the start time, the subtraction needs to be flipped.
+                    if (recordTimeOnly < schedule.TimeSlot.StartsAt)
+                    {
+						//the start time is after the recorded time, so timeslot time first
+                        difference = Math.Abs((schedule.TimeSlot.StartsAt - recordTimeOnly).TotalMinutes);
+                    }
+                    else
+                    {
+						//the start time is before the recorded time, so timeslot time last
+                        difference = Math.Abs((recordTimeOnly - schedule.TimeSlot.StartsAt).TotalMinutes);
+                    }
+
+					//if it was in the checkin time, set hasCheckedIn to true
+                    if (difference < 30)
+                    {
+                        hasCheckedIn = true;
+
+						//break out of the loop, it's not needed anymore.
+						break;
+                    }
+                }
+			}
+
+			return hasCheckedIn;
 		}
 	}
 }
