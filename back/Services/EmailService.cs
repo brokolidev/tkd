@@ -12,11 +12,9 @@ public class EmailService
     {
         _httpClient = httpClient;
 
-        var mailtrapSettings = configuration.GetSection("EmailSettings");
-
-        _apiUrl = mailtrapSettings["ApiUrl"] ?? throw new ArgumentNullException("Mailtrap API URL is missing.");
-        _apiToken = mailtrapSettings["ApiToken"] ?? throw new ArgumentNullException("Mailtrap API Token is missing.");
-        _fromEmail = mailtrapSettings["FromEmail"] ?? throw new ArgumentNullException("Sender email is missing.");
+        _apiUrl = Environment.GetEnvironmentVariable("API_URL") ?? throw new ArgumentNullException("Mailtrap API URL is missing.");
+        _apiToken = Environment.GetEnvironmentVariable("MAILTRAP_API_TOKEN") ?? throw new ArgumentNullException("Mailtrap API Token is missing.");
+        _fromEmail = Environment.GetEnvironmentVariable("FROM_EMAIL") ?? throw new ArgumentNullException("Sender email is missing.");
     }
 
     public async Task SendEmailAsync(string toEmail, string subject, string emailType, Dictionary<string, string>? placeholders = null)
