@@ -8,7 +8,11 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5043",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "API_URL": "https://send.api.mailtrap.io/api/send",
+        "MAILTRAP_API_TOKEN": "9ab3a8e186682d017e349a0c34b65597",
+        "FROM_EMAIL": "hello@demomailtrap.com",
+        "FROM_NAME": "Mailtrap Test"
       }
     },
     "https": {
