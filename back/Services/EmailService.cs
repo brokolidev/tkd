@@ -9,11 +9,14 @@ public class EmailService
     private readonly string _apiToken;
     private readonly string _fromEmail;
 
+    // Reference: Mailtrap API integration and HTML template processing with placeholders
+    // Source: https://mailtrap.io/blog/asp-net-core-send-email/#Send-HTML-email1
     public EmailService(HttpClient httpClient)
     {
         _httpClient = httpClient;
 
         // Load configuration from secretSettings.json
+        // adapted from https://chatgpt.com/c/67c1f535-e088-8008-8ea4-c2ad2d405afa
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory()) // Ensure it looks in the project root
             .AddJsonFile("secretSettings.json", optional: false, reloadOnChange: true)
