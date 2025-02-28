@@ -402,3 +402,6 @@ FodyWeavers.xsd
 
 # Environment Variables
 .env
+
+# Secret Settings.
+secretSettings.json

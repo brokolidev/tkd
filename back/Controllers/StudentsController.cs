@@ -50,7 +50,8 @@ namespace taekwondo_backend.Controllers
                         DateOfBirth = user.DateOfBirth,
                         Email = user.Email ?? "",
                         BeltColor = user.BeltColor,
-                        Role = UserRoles.Student
+                        Role = UserRoles.Student,
+                        ProfileImage = user.ProfileImage??""
                     }
                 );
 
@@ -96,7 +97,8 @@ namespace taekwondo_backend.Controllers
                 Email = student.Email ?? "",
                 BeltColor = student.BeltColor,
                 DateOfBirth = student.DateOfBirth,
-                Role = UserRoles.Student
+                Role = UserRoles.Student,
+                ProfileImage = student.ProfileImage ?? ""
             };
 
             // Student found, return the data with 200 OK
@@ -119,7 +121,8 @@ namespace taekwondo_backend.Controllers
                     FirstName = userDTO.FirstName,
                     LastName = userDTO.LastName,
                     DateOfBirth = userDTO.DateOfBirth,
-                    BeltColor = userDTO.BeltColor
+                    BeltColor = userDTO.BeltColor,
+                    ProfileImage = userDTO.ProfileImage ?? ""
                 };
 
                 //create the  user

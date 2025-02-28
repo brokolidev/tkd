@@ -17,6 +17,10 @@ namespace taekwondo_backend
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddHealthChecks();
 
+            //add config files for settings not meant to be pushed to git
+            //we don't want it to be optional, but we do want it to reload on change.
+            builder.Configuration.AddJsonFile("secretSettings.json", optional: false, reloadOnChange: true);
+
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(policy =>
@@ -30,6 +34,8 @@ namespace taekwondo_backend
 
             // Add services to the container.
             builder.Services.AddControllers();
+            // Add services to Azure bob service 
+            builder.Services.AddSingleton<AzureBlobStorageService>();
 
             // Add a database context to the container
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -62,6 +68,8 @@ namespace taekwondo_backend
 
             builder.Services.AddScoped<JwtService>();
             builder.Services.AddTransient<DataSeeder>();
+
+            builder.Services.AddHttpClient<EmailService>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

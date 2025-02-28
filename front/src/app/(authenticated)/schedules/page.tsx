@@ -49,10 +49,8 @@ function SchedulesPage({pageQuery}) {
     <div className="space-y-10 p-8">
       <div className="flex items-center justify-between">
         <Heading className="text-xl font-bold">Schedules</Heading>
-        <Button className="flex items-center gap-2 bg-black">
-          <Link href="/schedules/create" className="inline-flex items-center gap-2 text-sm/6 text-white">
-            Create New
-          </Link>
+        <Button href="/schedules/create" className="bg-black text-sm/6 text-white">
+          Create New
         </Button>
       </div>
 
