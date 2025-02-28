@@ -33,6 +33,8 @@ namespace taekwondo_backend
 
             // Add services to the container.
             builder.Services.AddControllers();
+            // Add services to Azure bob service 
+            builder.Services.AddSingleton<AzureBlobStorageService>();
 
             // Add a database context to the container
             builder.Services.AddDbContext<AppDbContext>(options =>
