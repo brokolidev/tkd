@@ -19,7 +19,6 @@ import {Listbox, ListboxLabel, ListboxOption} from "@/components/listbox";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/table";
 import {Avatar} from "@/components/avatar";
 
-
 export default function CreateSchedulePage() {
   const [isCreated, setIsCreated] = useState(false)
   const [formData, setFormData] = useState<ISchedule | null>(null)
@@ -27,9 +26,19 @@ export default function CreateSchedulePage() {
   const [isSaveOpen, setIsSaveOpen] = useState(false)
   const [users, setUsers] = useState([])
 
+  const daysOfWeek = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday'
+  ]
+
   useEffect(() => {
     
-  }, []);
+  }, [])
 
 
   const handleReset = () => {
@@ -104,19 +113,12 @@ export default function CreateSchedulePage() {
         </div>
         <div>
           <Headless.Field className="flex items-baseline justify-center gap-6">
-              <Listbox name="status" defaultValue="active" className="max-w-48">
-                <ListboxOption value="active">
-                  <ListboxLabel>Active</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="paused">
-                  <ListboxLabel>Paused</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="delayed">
-                  <ListboxLabel>Delayed</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="canceled">
-                  <ListboxLabel>Canceled</ListboxLabel>
-                </ListboxOption>
+              <Listbox name="status" defaultValue="Monday" className="max-w-48">
+                {daysOfWeek.map((day, index: number) => (
+                  <ListboxOption<string> value={day} key={index}>
+                    <ListboxLabel>{day}</ListboxLabel>
+                  </ListboxOption>
+                  ))}
               </Listbox>
             
               <Listbox name="status" defaultValue="active" className="max-w-48">
