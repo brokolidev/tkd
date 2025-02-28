@@ -25,6 +25,7 @@ import { SidebarLayout } from '@/components/sidebar-layout'
 import { Spinner } from '@/components/spinner'
 import { getEvents } from '@/data'
 import useUser from '@/hooks/swrHooks'
+import { userViews } from '@/hooks/userViews'
 import { setCookie } from '@/lib/cookie'
 import {
   ArrowRightStartOnRectangleIcon,
@@ -43,6 +44,7 @@ import {
   UsersIcon,
 } from '@heroicons/react/20/solid'
 import { redirect, usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 const logout = async () => {
   localStorage.removeItem('tkd-access-token')
@@ -85,6 +87,39 @@ export function ApplicationLayout({
   children: React.ReactNode
 }) {
   const { user, isError, isLoading } = useUser()
+  const [userRole, setUserRole] = useState(userViews.UNKNOWN)
+
+
+  useEffect(() => {
+    if (user) {
+        //pull out the role from the user as a number
+        const role = Object.entries(userViews)
+            .filter(entry => !isNaN(Number(userViews[entry[0]])))
+            .find(([key]) => key.toUpperCase() == user.role.toUpperCase())[1]
+
+        let roleAsUserViews = userViews.UNKNOWN
+
+        //get the role of the user as a userView
+        switch (role) {
+            case userViews.ADMIN:
+                roleAsUserViews = userViews.ADMIN
+                break;
+            case userViews.INSTRUCTOR:
+                roleAsUserViews = userViews.INSTRUCTOR
+                break;
+            case userViews.STUDENT:
+                roleAsUserViews = userViews.STUDENT
+                break;
+        }
+
+        //if the userRole is different, update it.
+        if (userRole != roleAsUserViews) {
+            setUserRole(roleAsUserViews)
+        }
+
+        console.log(role)
+    }
+  }, [user])
 
   let pathname = usePathname()
 
@@ -139,14 +174,22 @@ export function ApplicationLayout({
 
           <SidebarBody>
             <SidebarSection>
-              <SidebarItem href="/" current={pathname === '/'}>
+              <SidebarItem
+                href={userRole == userViews.STUDENT ? "/student" : "/"}
+                current={pathname === '/'}
+              >
                 <HomeIcon />
                 <SidebarLabel>Home</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/users" current={pathname.startsWith('/users')}>
-                <UsersIcon />
-                <SidebarLabel>Users</SidebarLabel>
-              </SidebarItem>
+              {
+                userRole != userViews.STUDENT &&
+                (
+                  <SidebarItem href="/users" current={pathname.startsWith('/users')}>
+                    <UsersIcon />
+                    <SidebarLabel>Users</SidebarLabel>
+                  </SidebarItem>
+                )
+              }
               <SidebarItem href="/schedules">
                 <CalendarDaysIcon />
                 <SidebarLabel>Schedules</SidebarLabel>
@@ -155,10 +198,15 @@ export function ApplicationLayout({
                 <Square2StackIcon />
                 <SidebarLabel>Events</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/settings" current={pathname.startsWith('/settings')}>
-                <Cog6ToothIcon />
-                <SidebarLabel>Settings</SidebarLabel>
-              </SidebarItem>
+              
+              {
+                userRole != userViews.STUDENT &&
+                
+                <SidebarItem href="/settings" current={pathname.startsWith('/settings')}>
+                    <Cog6ToothIcon />
+                    <SidebarLabel>Settings</SidebarLabel>
+                </SidebarItem>
+              }
             </SidebarSection>
 
             <SidebarSection className="max-lg:hidden">

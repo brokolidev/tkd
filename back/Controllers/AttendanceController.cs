@@ -59,6 +59,16 @@ namespace taekwondo_backend.Controllers
 			}
 		}
 
+		[HttpPost("qr/{token}")]
+		public async Task<IActionResult> CreateAttendanceRecordFromQR(string token)
+		{
+			//generate the dateTime
+			DateTime recordTime = DateTime.UtcNow;
+
+			//this will eventually return the attendance record id
+			return Ok(0);
+		}
+
 		[HttpPost("{userId}")]
 		public async Task<IActionResult> CreateAttendanceRecord(int userId, DateTime recordTime)
 		{
