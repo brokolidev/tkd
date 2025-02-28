@@ -9,6 +9,9 @@ namespace taekwondo_backend.Models
 
         [Required]
         public int UserId { get; set; }
+        
+        [Required]
+        public int ScheduleId { get; set; }
 
         [Required]
         public DateTime DateRecorded { get; set; }

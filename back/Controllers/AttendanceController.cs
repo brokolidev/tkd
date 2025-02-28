@@ -8,6 +8,8 @@ using taekwondo_backend.Models.Identity;
 using taekwondo_backend.Enums;
 using Microsoft.EntityFrameworkCore;
 using taekwondo_backend.Models;
+using Microsoft.Extensions.Configuration.UserSecrets;
+using System.Text.Json;
 
 namespace taekwondo_backend.Controllers
 {
@@ -37,7 +39,7 @@ namespace taekwondo_backend.Controllers
 		public async Task<IActionResult> GetAttendanceRecords(int userId)
 		{
 			//check that the user exists in the system
-			var user = _userManager.FindByIdAsync(userId.ToString());
+			var user = await _userManager.FindByIdAsync(userId.ToString());
 
 			if (user == null)
 			{
@@ -57,7 +59,7 @@ namespace taekwondo_backend.Controllers
 		}
 
 		[HttpPost("{userId}")]
-		public async Task<IActionResult> CreateAttendanceRecord(int userId)
+		public async Task<IActionResult> CreateAttendanceRecord(int userId, DateTime recordTime)
 		{
 			//check that the user exists in the system
 			var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -74,14 +76,29 @@ namespace taekwondo_backend.Controllers
 			{
 				return BadRequest("The user must be a student to check in.");
 			}
+
+			//attempt to find the schedule that this is for.
+			int? scheduleId = await GetScheduleId(user, recordTime);
 			
+			//if scheduleId is null, then that means that the date inputted wasn't close to one of the user's schedules.
+			if (scheduleId == null)
+			{
+				return BadRequest(JsonSerializer.Serialize("The Time inputted was not within a half an hour of a schedule start time for the user"));
+			}
+
 			//create the record
 			var record = new AttendanceRecord()
 			{
 				Id = 0,
 				UserId = userId,
-				DateRecorded = DateTime.UtcNow,
+				//the above type is nullable, but it will never be null here
+				ScheduleId = (int)scheduleId,
+				DateRecorded = recordTime,
 			};
+
+            //created with help from: https://chatgpt.com/share/67c14ff1-3378-800c-ac35-d0e1738c8c0a
+            //ensure all dates are formatted properly
+            record.DateRecorded = record.DateRecorded.Kind == DateTimeKind.Utc ? record.DateRecorded : record.DateRecorded.ToUniversalTime();
 
 			//add the record to the database, and save the changes.
 			await _context.AttendanceRecords.AddAsync(record);
@@ -107,6 +124,50 @@ namespace taekwondo_backend.Controllers
 			await _context.SaveChangesAsync();
 
 			return Ok(id);
+		}
+	
+
+		private async Task<int?> GetScheduleId(Models.Identity.User user, DateTime timeOfRecord)
+		{
+			DateTime localRecordTime = timeOfRecord.Kind == DateTimeKind.Utc ? timeOfRecord.ToLocalTime() : timeOfRecord;
+
+			TimeOnly timeOnlyOfRecord = new(localRecordTime.Hour, localRecordTime.Minute, localRecordTime.Second);
+			DayOfWeek dayOfWeek = timeOfRecord.DayOfWeek;
+
+            //created with help from: https://chatgpt.com/share/67c14ff1-3378-800c-ac35-d0e1738c8c0a
+            //get the list of scheules from the user
+            //they will be ordered by the timeslot's start time, to make the next step easier
+            var schedules = await _context.Schedules
+				.Where(schedule => schedule.Students.Contains(user))
+				.Include(schedule => schedule.TimeSlot)
+				.OrderBy(schedule => schedule.TimeSlot.StartsAt)
+				.ToListAsync();
+
+            //created with help from: https://chatgpt.com/share/67c14ff1-3378-800c-ac35-d0e1738c8c0a
+            //take the list, and find the schedule that matches closest to the schedule
+            //this checks if the user has checked in within a half hour of any of their schedules, and pulls out the closest one.
+            int? scheduleId = schedules.FirstOrDefault(schedule =>
+			{
+
+				double difference = 0;
+				
+				if (timeOnlyOfRecord < schedule.TimeSlot.StartsAt)
+				{
+					difference = Math.Abs((schedule.TimeSlot.StartsAt - timeOnlyOfRecord).TotalMinutes);
+                } else
+				{
+					difference = Math.Abs((timeOnlyOfRecord - schedule.TimeSlot.StartsAt).TotalMinutes);
+                }
+
+				if (difference < 30 && schedule.Day == dayOfWeek)
+				{
+					return true;
+				}
+
+				return false;
+            })?.Id;
+
+			return scheduleId;
 		}
 	}
 }

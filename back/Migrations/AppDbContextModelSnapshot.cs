@@ -169,6 +169,9 @@ namespace taekwondo_backend.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.ToTable("AttendanceRecords");
