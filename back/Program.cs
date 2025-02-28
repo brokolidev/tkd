@@ -19,7 +19,7 @@ namespace taekwondo_backend
 
             //add config files for settings not meant to be pushed to git
             builder.Configuration.AddJsonFile("secretSettings.json");
-            
+
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(policy =>
@@ -65,6 +65,9 @@ namespace taekwondo_backend
 
             builder.Services.AddScoped<JwtService>();
             builder.Services.AddTransient<DataSeeder>();
+
+            builder.Services.AddHttpClient<EmailService>();
+
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
