@@ -25,7 +25,8 @@ namespace taekwondo_backend.Controllers
             if (string.IsNullOrEmpty(request.EmailType))
                 return BadRequest("Email type is required.");
 
-            // 📌 Send email using template, passing placeholders if available
+            // Send email using template, passing placeholders if available
+            // Checked with AI from https://chatgpt.com/c/67c1f943-62d0-8008-8390-d86aab9a5751
             await _emailService.SendEmailAsync(request.ToEmail, request.Subject, request.EmailType, request.Placeholders);
             return Ok(new { Message = "Email Sent Successfully" });
         }
