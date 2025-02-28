@@ -32,3 +32,9 @@ public class AzureBlobStorageService
         return blobClient.Uri.ToString();
     }
 }
+
+
+// REFERNCES :
+//[AzureTeach•Net ], “Upload files to Microsoft Azure Blob storage with C# | Azure Storage Account | .Net Core,”
+//  YouTube, Feb. 25, 2025. [Online]. 
+// Available: https://www.youtube.com/watch?v=HXQYSuBKHCE.
