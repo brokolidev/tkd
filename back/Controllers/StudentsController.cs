@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using taekwondo_backend.Models.Identity;
 using taekwondo_backend.Enums;
 using Microsoft.AspNetCore.Authorization;
+using QRCoder;
+using taekwondo_backend.Services;
+using System.Reflection.Emit;
 
 
 namespace taekwondo_backend.Controllers
@@ -16,11 +19,13 @@ namespace taekwondo_backend.Controllers
     {
         private readonly AppDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly JwtService _jwtService;
         
-        public StudentsController(AppDbContext context, UserManager<User> userManager)
+        public StudentsController(AppDbContext context, UserManager<User> userManager, JwtService jwtService)
         {
             _context = context;
             _userManager = userManager;
+            _jwtService = jwtService;
         }
 
 
@@ -103,6 +108,30 @@ namespace taekwondo_backend.Controllers
 
             // Student found, return the data with 200 OK
             return Ok(user);
+        }
+
+        [HttpGet("{id}/qr")]
+        public IActionResult GetUserQR(int id)
+        {
+            //so this here is going to have to build a qr code and return it to the user
+            QRCodeGenerator qRCodeGenerator = new();
+
+            //generate a new qr code token
+            string idToken = _jwtService.GenerateTokenForQR(id);
+
+            //found here: https://chatgpt.com/share/67c1dc7c-2dc8-800c-ba64-fa7668c05b8b
+            string? url = Url.Action("CreateAttendanceRecordFromQR", "AttendanceController", idToken);
+
+            if (url == null)
+            {
+                return StatusCode(500, new { message = "The url failed to be created" });
+            }
+
+            PayloadGenerator.Url payloadUrl = new(url);
+            QRCodeData qrCodeData = qRCodeGenerator.CreateQrCode(payloadUrl, QRCodeGenerator.ECCLevel.Q);
+            Base64QRCode qrCode = new(qrCodeData);
+
+            return Ok(qrCode);
         }
 
         [HttpPost]
