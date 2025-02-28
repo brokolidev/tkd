@@ -29,6 +29,7 @@ export default function CreateSchedulePage() {
   const [users, setUsers] = useState([])
   const [timeslots, setTimeslots] = useState([]);
   const [timeslotComponents, setTimeslotComponents] = useState([])
+  const [selectedTimeslots, setSelectedTimeslots] = useState([])
 
   async function loadTimeslots(): Promise<void> {
     const timeslots = await getTimeSlots();
@@ -38,6 +39,9 @@ export default function CreateSchedulePage() {
       day: "Monday",
       timeslotId: timeslots.length > 0 ? timeslots[0].id : null
     }])
+    setSelectedTimeslots([
+      ["Monday", 1],
+    ]);
   }
 
   const daysOfWeek = [
@@ -54,6 +58,20 @@ export default function CreateSchedulePage() {
     loadTimeslots();
   }, [])
 
+  const handleDOWSelect = (e, idx) => {
+    const selected = selectedTimeslots
+    selected[idx][0] = e
+    setSelectedTimeslots(selected)
+    console.log(selectedTimeslots)
+  }
+
+  const handleTimeslotSelect = (e, idx) => {
+    const selected = selectedTimeslots
+    selected[idx][1] = e
+    setSelectedTimeslots(selected)
+    console.log(selectedTimeslots)
+  }
+
 
   const handleReset = () => {
     setFormData(null)
@@ -64,10 +82,14 @@ export default function CreateSchedulePage() {
     setTimeslotComponents([
       ...timeslotComponents,
       {
-        id: timeslotComponents.length + 1,
+        id: timeslotComponents.length,
         day: "Monday",
         timeslotId: timeslots.length > 0 ? timeslots[0].id : null
       }
+    ])
+    setSelectedTimeslots([
+      ...selectedTimeslots,
+      ["Monday", 1]
     ])
   } 
 
@@ -139,14 +161,16 @@ export default function CreateSchedulePage() {
         <div>
             {timeslotComponents.map((comp) => (
               <Headless.Field className="flex items-baseline justify-center gap-6 mb-4" key={comp.id}>
-                <Listbox name="dows[]" defaultValue={comp.day} className="max-w-48">
+                <Listbox name="dows[]" 
+                         onChange={(e) => handleDOWSelect(e, comp.id)} 
+                         defaultValue={comp.day} className="max-w-48">
                   {daysOfWeek.map((day, index: number) => (
                     <ListboxOption<string> value={day} key={index}>
                       <ListboxLabel>{day}</ListboxLabel>
                     </ListboxOption>
                   ))}
                 </Listbox>
-                <Listbox name="timeslots[]" onChange={(e) => { console.log(e); }}
+                <Listbox name="timeslots[]" onChange={(e) => handleTimeslotSelect(e, comp.id)}
                          defaultValue={comp.timeslotId} className="max-w-48">
                   {timeslots.map((timeslot) => (
                     <ListboxOption value={timeslot.id} key={timeslot.id}>
