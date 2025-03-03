@@ -40,7 +40,7 @@ namespace taekwondo_backend.Controllers
 
         [Authorize]
         [HttpGet("{userId}")]
-		public async Task<IActionResult> GetAttendanceRecords(int userId)
+		public async Task<IActionResult> GetAttendanceRecords(int userId, int pageNumber = 1, int pageSize = 10)
 		{
 			//check that the user exists in the system
 			var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -55,7 +55,19 @@ namespace taekwondo_backend.Controllers
 
 			if (records.Count != 0)
 			{
-				return Ok(records);
+				//convert the Records to FEDTOs, to pass the user and schedule back to the FE
+				var recordsForFE = await Task.WhenAll(records.Select(async record => new AttendanceRecordFEDTO()
+				{
+					Id = record.Id,
+					User = (await _userManager.FindByIdAsync(record.UserId.ToString()) ?? new Models.Identity.User()),
+					Schedule = (_context.Schedules.FirstOrDefault(schedule => schedule.Id == record.ScheduleId) ?? new Schedule()),
+					DateRecorded = record.DateRecorded
+				}));
+
+				//finally, paginate the list
+                var pagedRecords = PagedList<AttendanceRecordFEDTO>.Create(recordsForFE, pageNumber, pageSize);
+
+                return Ok(pagedRecords);
 			} else
 			{
 				return NoContent();
@@ -74,13 +86,13 @@ namespace taekwondo_backend.Controllers
 			//if the token could not be read, return an error
 			if (decodedToken == null)
 			{
-				return Content("<html><body><h1>ERROR</h1><p>The token inputted could not be parsed.</p></body></html>");
+				return Content("<html><body><h1>ERROR</h1><p>The token inputted could not be parsed.</p></body></html>", "text/html");
 			}
 
 			//if the token has expired, return an error
 			if ((decodedToken.ValidTo.Kind == DateTimeKind.Utc ? decodedToken.ValidTo : decodedToken.ValidTo.ToUniversalTime()) < recordTime)
 			{
-				return Content("<html><body><h1>ERROR</h1><p>The token inputted has expired. Refresh the token and try again</p></body></html>");
+				return Content("<html><body><h1>ERROR</h1><p>The token inputted has expired. Refresh the token and try again</p></body></html>", "text/html");
 			}
 
 			Claim? idClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type.ToLower() == "userid");
@@ -88,7 +100,7 @@ namespace taekwondo_backend.Controllers
 			//if the id claim was not found, return an error
 			if (idClaim == null)
 			{
-				return Content("<html><body><h1>ERROR</h1><p>The token inputted does not contain an ID claim.</p></body></html>");
+				return Content("<html><body><h1>ERROR</h1><p>The token inputted does not contain an ID claim.</p></body></html>", "text/html");
 			}
 
             bool parseSuccess = Int32.TryParse(idClaim.Value, out int userId);
@@ -96,21 +108,23 @@ namespace taekwondo_backend.Controllers
 			//if the parse failed return an error
 			if (!parseSuccess)
 			{
-				return Content("<html><body><h1>ERROR</h1><p>The id inputted could not be parsed.</p></body></html>");
+				return Content("<html><body><h1>ERROR</h1><p>The id inputted could not be parsed.</p></body></html>", "text/html");
 			}
+
+			recordTime = new DateTime(2025, 3, 3, 10, 51, 0);
 
 			//the id should be parsed now, send the date and id off to the other method to add the record
 			IActionResult result = await CreateAttendanceRecord(userId, recordTime);
 
 			//alert the user that the record creation was a success if the result was good
-			if (result.Equals(Ok()))
+			if (result is OkObjectResult)
 			{
 				//this will eventually return the attendance record id
 				string htmlContent = "<html><body><h1>Attendance Recorded</h1><p>Your attendance has been successfully marked.</p></body></html>";
 				return Content(htmlContent, "text/html");
 			} else
 			{
-				return Content("<html><body><h1>ERROR</h1><p>The attendance record failed to be created.</p></body></html>");
+				return Content("<html><body><h1>ERROR</h1><p>The attendance record failed to be created.</p></body></html>", "text/html");
 			}
 
         }

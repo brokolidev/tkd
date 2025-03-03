@@ -35,6 +35,7 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/16/solid'
 import {
+  BookOpenIcon,
   CalendarDaysIcon,
   Cog6ToothIcon,
   HomeIcon,
@@ -181,6 +182,17 @@ export function ApplicationLayout({
                 <HomeIcon />
                 <SidebarLabel>Home</SidebarLabel>
               </SidebarItem>
+              {
+                userRole == userViews.STUDENT &&
+                <SidebarItem
+                  href="/attendance"
+                  current={pathname === '/attendance'}
+                >
+                  <BookOpenIcon/>
+                  <SidebarLabel>Attendance</SidebarLabel>
+                </SidebarItem>
+
+              }
               {
                 userRole != userViews.STUDENT &&
                 (
