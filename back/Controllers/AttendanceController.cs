@@ -11,6 +11,8 @@ using taekwondo_backend.Models;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Text.Json;
 using System;
+using taekwondo_backend.Services;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace taekwondo_backend.Controllers
 {
@@ -36,7 +38,8 @@ namespace taekwondo_backend.Controllers
 			_roleManager = roleManager;
 		}
 
-		[HttpGet("{userId}")]
+        [Authorize]
+        [HttpGet("{userId}")]
 		public async Task<IActionResult> GetAttendanceRecords(int userId)
 		{
 			//check that the user exists in the system
@@ -59,17 +62,61 @@ namespace taekwondo_backend.Controllers
 			}
 		}
 
-		[HttpPost("qr/{token}")]
+		[HttpGet("qr/{token}")]
 		public async Task<IActionResult> CreateAttendanceRecordFromQR(string token)
 		{
 			//generate the dateTime
 			DateTime recordTime = DateTime.UtcNow;
 
-			//this will eventually return the attendance record id
-			return Ok(0);
-		}
+			//decode & validate the JWT, then pass the id and time off to the create attendance record
+			JwtSecurityToken? decodedToken = JwtService.DecodeJwt(token);
 
-		[HttpPost("{userId}")]
+			//if the token could not be read, return an error
+			if (decodedToken == null)
+			{
+				return Content("<html><body><h1>ERROR</h1><p>The token inputted could not be parsed.</p></body></html>");
+			}
+
+			//if the token has expired, return an error
+			if ((decodedToken.ValidTo.Kind == DateTimeKind.Utc ? decodedToken.ValidTo : decodedToken.ValidTo.ToUniversalTime()) < recordTime)
+			{
+				return Content("<html><body><h1>ERROR</h1><p>The token inputted has expired. Refresh the token and try again</p></body></html>");
+			}
+
+			Claim? idClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type.ToLower() == "userid");
+
+			//if the id claim was not found, return an error
+			if (idClaim == null)
+			{
+				return Content("<html><body><h1>ERROR</h1><p>The token inputted does not contain an ID claim.</p></body></html>");
+			}
+
+            bool parseSuccess = Int32.TryParse(idClaim.Value, out int userId);
+
+			//if the parse failed return an error
+			if (!parseSuccess)
+			{
+				return Content("<html><body><h1>ERROR</h1><p>The id inputted could not be parsed.</p></body></html>");
+			}
+
+			//the id should be parsed now, send the date and id off to the other method to add the record
+			IActionResult result = await CreateAttendanceRecord(userId, recordTime);
+
+			//alert the user that the record creation was a success if the result was good
+			if (result.Equals(Ok()))
+			{
+				//this will eventually return the attendance record id
+				string htmlContent = "<html><body><h1>Attendance Recorded</h1><p>Your attendance has been successfully marked.</p></body></html>";
+				return Content(htmlContent, "text/html");
+			} else
+			{
+				return Content("<html><body><h1>ERROR</h1><p>The attendance record failed to be created.</p></body></html>");
+			}
+
+        }
+
+        [Authorize]
+        [HttpPost("{userId}")]
 		public async Task<IActionResult> CreateAttendanceRecord(int userId, DateTime recordTime)
 		{
 			//check that the user exists in the system
@@ -135,7 +182,8 @@ namespace taekwondo_backend.Controllers
 			return Created(String.Empty, new { id = record.Id });
 		}
 
-		[HttpDelete("{id}")]
+        [Authorize]
+        [HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteAttendanceRecord(int id)
 		{
 			//ensure the record exists in the system before attempting to delete it

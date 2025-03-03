@@ -51,6 +51,17 @@ namespace taekwondo_backend.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        public static JwtSecurityToken? DecodeJwt(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            if (!handler.CanReadToken(token))
+            {
+                return null; // Check if token is valid
+            }
+         
+            return handler.ReadJwtToken(token);
+        }
     }
 }
 

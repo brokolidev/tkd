@@ -15,18 +15,21 @@ using System.Text.Json;
 namespace taekwondo_backend.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("[controller]")]
     public class StudentsController : ControllerBase
     {
         private readonly AppDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly JwtService _jwtService;
+        private readonly IConfiguration _config;
         
-        public StudentsController(AppDbContext context, UserManager<User> userManager, JwtService jwtService)
+        public StudentsController(AppDbContext context, UserManager<User> userManager, JwtService jwtService, IConfiguration config)
         {
             _context = context;
             _userManager = userManager;
             _jwtService = jwtService;
+            _config = config;
         }
 
 
@@ -37,7 +40,6 @@ namespace taekwondo_backend.Controllers
         /// <response code="204">No students found in the database</response>
         /// <response code="400">Invalid page number or page size</response>
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetStudents(int pageNumber = 1, int pageSize = 10)
         {
             // Check if pageNumber or pageSize are less than 1 and return response
@@ -81,7 +83,6 @@ namespace taekwondo_backend.Controllers
         /// <response code="200">The student was found</response>
         /// <response code="204">No student matching the given id was found</response>
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<IActionResult> GetStudentById(int id)
         {
             // Find the student with the given ID and role "Student"
@@ -125,15 +126,27 @@ namespace taekwondo_backend.Controllers
             //found here: https://chatgpt.com/share/67c1dc7c-2dc8-800c-ba64-fa7668c05b8b
             string? url = Url.Action("CreateAttendanceRecordFromQR", "Attendance", new { token = idToken});
 
+            //if the url is null, return status code 500
             if (url == null)
             {
                 return StatusCode(500, new { message = "The url failed to be created" });
             }
 
-            PayloadGenerator.Url payloadUrl = new(url);
+            //pull out the host from appsettings
+            string? host = _config.GetValue<string>("BEHost");
+
+            //if the host could not be found, return status code 500
+            if (host == null)
+            {
+                return StatusCode(500, new { message = "The backend host could not be determined" });
+            }
+
+            //generate the QR code
+            PayloadGenerator.Url payloadUrl = new(host + url);
             QRCodeData qrCodeData = qRCodeGenerator.CreateQrCode(payloadUrl, QRCodeGenerator.ECCLevel.Q);
             Base64QRCode qrCode = new(qrCodeData);
 
+            //return the QR code
             return Ok(qrCode.GetGraphic(20));
         }
 
