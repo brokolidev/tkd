@@ -117,7 +117,7 @@ namespace taekwondo_backend.Controllers
 			IActionResult result = await CreateAttendanceRecord(userId, recordTime);
 
 			//alert the user that the record creation was a success if the result was good
-			if (result is OkObjectResult)
+			if (result is CreatedResult)
 			{
 				//this will eventually return the attendance record id
 				string htmlContent = "<html><body><h1>Attendance Recorded</h1><p>Your attendance has been successfully marked.</p></body></html>";
