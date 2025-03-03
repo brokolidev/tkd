@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace taekwondo_backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class ImagesController : ControllerBase
     {
         private readonly AzureBlobStorageService _blobService;

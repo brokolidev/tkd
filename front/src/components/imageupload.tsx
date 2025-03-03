@@ -18,7 +18,7 @@ export default function ImageUpload({ onImageUploaded }: { onImageUploaded?: (ur
     if (!imagePreview) return;
 
     try {
-      const response = await fetch("https://localhost:7183/api/images/upload", {
+      const response = await fetch("https://localhost:7183/images/upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: imagePreview }),
