@@ -33,7 +33,7 @@ namespace taekwondo_backend.Services
             if (user == null)
             {
                 // Send an alert to Slack if the user is not found
-                await _slackService.SendSlackAlertAsync($"Login failed detected! \nEmail: {userName}\nReason: User not found");
+                await _slackService.SendSlackAlertAsync($"⚠️Login failed detected!⚠️ \n✔️Email: {userName}\n✔️Reason: User not found");
                 return SignInResult.Failed;
             }
 
@@ -43,7 +43,7 @@ namespace taekwondo_backend.Services
             // If the login fails due to an incorrect password, send an alert
             if (!result.Succeeded)
             {
-                await _slackService.SendSlackAlertAsync($"Login failed detected! \nEmail: {userName}\nReason: Incorrect password");
+                await _slackService.SendSlackAlertAsync($"⚠️Login failed detected!⚠️ \n✔️Email: {userName}\n✔️Reason: Incorrect password");
             }
 
             return result;
