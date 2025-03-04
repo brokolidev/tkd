@@ -6,6 +6,7 @@ using taekwondo_backend.Services;
 using taekwondo_backend.Data;
 using taekwondo_backend.Models.Identity;
 using taekwondo_backend.Seeder;
+using Microsoft.AspNetCore.Identity;
 
 namespace taekwondo_backend
 {
@@ -16,6 +17,10 @@ namespace taekwondo_backend
             //create a new web app builder, to add the other settings below to
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddHealthChecks();
+
+            //add config files for settings not meant to be pushed to git
+            //we don't want it to be optional, but we do want it to reload on change.
+            builder.Configuration.AddJsonFile("secretSettings.json", optional: false, reloadOnChange: true);
 
             builder.Services.AddCors(options =>
             {
@@ -30,6 +35,8 @@ namespace taekwondo_backend
 
             // Add services to the container.
             builder.Services.AddControllers();
+            // Add services to Azure bob service 
+            builder.Services.AddSingleton<AzureBlobStorageService>();
 
             // Add a database context to the container
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -62,6 +69,14 @@ namespace taekwondo_backend
 
             builder.Services.AddScoped<JwtService>();
             builder.Services.AddTransient<DataSeeder>();
+
+            builder.Services.AddHttpClient<EmailService>();
+
+            builder.Services.AddScoped<SlackService>();
+            builder.Services.AddScoped<CustomSignInManager>();
+            builder.Services.AddScoped<SignInManager<User>>(provider => provider.GetRequiredService<CustomSignInManager>());
+
+
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

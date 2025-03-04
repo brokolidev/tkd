@@ -64,7 +64,7 @@ namespace taekwondo_backend.Controllers
 				FirstName = user.FirstName ?? string.Empty,
 				LastName = user.LastName ?? string.Empty,
 				BeltColor = user.BeltColor ?? BeltColorType.White,
-				ProfileImage = user.ProfileImage ?? "https://i.pravatar.cc/300",
+				ProfileImage = user.ProfileImage ?? string.Empty,
 				Role = role.FirstOrDefault() ?? string.Empty,
 			});
 		}
@@ -104,6 +104,7 @@ namespace taekwondo_backend.Controllers
 				user.LastName = userDTO.LastName;
 				user.DateOfBirth = userDTO.DateOfBirth;
 				user.BeltColor = userDTO.BeltColor;
+				user.ProfileImage = userDTO.ProfileImage;
 
                 //update the user.
                 IdentityResult result = await _userManager.UpdateAsync(user);

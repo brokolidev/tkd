@@ -13,6 +13,8 @@ namespace taekwondo_backend.DTO
         public UserRoles Role { get; set; }
         public string ProfileImage { get; set; }
 
+        public string ProfileImage { get; set; }
+
         public UserFEDTO()
         {
             Id = 0;
@@ -35,6 +37,7 @@ namespace taekwondo_backend.DTO
             BeltColor = beltColor;
             Role = role;
             ProfileImage = profileImage;
+            ProfileImage = profileimage;
         }
     }
 }

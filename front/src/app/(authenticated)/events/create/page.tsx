@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { Textarea } from '@/components/textarea';
 import axios from 'axios';
 import { Link } from '@/components/link'
-import ImageUpload from '@/components/image'
+import ImageUpload from '@/components/imageupload'
 enum DaysOfWeek {
   Monday = "Monday",
   Tuesday = "Tuesday",

@@ -8,7 +8,7 @@ import { Input } from '@/components/input'
 import { Link } from '@/components/link'
 import { ChevronLeftIcon, PlusIcon, MinusIcon } from '@heroicons/react/16/solid'
 import { useState, useEffect } from 'react'
-import ImageUpload from '@/components/image'
+import ImageUpload from '@/components/imageupload'
 import {ISchedule} from "@/structures/schedule";
 import {Badge, BadgeButton} from "@/components/badge";
 import {Dialog, DialogActions, DialogDescription, DialogTitle} from "@/components/dialog";
