@@ -93,7 +93,6 @@ namespace taekwondo_backend
             }
 
             app.MapIdentityApi<User>();
-            // app.MapCustomIdentityApi();
 
             app.UseHttpsRedirection();
 
