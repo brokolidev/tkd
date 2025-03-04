@@ -11,6 +11,7 @@ namespace taekwondo_backend.DTO
         public string Email { get; set; }
         public BeltColorType? BeltColor { get; set; }
         public UserRoles Role { get; set; }
+        public string ProfileImage { get; set; }
 
         public UserFEDTO()
         {
@@ -21,9 +22,10 @@ namespace taekwondo_backend.DTO
             Email = string.Empty;
             DateOfBirth = null;
             Role = UserRoles.Student;
+            ProfileImage = string.Empty;
         }
 
-        public UserFEDTO(int id, string firstName, string lastName, string email, DateOnly? birthDate, BeltColorType? beltColor, UserRoles role)
+        public UserFEDTO(int id, string firstName, string lastName, string email, DateOnly? birthDate, BeltColorType? beltColor, UserRoles role, string? profileImage)
         {
             Id = id;
             FirstName = firstName;
@@ -32,6 +34,7 @@ namespace taekwondo_backend.DTO
             DateOfBirth = birthDate;
             BeltColor = beltColor;
             Role = role;
+            ProfileImage = profileImage;
         }
     }
 }
