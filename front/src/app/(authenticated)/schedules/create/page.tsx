@@ -13,13 +13,15 @@ import ImageUpload from '@/components/image'
 import {ISchedule} from "@/structures/schedule";
 import {Badge, BadgeButton} from "@/components/badge";
 import {Dialog, DialogActions, DialogDescription, DialogTitle} from "@/components/dialog";
-import {Field, Label} from "@/components/fieldset";
+import {Description, Field, Label} from "@/components/fieldset";
 import * as Headless from '@headlessui/react'
 import {Listbox, ListboxLabel, ListboxOption} from "@/components/listbox";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/table";
 import {Avatar} from "@/components/avatar";
 import {getTimeSlots} from "@/services/tmeSlotServices";
 import {Monda} from "next/dist/compiled/@next/font/dist/google";
+import {Checkbox, CheckboxField, CheckboxGroup} from "@/components/checkbox";
+import {getAllInstructors, getInstructors} from "@/services/instructorServices";
 
 export default function CreateSchedulePage() {
   const [isCreated, setIsCreated] = useState(false)
@@ -27,6 +29,7 @@ export default function CreateSchedulePage() {
   const [isResetOpen, setIsResetOpen] = useState(false)
   const [isSaveOpen, setIsSaveOpen] = useState(false)
   const [users, setUsers] = useState([])
+  const [instructors, setInstructors] = useState([])
   const [timeslots, setTimeslots] = useState([]);
   const [timeslotComponents, setTimeslotComponents] = useState([])
   const [selectedTimeslots, setSelectedTimeslots] = useState([])
@@ -41,6 +44,11 @@ export default function CreateSchedulePage() {
       ["Monday", 1],
     ]);
   }
+  
+  async function loadInstructors(): Promise<void> {
+    const instructorData = await getAllInstructors();
+    setInstructors(instructorData.data)
+  }
 
   const daysOfWeek = [
     'Monday',
@@ -51,10 +59,6 @@ export default function CreateSchedulePage() {
     'Saturday',
     'Sunday'
   ]
-
-  useEffect(() => {
-    loadTimeslots();
-  }, [])
 
   const handleDOWSelect = (e, idx) => {
     selectedTimeslots[idx][0] = e
@@ -96,6 +100,11 @@ export default function CreateSchedulePage() {
   const handleSubmit = async (event?: React.FormEvent) => {
     return false;
   }
+
+  useEffect(() => {
+    loadTimeslots();
+    loadInstructors();
+  }, [])
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-full">
@@ -189,30 +198,52 @@ export default function CreateSchedulePage() {
       <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2 items-start">
         <div className="flex items-center gap-3">
           <Subheading>Instructors</Subheading>
-          <BadgeButton color="blue" onClick={() => null}>
-            + Add
-          </BadgeButton>
         </div>
-        <div>
-          <Headless.Field className="flex items-baseline justify-center gap-6">
-            <Listbox name="status" defaultValue="active" className="max-w-96">
-              <ListboxOption value="active">
-                <ListboxLabel>Active</ListboxLabel>
-              </ListboxOption>
-              <ListboxOption value="paused">
-                <ListboxLabel>Paused</ListboxLabel>
-              </ListboxOption>
-              <ListboxOption value="delayed">
-                <ListboxLabel>Delayed</ListboxLabel>
-              </ListboxOption>
-              <ListboxOption value="canceled">
-                <ListboxLabel>Canceled</ListboxLabel>
-              </ListboxOption>
-            </Listbox>
-
-            <BadgeButton color="red">Remove</BadgeButton>
-          </Headless.Field>
-        </div>
+        <fieldset className="pl-4">
+          {instructors.length > 0 && instructors.map((value, idx) => (
+            <div className="space-y-5" key={idx}>
+              <div className="flex gap-3">
+                <div className="flex h-6 shrink-0 items-center">
+                  <div className="group grid size-4 grid-cols-1">
+                    <input
+                      defaultChecked={idx == 0}
+                      id="comments"
+                      name="comments"
+                      type="checkbox"
+                      aria-describedby="comments-description"
+                      className="col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                    />
+                    <svg
+                      fill="none"
+                      viewBox="0 0 14 14"
+                      className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25"
+                    >
+                      <path
+                        d="M3 8L6 11L11 3.5"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="opacity-0 group-has-[:checked]:opacity-100"
+                      />
+                      <path
+                        d="M3 7H11"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="opacity-0 group-has-[:indeterminate]:opacity-100"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <div className="text-sm/6">
+                  <label htmlFor="comments" className="font-medium text-gray-900">
+                    {`${value.firstName} ${value.lastName}`}
+                  </label>
+                </div>
+              </div>
+            </div>
+          ))}
+        </fieldset>
       </section>
 
       <Divider className="my-10" />
