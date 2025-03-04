@@ -6,6 +6,7 @@ using taekwondo_backend.Services;
 using taekwondo_backend.Data;
 using taekwondo_backend.Models.Identity;
 using taekwondo_backend.Seeder;
+using Microsoft.AspNetCore.Identity;
 
 namespace taekwondo_backend
 {
@@ -70,6 +71,12 @@ namespace taekwondo_backend
             builder.Services.AddTransient<DataSeeder>();
 
             builder.Services.AddHttpClient<EmailService>();
+
+            builder.Services.AddScoped<SlackService>();
+            builder.Services.AddScoped<CustomSignInManager>();
+            builder.Services.AddScoped<SignInManager<User>>(provider => provider.GetRequiredService<CustomSignInManager>());
+
+
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
