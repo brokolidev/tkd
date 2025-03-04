@@ -6,29 +6,26 @@ import { Divider } from '@/components/divider'
 import { Heading, Subheading } from '@/components/heading'
 import { Input } from '@/components/input'
 import { Link } from '@/components/link'
-import { Select } from '@/components/select'
 import { ChevronLeftIcon, PlusIcon, MinusIcon } from '@heroicons/react/16/solid'
 import { useState, useEffect } from 'react'
 import ImageUpload from '@/components/image'
 import {ISchedule} from "@/structures/schedule";
 import {Badge, BadgeButton} from "@/components/badge";
 import {Dialog, DialogActions, DialogDescription, DialogTitle} from "@/components/dialog";
-import {Description, Field, Label} from "@/components/fieldset";
 import * as Headless from '@headlessui/react'
 import {Listbox, ListboxLabel, ListboxOption} from "@/components/listbox";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/table";
 import {Avatar} from "@/components/avatar";
 import {getTimeSlots} from "@/services/tmeSlotServices";
-import {Monda} from "next/dist/compiled/@next/font/dist/google";
-import {Checkbox, CheckboxField, CheckboxGroup} from "@/components/checkbox";
 import {getAllInstructors, getInstructors} from "@/services/instructorServices";
+import {getAllStudents} from "@/services/studentServices";
 
 export default function CreateSchedulePage() {
   const [isCreated, setIsCreated] = useState(false)
   const [formData, setFormData] = useState<ISchedule | null>(null)
   const [isResetOpen, setIsResetOpen] = useState(false)
   const [isSaveOpen, setIsSaveOpen] = useState(false)
-  const [users, setUsers] = useState([])
+  const [students, setStudents] = useState([])
   const [instructors, setInstructors] = useState([])
   const [timeslots, setTimeslots] = useState([]);
   const [timeslotComponents, setTimeslotComponents] = useState([])
@@ -50,6 +47,11 @@ export default function CreateSchedulePage() {
     setInstructors(instructorData.data)
   }
 
+  async function loadStudents(): Promise<void> {
+    const studentsData = await getAllStudents();
+    setStudents(studentsData.data)
+  }
+
   const daysOfWeek = [
     'Monday',
     'Tuesday',
@@ -58,6 +60,15 @@ export default function CreateSchedulePage() {
     'Friday',
     'Saturday',
     'Sunday'
+  ]
+  
+  const classLevels = [
+    'Little Warriors',
+    'Family Class',
+    'Beginner Class 1',
+    'Little Warriors 1',
+    'Private Lesson',
+    'Private Class',
   ]
 
   const handleDOWSelect = (e, idx) => {
@@ -104,6 +115,7 @@ export default function CreateSchedulePage() {
   useEffect(() => {
     loadTimeslots();
     loadInstructors();
+    loadStudents();
   }, [])
 
   return (
@@ -119,31 +131,19 @@ export default function CreateSchedulePage() {
 
       <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
         <div className="space-y-1">
-          <Subheading>Class Name</Subheading>
+          <Subheading>Class Level</Subheading>
         </div>
         <div>
-          <Input
-            aria-label="Class Name"
-            name="className"
-            placeholder="Little Warrior 1"
-            onChange={(e) => setFormData({ ...formData, className: e.target.value })}
-          />
-        </div>
-      </section>
-
-      <Divider className="my-6" soft />
-
-      <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-        <div className="space-y-1">
-          <Subheading>Class Description</Subheading>
-        </div>
-        <div>
-          <Input
-            aria-label="Class Description"
-            name="description"
-            placeholder="Enter a description for the class"
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          />
+          <Headless.Field className="flex items-baseline justify-center gap-6 mb-4">
+            <Listbox name="classLevel"
+                     defaultValue={classLevels[0]} className="max-w-full">
+              {classLevels.map((level: string, idx: number) => (
+                <ListboxOption<string> value={level} key={idx}>
+                  <ListboxLabel>{level}</ListboxLabel>
+                </ListboxOption>
+              ))}
+            </Listbox>
+          </Headless.Field>
         </div>
       </section>
 
@@ -172,7 +172,7 @@ export default function CreateSchedulePage() {
               <Headless.Field className="flex items-baseline justify-center gap-6 mb-4" key={compIdx}>
                 <Listbox name="dows[]" 
                          onChange={(e) => handleDOWSelect(e, compIdx)} 
-                         defaultValue={value[0]} className="max-w-48">
+                         defaultValue={value[0]} className="max-w-full">
                   {daysOfWeek.map((day, index: number) => (
                     <ListboxOption<string> value={day} key={index}>
                       <ListboxLabel>{day}</ListboxLabel>
@@ -180,7 +180,7 @@ export default function CreateSchedulePage() {
                   ))}
                 </Listbox>
                 <Listbox name="timeslots[]" onChange={(e) => handleTimeslotSelect(e, compIdx)}
-                         defaultValue={value[1]} className="max-w-48">
+                         defaultValue={value[1]} className="max-w-full">
                   {timeslots.map((timeslot) => (
                     <ListboxOption value={timeslot.id} key={timeslot.id}>
                       <ListboxLabel>{timeslot?.startsAt.replace(/:00$/, '')} ~ {timeslot?.endsAt.replace(/:00$/, '')}</ListboxLabel>
@@ -200,7 +200,7 @@ export default function CreateSchedulePage() {
           <Subheading>Instructors</Subheading>
         </div>
         <fieldset className="pl-4">
-          {instructors.length > 0 && instructors.map((value, idx) => (
+          {instructors.map((value, idx) => (
             <div className="space-y-5" key={idx}>
               <div className="flex gap-3">
                 <div className="flex h-6 shrink-0 items-center">
@@ -260,18 +260,18 @@ export default function CreateSchedulePage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.handle}>
+            {students.map((student) => (
+              <TableRow key={student.id}>
                 <TableCell>
                   <div className="flex items-center gap-4">
-                    <Avatar src={user.avatarUrl} className="size-12" />
+                    <Avatar src={student.profileImage} className="size-12" />
                     <div>
-                      <div className="font-medium">{user.name}</div>
+                      <div className="font-medium">{`${student.firstName} ${student.lastName}`}</div>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  {user.online ? <Badge color="lime">Online</Badge> : <Badge color="zinc">Offline</Badge>}
+                  {student.online ? <Badge color="lime">Online</Badge> : <Badge color="zinc">Offline</Badge>}
                 </TableCell>
               </TableRow>
             ))}

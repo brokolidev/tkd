@@ -6,7 +6,18 @@ export async function getStudent(id: number): Promise<IUser> {
     return axios.get(`students/${id}`)
         .then((res) => ensureValidTypes([res.data])[0])
 }
-  
+
+export async function getAllStudents() {
+  try {
+    const response = await axios.get(
+      '/students?page=1&pagesize=1000');
+    return response.data;
+  } catch (e) {
+    console.error('Error fetching timeslots:', e);
+    throw e;
+  }
+}
+
 export async function getStudents(page: number) : Promise<UserPagination> {
     //get all students in the system. for right now, return a promise of fake data.
 
