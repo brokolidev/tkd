@@ -7,7 +7,7 @@ export interface IUser {
     email: string
     dateOfBirth: Date
     beltColor: beltColors
-    profileImgUrl: string
+    profileImage: string
     role: userViews
 }
 
@@ -34,6 +34,7 @@ export interface NewUser {
   BeltColor: beltColors | null //not needed for instructors/admins
   Password: string
   Role: userViews
+  profileImage: string
 }
 
 /**

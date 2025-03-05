@@ -101,6 +101,7 @@ export default function UserRegisterPage() {
     DateOfBirth: new Date(),
     BeltColor: beltColors.WHITE, //init to white, as that is the default below
     Password: "",
+    profileImage: "", // This is the uploaded image URL.
     Role: currentView //init to current view 
   })
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -183,8 +184,12 @@ export default function UserRegisterPage() {
               </Button>
             </div>
             {/* Conditionally render the component based on activeImageSource */}
-            {activeImageSource === 'upload' && <ImageUpload />}
-            {activeImageSource === 'webcam' && <WebcamCapture />}
+            {activeImageSource === 'upload' && (
+              <ImageUpload onImageUploaded={(url) => setNewUser({ ...newUser, profileImage: url })} />
+            )}        
+              {activeImageSource === 'webcam' && (
+                <WebcamCapture onImageUploaded={(url) => setNewUser({ ...newUser, profileImage: url })} />
+            )}
           </div>
             
             

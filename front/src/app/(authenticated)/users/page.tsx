@@ -222,7 +222,7 @@ export default function UserPage(props) {
                 {/* For the belt color and user avatar */}
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Avatar src={user.profileImgUrl} className="size-6" />
+                    <Avatar src={user.profileImage} className="size-6" />
 
                     {/* The belt color is only needed if the user is a student */}
                     {

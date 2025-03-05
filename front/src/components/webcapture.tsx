@@ -1,5 +1,5 @@
 "use client";
-
+import axios from "@/lib/axios";
 import React, { useRef, useState, useCallback } from "react";
 import Webcam from "react-webcam";
 import { Button } from "@/components/button";
@@ -28,26 +28,20 @@ const WebcamCapture: React.FC<{ onImageUploaded?: (url: string) => void }> = ({ 
 
   const uploadImage = async () => {
     if (!image) return;
-
+  
     try {
-      const response = await fetch("https://localhost:7183/images/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image }),
-      });
-
-      const data = await response.json();
-      alert("Image uploaded successfully. URL: " + data.fileUrl);
-      
+      // Using the Axios instance with the base URL and interceptors already set up.
+      const response = await axios.post("/images/upload", { image });
+      alert("Image uploaded successfully. URL: " + response.data.fileUrl);
+  
       // Pass the uploaded image URL back to the parent component if a callback is provided.
       if (onImageUploaded) {
-        onImageUploaded(data.fileUrl);
+        onImageUploaded(response.data.fileUrl);
       }
     } catch (error) {
       console.error("Error uploading image:", error);
     }
   };
-
   const videoConstraints = {
     facingMode: { ideal: "environment" },
   };
