@@ -33,6 +33,7 @@ export function createAttendanceRecord(userToken: string, timeOverride: string) 
       .catch(err => {
         let msg = "No response"
 
+        //found here: https://chatgpt.com/share/67c898d8-8770-800c-af57-2618c5e40d9a
         if (err.response) {
           // The request was made and the server responded with a non-2xx status
           msg = err.response.data
