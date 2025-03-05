@@ -17,7 +17,7 @@ import WebcamCapture from '@/components/webcapture'
 import ImageUpload from '@/components/imageupload'
 
 export default function UserRegisterPage() {
-
+  const [activeImageSource, setActiveImageSource] = useState('upload') // 'upload' or 'webcam
   const { currentView } = useUserViews()
 
   const formAction = (event) => {
@@ -101,6 +101,7 @@ export default function UserRegisterPage() {
     DateOfBirth: new Date(),
     BeltColor: beltColors.WHITE, //init to white, as that is the default below
     Password: "",
+    profileImage: "", // This is the uploaded image URL.
     Role: currentView //init to current view 
   })
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -163,15 +164,36 @@ export default function UserRegisterPage() {
 
           <div className="space-y-1">
             <Subheading>Profile Picture</Subheading>
+          </div>
+          <div>
+            {/* Toggle buttons to choose between upload and webcam */}
+            <div className="flex gap-4 mb-2">
+            <Button
+            type="button"
+             onClick={() => setActiveImageSource('upload')}
+              className='bg-red-500 text-white'
+              >
+                Upload Image
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setActiveImageSource('webcam')}
+              className='bg-blue-500 text-white'
+                  >
+                Capture with Webcam
+              </Button>
             </div>
-            <div>
-              <ImageUpload/>
-             <WebcamCapture />
-            </div>
+            {/* Conditionally render the component based on activeImageSource */}
+            {activeImageSource === 'upload' && (
+              <ImageUpload onImageUploaded={(url) => setNewUser({ ...newUser, profileImage: url })} />
+            )}        
+              {activeImageSource === 'webcam' && (
+                <WebcamCapture onImageUploaded={(url) => setNewUser({ ...newUser, profileImage: url })} />
+            )}
+          </div>
             
             
-            
-
+        
 
           <div className="space-y-1">
             <Subheading>Email</Subheading>

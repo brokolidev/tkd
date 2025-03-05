@@ -167,6 +167,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
           Users
         </Link>
       </div>
+
       <div className="mt-4 lg:mt-8">
         <div className="flex items-center gap-4">
           <Heading>{((user?.firstName ?? "") + " " + (user?.lastName ?? ""))}</Heading>
@@ -221,6 +222,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
         </DescriptionList>
       </div>
       <div className="mt-10 w-full flex gap-3 justify-end">
+        <Button href={"/attendance?user=" + user.id}>View Attendance</Button>
         <Button href={"/users/" + user.id + "/edit"} >Edit Information</Button>
         <Button {...{color: 'red'}} onClick={() => setShowDeleteAlert(true)}>Delete User</Button>
       </div>

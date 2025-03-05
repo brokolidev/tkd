@@ -11,6 +11,10 @@ using taekwondo_backend.Models;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Text.Json;
 using System;
+using taekwondo_backend.Services;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace taekwondo_backend.Controllers
 {
@@ -36,8 +40,9 @@ namespace taekwondo_backend.Controllers
 			_roleManager = roleManager;
 		}
 
-		[HttpGet("{userId}")]
-		public async Task<IActionResult> GetAttendanceRecords(int userId)
+        [Authorize]
+        [HttpGet("{userId}")]
+		public async Task<IActionResult> GetAttendanceRecords(int userId, int pageNumber = 1, int pageSize = 10)
 		{
 			//check that the user exists in the system
 			var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -52,14 +57,70 @@ namespace taekwondo_backend.Controllers
 
 			if (records.Count != 0)
 			{
-				return Ok(records);
+				//convert the Records to FEDTOs, to pass the user and schedule back to the FE
+				var recordsForFE = await Task.WhenAll(records.Select(async record => new AttendanceRecordFEDTO()
+				{
+					Id = record.Id,
+					User = (await _userManager.FindByIdAsync(record.UserId.ToString()) ?? new Models.Identity.User()),
+					Schedule = (_context.Schedules.FirstOrDefault(schedule => schedule.Id == record.ScheduleId) ?? new Schedule()),
+					DateRecorded = record.DateRecorded
+				}));
+
+				//finally, paginate the list
+                var pagedRecords = PagedList<AttendanceRecordFEDTO>.Create(recordsForFE, pageNumber, pageSize);
+
+                return Ok(pagedRecords);
 			} else
 			{
 				return NoContent();
 			}
 		}
 
-		[HttpPost("{userId}")]
+		[HttpPost("qr")]
+		public async Task<IActionResult> CreateAttendanceRecordFromQR(DateTime? timeOverride, [FromBody] string token)
+		{
+			//generate the dateTime
+			DateTime recordTime = timeOverride ?? DateTime.UtcNow;
+
+			//decode & validate the JWT, then pass the id and time off to the create attendance record
+			JwtSecurityToken? decodedToken = JwtService.DecodeJwt(token);
+
+			//if the token could not be read, return an error
+			if (decodedToken == null)
+			{
+				return BadRequest("the token inputted could not be parsed.");
+			}
+
+			//if the token has expired, return an error
+			if ((decodedToken.ValidTo.Kind == DateTimeKind.Utc ? decodedToken.ValidTo : decodedToken.ValidTo.ToUniversalTime()) < recordTime)
+			{
+				return BadRequest("The token inputted has expired. Refresh the token and try again");
+			}
+
+			Claim? idClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type.ToLower() == "userid");
+
+			//if the id claim was not found, return an error
+			if (idClaim == null)
+			{
+				return BadRequest("The token inputted does ot contain an ID");
+			}
+
+            bool parseSuccess = Int32.TryParse(idClaim.Value, out int userId);
+
+			//if the parse failed return an error
+			if (!parseSuccess)
+			{
+				return BadRequest("The id could not be parsed from the token inputted");
+			}
+
+			//the id should be parsed now, send the date and id off to the other method to add the record
+			//then return the result of the method
+			return await CreateAttendanceRecord(userId, recordTime);
+
+        }
+
+        [Authorize]
+        [HttpPost("{userId}")]
 		public async Task<IActionResult> CreateAttendanceRecord(int userId, DateTime recordTime)
 		{
 			//check that the user exists in the system
@@ -67,7 +128,7 @@ namespace taekwondo_backend.Controllers
 
 			if (user == null)
 			{
-				return NotFound();
+				return NotFound("The user could not be found");
 			}
 
 			//the user exists, create the record in the system
@@ -84,7 +145,7 @@ namespace taekwondo_backend.Controllers
 			//if scheduleId is null, then that means that the date inputted wasn't close to one of the user's schedules.
 			if (scheduleId == -1)
 			{
-				return BadRequest(JsonSerializer.Serialize("The Time inputted was not within a half an hour of a schedule start time for the user"));
+				return BadRequest("The Time inputted was not within a half an hour of a schedule start time for the user");
 			}
 
 			//if the schedule cannot be found in the HasAlreadyCheckedIn method, it throws an exception. catch it here and return.
@@ -93,7 +154,7 @@ namespace taekwondo_backend.Controllers
 				//Here, check that the user hasn't already checked into this class
 				if (HasAlreadyCheckedIn(scheduleId, userId, recordTime))
 				{
-					return BadRequest(JsonSerializer.Serialize("The user has already checked into this class."));
+					return BadRequest("The user has already checked into this class.");
 				}
 			} catch (InvalidOperationException ex)
 			{
@@ -125,7 +186,8 @@ namespace taekwondo_backend.Controllers
 			return Created(String.Empty, new { id = record.Id });
 		}
 
-		[HttpDelete("{id}")]
+        [Authorize]
+        [HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteAttendanceRecord(int id)
 		{
 			//ensure the record exists in the system before attempting to delete it
@@ -246,6 +308,26 @@ namespace taekwondo_backend.Controllers
 			}
 
 			return hasCheckedIn;
+		}
+		private string CreateHTMLMessage(string title, string message)
+		{
+            //webutility.UrlEncode found from:
+			//https://learn.microsoft.com/en-us/dotnet/api/system.net.webutility.urlencode?view=net-9.0
+			//it will ensure that if for whatever reason the user manages to get their own input in,
+			//it is only rendered as a string rather than as part of the page
+            string HTMLMessage = $@"
+<html>
+	<body
+		style='background-color: #F2F0EF; display: flex; justify-content: center; align-items: center; font-family: sans-serif;'
+	>
+		<div style='text-align: center;'>
+			<h1 style='font-size: 100;'>{WebUtility.UrlEncode(title)}</h1>
+			<p style='font-size: 50;'>{WebUtility.UrlEncode(message)}</p>
+		</div>
+	</body>
+</html>";
+
+			return HTMLMessage;
 		}
 	}
 }
