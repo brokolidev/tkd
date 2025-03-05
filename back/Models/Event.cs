@@ -16,10 +16,10 @@ namespace taekwondo_backend.Models
         public string Title { get; set; }
         
         [Required]
-        public DateTime StartsAt { get; set; }
+        public DateTime? StartsAt { get; set; }
         
         [Required]
-        public DateTime EndsAt { get; set; }
+        public DateTime? EndsAt { get; set; }
         
         [Required]
         public string Description { get; set; }
@@ -36,12 +36,8 @@ namespace taekwondo_backend.Models
         {
             User = new User();
             Title = string.Empty;
-            StartsAt = DateTime.Now;
-            EndsAt = DateTime.Now;
             Description = string.Empty;
             IsOpen = false;
-            CreatedAt = DateTime.MinValue;
-            UpdatedAt = DateTime.MinValue;
         }
 
         public Event(User user, string title, DateTime startsAt, DateTime endsAt, string description, bool isOpen)
