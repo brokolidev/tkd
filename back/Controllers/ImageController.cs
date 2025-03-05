@@ -1,16 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace taekwondo_backend.Controllers
 {
+
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class ImagesController : ControllerBase
     {
         private readonly AzureBlobStorageService _blobService;
 
-        // Use dependency injection to receive the AzureBlobStorageService.
         public ImagesController(AzureBlobStorageService blobService)
         {
             _blobService = blobService;
@@ -31,13 +31,12 @@ namespace taekwondo_backend.Controllers
 
             try
             {
-                // Remove any data URL metadata if present.basically remove the first part of the string data:image/png;base64
-                var base64Data = dto.Image.Contains(",") // to check if the image is base64 encoded or if there is a prefix , 
-                    ? dto.Image.Substring(dto.Image.IndexOf(",") + 1) // if there is a prefix then remove it
-                    : dto.Image; // if there is no prefix then just use the image data as it is
-                byte[] imageBytes = Convert.FromBase64String(base64Data); // convert the base64 string to byte array
+                // Remove data URL prefix if present.
+                var base64Data = dto.Image.Contains(",")
+                    ? dto.Image.Substring(dto.Image.IndexOf(",") + 1)
+                    : dto.Image;
+                byte[] imageBytes = Convert.FromBase64String(base64Data);
 
-                // Generate a unique file name.
                 var fileName = $"{Guid.NewGuid()}.jpg";
                 string fileUrl = await _blobService.UploadFileAsync(imageBytes, fileName);
 

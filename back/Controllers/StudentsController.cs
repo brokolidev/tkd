@@ -161,7 +161,7 @@ namespace taekwondo_backend.Controllers
                     LastName = userDTO.LastName,
                     DateOfBirth = userDTO.DateOfBirth,
                     BeltColor = userDTO.BeltColor,
-                    ProfileImage = userDTO.ProfileImage ?? ""
+                    ProfileImage = userDTO.ProfileImage ?? "" 
                 };
 
                 //create the  user
