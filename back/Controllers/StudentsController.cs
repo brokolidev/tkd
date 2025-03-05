@@ -51,7 +51,7 @@ namespace taekwondo_backend.Controllers
                         Email = user.Email ?? "",
                         BeltColor = user.BeltColor,
                         Role = UserRoles.Student,
-                        ProfileImage = user.ProfileImage??""
+                        ProfileImage = user.ProfileImage ?? "https://i.pravatar.cc/300",
                     }
                 );
 

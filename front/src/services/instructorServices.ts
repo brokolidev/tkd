@@ -6,6 +6,18 @@ export async function getInstructor(id: number): Promise<IUser> {
     return axios.get(`instructors/${id}`)
         .then((res) => ensureValidTypes([res.data])[0])
 }
+
+export async function getAllInstructors() {
+  try {
+    const response = await axios.get(
+      '/instructors');
+    return response.data;
+  } catch (e) {
+    console.error('Error fetching timeslots:', e);
+    throw e;
+  }
+}
+
   
 export async function getInstructors(page: number) : Promise<UserPagination> {
     //get all instructors in the system. for right now, return a promise of fake data.
