@@ -25,6 +25,7 @@ import { SidebarLayout } from '@/components/sidebar-layout'
 import { Spinner } from '@/components/spinner'
 import { getEvents } from '@/data'
 import useUser from '@/hooks/swrHooks'
+import { userViews } from '@/hooks/userViews'
 import { setCookie } from '@/lib/cookie'
 import {
   ArrowRightStartOnRectangleIcon,
@@ -34,6 +35,7 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/16/solid'
 import {
+  BookOpenIcon,
   CalendarDaysIcon,
   Cog6ToothIcon,
   HomeIcon,
@@ -43,6 +45,7 @@ import {
   UsersIcon,
 } from '@heroicons/react/20/solid'
 import { redirect, usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 const logout = async () => {
   localStorage.removeItem('tkd-access-token')
@@ -84,7 +87,21 @@ export function ApplicationLayout({
   events: Awaited<ReturnType<typeof getEvents>>
   children: React.ReactNode
 }) {
-  const { user, isError, isLoading } = useUser()
+  const { user, isError, isLoading, getRole } = useUser()
+  const [userRole, setUserRole] = useState(userViews.UNKNOWN)
+
+
+  useEffect(() => {
+    if (user) {
+        
+        const roleAsUserViews = getRole()
+
+        //if the userRole is different, update it.
+        if (userRole != roleAsUserViews) {
+            setUserRole(roleAsUserViews)
+        }
+    }
+  }, [user])
 
   let pathname = usePathname()
 
@@ -139,14 +156,33 @@ export function ApplicationLayout({
 
           <SidebarBody>
             <SidebarSection>
-              <SidebarItem href="/" current={pathname === '/'}>
+              <SidebarItem
+                href={userRole == userViews.STUDENT ? "/student" : "/"}
+                current={pathname === '/'}
+              >
                 <HomeIcon />
                 <SidebarLabel>Home</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/users" current={pathname.startsWith('/users')}>
-                <UsersIcon />
-                <SidebarLabel>Users</SidebarLabel>
-              </SidebarItem>
+              {
+                userRole == userViews.STUDENT &&
+                <SidebarItem
+                  href="/attendance"
+                  current={pathname === '/attendance'}
+                >
+                  <BookOpenIcon/>
+                  <SidebarLabel>Attendance</SidebarLabel>
+                </SidebarItem>
+
+              }
+              {
+                userRole != userViews.STUDENT &&
+                (
+                  <SidebarItem href="/users" current={pathname.startsWith('/users')}>
+                    <UsersIcon />
+                    <SidebarLabel>Users</SidebarLabel>
+                  </SidebarItem>
+                )
+              }
               <SidebarItem href="/schedules">
                 <CalendarDaysIcon />
                 <SidebarLabel>Schedules</SidebarLabel>
@@ -155,10 +191,15 @@ export function ApplicationLayout({
                 <Square2StackIcon />
                 <SidebarLabel>Events</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/settings" current={pathname.startsWith('/settings')}>
-                <Cog6ToothIcon />
-                <SidebarLabel>Settings</SidebarLabel>
-              </SidebarItem>
+              
+              {
+                userRole != userViews.STUDENT &&
+                
+                <SidebarItem href="/settings" current={pathname.startsWith('/settings')}>
+                    <Cog6ToothIcon />
+                    <SidebarLabel>Settings</SidebarLabel>
+                </SidebarItem>
+              }
             </SidebarSection>
 
             <SidebarSection className="max-lg:hidden">

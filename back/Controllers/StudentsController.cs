@@ -6,21 +6,30 @@ using Microsoft.AspNetCore.Identity;
 using taekwondo_backend.Models.Identity;
 using taekwondo_backend.Enums;
 using Microsoft.AspNetCore.Authorization;
+using QRCoder;
+using taekwondo_backend.Services;
+using System.Reflection.Emit;
+using System.Text.Json;
 
 
 namespace taekwondo_backend.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("[controller]")]
     public class StudentsController : ControllerBase
     {
         private readonly AppDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly JwtService _jwtService;
+        private readonly IConfiguration _config;
         
-        public StudentsController(AppDbContext context, UserManager<User> userManager)
+        public StudentsController(AppDbContext context, UserManager<User> userManager, JwtService jwtService, IConfiguration config)
         {
             _context = context;
             _userManager = userManager;
+            _jwtService = jwtService;
+            _config = config;
         }
 
 
@@ -31,7 +40,6 @@ namespace taekwondo_backend.Controllers
         /// <response code="204">No students found in the database</response>
         /// <response code="400">Invalid page number or page size</response>
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetStudents(int pageNumber = 1, int pageSize = 10)
         {
             // Check if pageNumber or pageSize are less than 1 and return response
@@ -75,7 +83,6 @@ namespace taekwondo_backend.Controllers
         /// <response code="200">The student was found</response>
         /// <response code="204">No student matching the given id was found</response>
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<IActionResult> GetStudentById(int id)
         {
             // Find the student with the given ID and role "Student"
@@ -103,6 +110,38 @@ namespace taekwondo_backend.Controllers
 
             // Student found, return the data with 200 OK
             return Ok(user);
+        }
+
+        [HttpGet("{id}/qr")]
+        public IActionResult GetUserQR(int id)
+        {
+            //qr code generation adapted from: https://github.com/codebude/QRCoder/wiki/
+
+            //so this here is going to have to build a qr code and return it to the user
+            QRCodeGenerator qRCodeGenerator = new();
+
+            //generate a new qr code token
+            string idToken = _jwtService.GenerateTokenForQR(id);
+
+            //get the url to the page on the frontend
+            string url = "/attendance/new_record?user=" + idToken;
+
+            //pull out the host from appsettings
+            string? host = _config.GetValue<string>("FEHost");
+
+            //if the host could not be found, return status code 500
+            if (host == null)
+            {
+                return StatusCode(500, new { message = "The frontend host could not be determined" });
+            }
+
+            //generate the QR code
+            PayloadGenerator.Url payloadUrl = new(host + url);
+            QRCodeData qrCodeData = qRCodeGenerator.CreateQrCode(payloadUrl, QRCodeGenerator.ECCLevel.Q);
+            Base64QRCode qrCode = new(qrCodeData);
+
+            //return the QR code
+            return Ok(qrCode.GetGraphic(20));
         }
 
         [HttpPost]

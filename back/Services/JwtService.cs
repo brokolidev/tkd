@@ -33,6 +33,35 @@ namespace taekwondo_backend.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public string GenerateTokenForQR(int userId)
+        {
+            var jwtSecret = _configuration["Jwt:SecretKey"] ?? "DEFAULTSECRETKEYISHERE";
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
+
+            //found from: https://chatgpt.com/share/67c1dc7c-2dc8-800c-ba64-fa7668c05b8b
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity([new Claim("userId", userId.ToString())]),
+                Expires = DateTime.UtcNow.AddMinutes(15), // Token valid for 15 mins
+                SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        public static JwtSecurityToken? DecodeJwt(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            if (!handler.CanReadToken(token))
+            {
+                return null; // Check if token is valid
+            }
+         
+            return handler.ReadJwtToken(token);
+        }
     }
 }
 

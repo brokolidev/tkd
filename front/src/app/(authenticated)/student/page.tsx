@@ -2,23 +2,26 @@
 
 import { Heading } from '@/components/heading'
 import useUser from "@/hooks/swrHooks";
+import { getStudentQR } from '@/services/studentServices';
 import {QRCodeSVG} from "qrcode.react";
+import { useEffect, useState } from 'react';
 
 export default function StudentPage() {
 
   const { user, isError, isLoading } = useUser()
   
-  const url = "localhost:5043/checkin/test";
+  const [qrCode, setQRCode] = useState("")
 
-  // async function loadSchedules(): Promise<void> {
-  //   await axios.get('/schedule').then((response) => {
-  //     setSchedules(response.data);
-  //   });
-  // }
-
-  // useEffect(() => {
-  //   loadUserCounts();
-  // }, []);
+  useEffect(() => {
+    //load in the qr code
+    getStudentQR(user.id)
+        .then(qr => {
+            setQRCode(qr)
+        })
+        .catch(err => {
+            console.log("ERROR loading QR code: " + err)
+        })
+  }, []);
 
   return (
     <>
@@ -26,7 +29,7 @@ export default function StudentPage() {
         Check-in Code
       </Heading>
       <div className="mt-4">
-        {url && <QRCodeSVG value={url} size={256} />}
+        {qrCode && <img src={"data:image/png;base64," + qrCode} />}
       </div>
     </>
   )

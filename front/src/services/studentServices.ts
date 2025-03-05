@@ -33,6 +33,20 @@ export async function getStudents(page: number) : Promise<UserPagination> {
         })
 }
 
+export async function getStudentQR(userId: number) : Promise<string> {
+    //get the base64 image from the BE for the user's id QR
+    return axios.get(`students/${userId}/qr`)
+        .then(r => {
+            // console.log(r.data)
+            return r.data
+        })
+        .catch(err => {
+            const msg = "ERROR: getStudentQR: " + err
+            console.log(msg)
+            throw new Error(msg)
+        })
+}
+
 const ensureValidTypes = (students: IUser[]) => {
     
     //ensure we're not altering the original array
