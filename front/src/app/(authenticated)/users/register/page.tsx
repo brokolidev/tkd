@@ -17,7 +17,7 @@ import WebcamCapture from '@/components/webcapture'
 import ImageUpload from '@/components/imageupload'
 
 export default function UserRegisterPage() {
-
+  const [activeImageSource, setActiveImageSource] = useState('upload') // 'upload' or 'webcam
   const { currentView } = useUserViews()
 
   const formAction = (event) => {
@@ -163,15 +163,32 @@ export default function UserRegisterPage() {
 
           <div className="space-y-1">
             <Subheading>Profile Picture</Subheading>
+          </div>
+          <div>
+            {/* Toggle buttons to choose between upload and webcam */}
+            <div className="flex gap-4 mb-2">
+            <Button
+            type="button"
+             onClick={() => setActiveImageSource('upload')}
+              className='bg-red-500 text-white'
+              >
+                Upload Image
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setActiveImageSource('webcam')}
+              className='bg-blue-500 text-white'
+                  >
+                Capture with Webcam
+              </Button>
             </div>
-            <div>
-              <ImageUpload/>
-             <WebcamCapture />
-            </div>
+            {/* Conditionally render the component based on activeImageSource */}
+            {activeImageSource === 'upload' && <ImageUpload />}
+            {activeImageSource === 'webcam' && <WebcamCapture />}
+          </div>
             
             
-            
-
+        
 
           <div className="space-y-1">
             <Subheading>Email</Subheading>
