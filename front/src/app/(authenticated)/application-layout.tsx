@@ -87,38 +87,19 @@ export function ApplicationLayout({
   events: Awaited<ReturnType<typeof getEvents>>
   children: React.ReactNode
 }) {
-  const { user, isError, isLoading } = useUser()
+  const { user, isError, isLoading, getRole } = useUser()
   const [userRole, setUserRole] = useState(userViews.UNKNOWN)
 
 
   useEffect(() => {
     if (user) {
-        //pull out the role from the user as a number
-        const role = Object.entries(userViews)
-            .filter(entry => !isNaN(Number(userViews[entry[0]])))
-            .find(([key]) => key.toUpperCase() == user.role.toUpperCase())[1]
-
-        let roleAsUserViews = userViews.UNKNOWN
-
-        //get the role of the user as a userView
-        switch (role) {
-            case userViews.ADMIN:
-                roleAsUserViews = userViews.ADMIN
-                break;
-            case userViews.INSTRUCTOR:
-                roleAsUserViews = userViews.INSTRUCTOR
-                break;
-            case userViews.STUDENT:
-                roleAsUserViews = userViews.STUDENT
-                break;
-        }
+        
+        const roleAsUserViews = getRole()
 
         //if the userRole is different, update it.
         if (userRole != roleAsUserViews) {
             setUserRole(roleAsUserViews)
         }
-
-        console.log(role)
     }
   }, [user])
 

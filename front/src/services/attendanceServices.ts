@@ -19,6 +19,37 @@ export function getRecordsForUser(page: number, userId: number)
         })
 }
 
+export function createAttendanceRecord(userToken: string, timeOverride: string) {
+
+    let endpoint = "attendance/qr"
+
+    if (timeOverride) {
+        endpoint += "?timeOverride=" + encodeURIComponent(timeOverride)
+    }
+
+    //send the user off to be created at the backend
+    return axios.post(endpoint, userToken)
+      .then(r => r.data)
+      .catch(err => {
+        let msg = "No response"
+
+        if (err.response) {
+          // The request was made and the server responded with a non-2xx status
+          msg = err.response.data
+          console.error('Backend Error:', err.response.data); // Extract error message
+          console.error('Status Code:', err.response.status);
+        } else if (err.request) {
+          // The request was made but no response was received
+          console.error('No response received:', err.request);
+        } else {
+          // Something else went wrong
+          console.error('Error:', err.message);
+        }
+
+        throw new Error(msg);
+      })
+}
+
 export function deleteRecord(id: number) {
     return axios.delete(`attendance/${id}`)
         .catch(err => {
@@ -36,7 +67,7 @@ const ensureValidTypes = (records: IAttendanceRecord[]) => {
     recordsArray.forEach(record => {
         //map the date string to a date object
         if (record.dateRecorded) {
-            record.dateRecorded = buildDate(record.dateRecorded.toString())
+            record.dateRecorded = new Date(record.dateRecorded.toString())
         }
     })
 

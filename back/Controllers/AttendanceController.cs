@@ -13,6 +13,8 @@ using System.Text.Json;
 using System;
 using taekwondo_backend.Services;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace taekwondo_backend.Controllers
 {
@@ -74,11 +76,11 @@ namespace taekwondo_backend.Controllers
 			}
 		}
 
-		[HttpGet("qr/{token}")]
-		public async Task<IActionResult> CreateAttendanceRecordFromQR(string token)
+		[HttpPost("qr")]
+		public async Task<IActionResult> CreateAttendanceRecordFromQR(DateTime? timeOverride, [FromBody] string token)
 		{
 			//generate the dateTime
-			DateTime recordTime = DateTime.UtcNow;
+			DateTime recordTime = timeOverride ?? DateTime.UtcNow;
 
 			//decode & validate the JWT, then pass the id and time off to the create attendance record
 			JwtSecurityToken? decodedToken = JwtService.DecodeJwt(token);
@@ -86,13 +88,13 @@ namespace taekwondo_backend.Controllers
 			//if the token could not be read, return an error
 			if (decodedToken == null)
 			{
-				return Content("<html><body><h1>ERROR</h1><p>The token inputted could not be parsed.</p></body></html>", "text/html");
+				return BadRequest("the token inputted could not be parsed.");
 			}
 
 			//if the token has expired, return an error
 			if ((decodedToken.ValidTo.Kind == DateTimeKind.Utc ? decodedToken.ValidTo : decodedToken.ValidTo.ToUniversalTime()) < recordTime)
 			{
-				return Content("<html><body><h1>ERROR</h1><p>The token inputted has expired. Refresh the token and try again</p></body></html>", "text/html");
+				return BadRequest("The token inputted has expired. Refresh the token and try again");
 			}
 
 			Claim? idClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type.ToLower() == "userid");
@@ -100,7 +102,7 @@ namespace taekwondo_backend.Controllers
 			//if the id claim was not found, return an error
 			if (idClaim == null)
 			{
-				return Content("<html><body><h1>ERROR</h1><p>The token inputted does not contain an ID claim.</p></body></html>", "text/html");
+				return BadRequest("The token inputted does ot contain an ID");
 			}
 
             bool parseSuccess = Int32.TryParse(idClaim.Value, out int userId);
@@ -108,24 +110,12 @@ namespace taekwondo_backend.Controllers
 			//if the parse failed return an error
 			if (!parseSuccess)
 			{
-				return Content("<html><body><h1>ERROR</h1><p>The id inputted could not be parsed.</p></body></html>", "text/html");
+				return BadRequest("The id could not be parsed from the token inputted");
 			}
-
-			recordTime = new DateTime(2025, 3, 3, 10, 51, 0);
 
 			//the id should be parsed now, send the date and id off to the other method to add the record
-			IActionResult result = await CreateAttendanceRecord(userId, recordTime);
-
-			//alert the user that the record creation was a success if the result was good
-			if (result is CreatedResult)
-			{
-				//this will eventually return the attendance record id
-				string htmlContent = "<html><body><h1>Attendance Recorded</h1><p>Your attendance has been successfully marked.</p></body></html>";
-				return Content(htmlContent, "text/html");
-			} else
-			{
-				return Content("<html><body><h1>ERROR</h1><p>The attendance record failed to be created.</p></body></html>", "text/html");
-			}
+			//then return the result of the method
+			return await CreateAttendanceRecord(userId, recordTime);
 
         }
 
@@ -138,7 +128,7 @@ namespace taekwondo_backend.Controllers
 
 			if (user == null)
 			{
-				return NotFound();
+				return NotFound("The user could not be found");
 			}
 
 			//the user exists, create the record in the system
@@ -155,7 +145,7 @@ namespace taekwondo_backend.Controllers
 			//if scheduleId is null, then that means that the date inputted wasn't close to one of the user's schedules.
 			if (scheduleId == -1)
 			{
-				return BadRequest(JsonSerializer.Serialize("The Time inputted was not within a half an hour of a schedule start time for the user"));
+				return BadRequest("The Time inputted was not within a half an hour of a schedule start time for the user");
 			}
 
 			//if the schedule cannot be found in the HasAlreadyCheckedIn method, it throws an exception. catch it here and return.
@@ -164,7 +154,7 @@ namespace taekwondo_backend.Controllers
 				//Here, check that the user hasn't already checked into this class
 				if (HasAlreadyCheckedIn(scheduleId, userId, recordTime))
 				{
-					return BadRequest(JsonSerializer.Serialize("The user has already checked into this class."));
+					return BadRequest("The user has already checked into this class.");
 				}
 			} catch (InvalidOperationException ex)
 			{
@@ -318,6 +308,26 @@ namespace taekwondo_backend.Controllers
 			}
 
 			return hasCheckedIn;
+		}
+		private string CreateHTMLMessage(string title, string message)
+		{
+            //webutility.UrlEncode found from:
+			//https://learn.microsoft.com/en-us/dotnet/api/system.net.webutility.urlencode?view=net-9.0
+			//it will ensure that if for whatever reason the user manages to get their own input in,
+			//it is only rendered as a string rather than as part of the page
+            string HTMLMessage = $@"
+<html>
+	<body
+		style='background-color: #F2F0EF; display: flex; justify-content: center; align-items: center; font-family: sans-serif;'
+	>
+		<div style='text-align: center;'>
+			<h1 style='font-size: 100;'>{WebUtility.UrlEncode(title)}</h1>
+			<p style='font-size: 50;'>{WebUtility.UrlEncode(message)}</p>
+		</div>
+	</body>
+</html>";
+
+			return HTMLMessage;
 		}
 	}
 }

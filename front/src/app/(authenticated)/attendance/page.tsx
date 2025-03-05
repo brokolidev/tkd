@@ -12,7 +12,7 @@ import { userViews, useUserViews } from '@/hooks/userViews'
 import { getAdmins } from '@/services/adminServices'
 import { deleteRecord, getRecordsForUser } from '@/services/attendanceServices'
 import { getInstructors } from '@/services/instructorServices'
-import { getStudents } from '@/services/studentServices'
+import { getStudent, getStudents } from '@/services/studentServices'
 import { AttendancePagination, IAttendanceRecord } from '@/structures/attendance'
 import { ISchedule } from '@/structures/schedule'
 import { beltColors, IUser, UserPagination } from '@/structures/users'
@@ -23,7 +23,9 @@ import { use, useEffect, useState } from 'react'
 export default function UserPage(props) {
   const searchParams: any = use(props.searchParams)
   const page = searchParams.page ? parseInt(searchParams.page) : 1
+  const userOverride = searchParams.user ? parseInt(searchParams.user) : -1
 
+  const [userShown, setUserShown] = useState<IUser | null>(null)
   const [records, setRecords] = useState<IAttendanceRecord[]>([])
   const [pageInfo, setPageInfo] = useState<AttendancePagination>({
     total: 0,
@@ -40,14 +42,32 @@ export default function UserPage(props) {
   })
 
   const { currentView, setCurrentView } = useUserViews()
-  const { user } = useUser()
+  const { user, getRole } = useUser()
 
   /**
    * Loads the users in from the BE, based on the user view chosen
    */
   const loadData = () => {
 
-    getRecordsForUser(page, user.id)
+    let id = user.id
+
+    //if a user was passed in a parameter, use that user
+    //default to the current user if it is empty.
+    //a student can't override the records they see (they can't view someone else's records)
+    if (userOverride && userOverride != -1 && getRole() != userViews.STUDENT) {
+        id = userOverride
+
+        //fetch the correct user from the database, to display the name
+        getStudent(id)
+            .then(student => {
+                setUserShown(student)
+            })
+    } else {
+        //there wasn't an override, show for the current user
+        setUserShown(user)
+    }
+
+    getRecordsForUser(page, id)
       .then((data: AttendancePagination) => {
         console.log("The data: ", data)
         setPageInfo(data)
@@ -60,9 +80,11 @@ export default function UserPage(props) {
   }
 
   useEffect(() => {
-    //pass the function off to load the data
-    loadData()
-  }, [page, currentView])
+    if (user) {
+      //pass the function off to load the data
+      loadData()
+    }
+  }, [page, user])
 
   const removeRecord = (id: number) => {
     const confirmDelete = confirm("Are you sure you want to delete record with id " + id + "?")
@@ -141,7 +163,7 @@ export default function UserPage(props) {
       {/* The header */}
       <div className="flex items-end justify-between gap-4">
         <Heading className='capitalize'>
-          Attendance History for {user.firstName + " " + user.lastName}
+          Attendance History for {userShown && userShown.firstName + " " + userShown.lastName}
         </Heading>
       </div>
 
@@ -153,7 +175,11 @@ export default function UserPage(props) {
             <TableHeader className='capitalize'>ID</TableHeader>
             <TableHeader>Level</TableHeader>
             <TableHeader>Date Recorded</TableHeader>
-            <TableHeader>Actions</TableHeader>
+
+            {
+                getRole() != userViews.STUDENT &&
+                <TableHeader>Actions</TableHeader>
+            }
 
           </TableRow>
         </TableHead>
@@ -174,9 +200,13 @@ export default function UserPage(props) {
                 <TableCell>{record.dateRecorded.toLocaleString()}</TableCell>
 
                 {/* Actions */}
-                <TableCell>
+                {
+                  // students shouldn't be able to delete their records
+                  getRole() != userViews.STUDENT &&
+                  <TableCell>
                     <Button onClick={() => removeRecord(record.id)}>Delete</Button>
-                </TableCell>
+                  </TableCell>
+                }
 
               </TableRow>
             ))

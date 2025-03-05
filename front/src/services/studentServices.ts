@@ -37,7 +37,7 @@ export async function getStudentQR(userId: number) : Promise<string> {
     //get the base64 image from the BE for the user's id QR
     return axios.get(`students/${userId}/qr`)
         .then(r => {
-            console.log(r.data)
+            // console.log(r.data)
             return r.data
         })
         .catch(err => {

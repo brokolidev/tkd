@@ -123,22 +123,16 @@ namespace taekwondo_backend.Controllers
             //generate a new qr code token
             string idToken = _jwtService.GenerateTokenForQR(id);
 
-            //found here: https://chatgpt.com/share/67c1dc7c-2dc8-800c-ba64-fa7668c05b8b
-            string? url = Url.Action("CreateAttendanceRecordFromQR", "Attendance", new { token = idToken});
-
-            //if the url is null, return status code 500
-            if (url == null)
-            {
-                return StatusCode(500, new { message = "The url failed to be created" });
-            }
+            //get the url to the page on the frontend
+            string url = "/attendance/new_record?user=" + idToken;
 
             //pull out the host from appsettings
-            string? host = _config.GetValue<string>("BEHost");
+            string? host = _config.GetValue<string>("FEHost");
 
             //if the host could not be found, return status code 500
             if (host == null)
             {
-                return StatusCode(500, new { message = "The backend host could not be determined" });
+                return StatusCode(500, new { message = "The frontend host could not be determined" });
             }
 
             //generate the QR code
