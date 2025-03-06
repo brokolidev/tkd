@@ -50,7 +50,7 @@ function EventPage({pageQuery}) {
 
       <div className="flex justify-between items-center">
         <Heading className="text-xl font-bold">Events</Heading>
-        <Button href="#/event/create" className="bg-black text-sm/6 text-white">
+        <Button href="/events/create" className="bg-black text-sm/6 text-white">
           Create New
         </Button>
       </div>
