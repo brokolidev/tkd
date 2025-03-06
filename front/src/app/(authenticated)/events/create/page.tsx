@@ -8,6 +8,8 @@ import Datepicker from "react-tailwindcss-datepicker";
 
 import {Input} from "@/components/input";
 import {useState} from "react";
+import Tiptap from "@/components/tiptap";
+import {Button} from "@/components/button";
 
 export default function CreateSchedulePage() {
 
@@ -15,7 +17,6 @@ export default function CreateSchedulePage() {
     startDate: null,
     endDate: null
   });
-  
 
   return (
     <form className="mx-auto max-w-full">
@@ -43,7 +44,7 @@ export default function CreateSchedulePage() {
       <Divider className="my-6" soft />
 
       <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-        <div className="space-y-1 flex items-center gap-2">
+        <div className="space-y-1">
           <Subheading>Period</Subheading>
         </div>
         <div>
@@ -53,16 +54,22 @@ export default function CreateSchedulePage() {
       
       <Divider className="my-6" soft />
 
-      <section>
+      <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
         <div className="space-y-1">
           <Subheading>Description</Subheading>
         </div>
         <div>
-
+          <Tiptap className="max-w-full" />
         </div>
       </section>
 
       <Divider className="my-10" />
+
+      <div className="flex justify-end gap-4">
+        <Button className="cursor-pointer text-white bg-black">
+          Create
+        </Button>
+      </div>
     </form>
   )
 }
