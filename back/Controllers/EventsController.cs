@@ -24,13 +24,27 @@ namespace taekwondo_backend.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Event>> GetSchedules(
             int pageNumber = 1,
-            int pageSize = 30
+            int pageSize = 30,
+            bool openOnly = true
         )
         {
             var pagedEvents =
-                PagedList<Event>.Create(
+                PagedList<GetEventsDTO>.Create(
                     _context.Events.AsQueryable()
-                        .OrderByDescending(s => s.CreatedAt),
+                        .Where(e=> e.IsOpen == openOnly)
+                        .OrderByDescending(e => e.CreatedAt)
+                        .Select(e => new GetEventsDTO
+                        {
+                            Id = e.Id,
+                            Title = e.Title,
+                            StartsAt = e.StartsAt,
+                            EndsAt = e.EndsAt,
+                            IsOpen = e.IsOpen,
+                            Description = e.Description,
+                            CreatedAt = e.CreatedAt,
+                            UpdatedAt = e.UpdatedAt
+                        })
+                    ,
                     pageNumber,
                     pageSize);
 
