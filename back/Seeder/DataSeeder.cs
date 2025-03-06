@@ -31,6 +31,43 @@ public class DataSeeder(
         await SeedInstructorsAndStudents();
         await SeedTimeSlots();
         await SeedSchedules();
+        await SeedEvents();
+    }
+    
+    private async Task SeedEvents()
+    {
+        var events = new List<Event>();
+        var random = new Random();
+        
+        var adminUser = await _userManager.FindByEmailAsync("admin@gmail.com");
+        
+        if (adminUser == null)
+        {
+            Console.WriteLine("Admin user not found. Seed operation aborted.");
+            return;
+        }
+
+        for (int i = 0; i < 10; i++)
+        {
+            
+            var startDate = DateTime.UtcNow.AddDays(random.Next(1, 30)).AddHours(random.Next(0, 24));
+            var endDate = startDate.AddHours(random.Next(1, 4)); // Event lasts 1 to 4 hours
+        
+            var evt = new Event
+            {
+                User = adminUser,
+                Title = $"Event {i + 1}",
+                StartsAt = startDate,
+                EndsAt = endDate,
+                Description = $"Description for event {i + 1}",
+                IsOpen = random.Next(0, 2) == 1, // Randomly set IsOpen to true/false
+            };
+            
+            events.Add(evt);
+        }
+        
+        _context.Events.AddRange(events);
+        await _context.SaveChangesAsync();
     }
 
     private async Task SeedSchedules()
