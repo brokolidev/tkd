@@ -6,6 +6,14 @@ import { Heading } from '@/components/heading';
 import { Divider } from '@/components/divider'
 import {useSearchParams} from "next/navigation";
 import {getEvents} from "@/services/eventService";
+import {
+  Pagination,
+  PaginationGap,
+  PaginationList,
+  PaginationNext,
+  PaginationPage,
+  PaginationPrevious
+} from "@/components/pagination";
 
 function EventPage({pageQuery}) {
   const searchParams = useSearchParams()
@@ -35,7 +43,7 @@ function EventPage({pageQuery}) {
   
   useEffect(() => {
     loadEvents();
-  }, []);
+  }, [page]);
 
   return (
     <div className="p-8 space-y-10">
@@ -74,6 +82,72 @@ function EventPage({pageQuery}) {
           </div>
         ))}
       </div>
+
+      <Pagination aria-label="Page Navigation">
+        <PaginationPrevious href={prevPageUrl || undefined}/>
+        <PaginationList>
+
+          {currentPage > 3 && (
+            <>
+              <PaginationPage href="?page=1">1</PaginationPage>
+              {currentPage > 4 && (
+                <>
+                  <PaginationPage href="?page=2">2</PaginationPage>
+                </>
+              )}
+              {currentPage > 5 && <PaginationGap />}
+            </>
+          )}
+
+          {currentPage > 1 && (
+            <>
+              {Array.from({ length: Math.min(2, currentPage - 1) }, (_, i) => {
+                const page = currentPage - (i + 1);
+                return page > 0 ? (
+                  <PaginationPage key={page} href={`?page=${page}`}>
+                    {page}
+                  </PaginationPage>
+                ) : null;
+              }).reverse()}
+            </>
+          )}
+
+          <PaginationPage href={`?page=${currentPage}`} current>{currentPage}</PaginationPage>
+
+          {currentPage < lastPage && (
+            <>
+              {Array.from({ length: Math.min(2, lastPage - currentPage) }, (_, i) => {
+                const nextPage = currentPage + (i + 1);
+                return nextPage <= lastPage ? (
+                  <PaginationPage key={nextPage} href={`?page=${nextPage}`}>
+                    {nextPage}
+                  </PaginationPage>
+                ) : null;
+              })}
+
+              {(lastPage - currentPage - 2) > 2 && <PaginationGap />}
+            </>
+          )}
+
+          {currentPage < lastPage && (
+            <>
+              {Array.from({ length: Math.min(2, lastPage - (currentPage + 2)) }, (_, i) => {
+                const nextPage = lastPage - i;
+                if (nextPage > currentPage + 2) {
+                  return (
+                    <PaginationPage key={nextPage} href={`?page=${nextPage}`}>
+                      {nextPage}
+                    </PaginationPage>
+                  );
+                }
+                return null;
+              }).reverse()}
+            </>
+          )}
+
+        </PaginationList>
+        <PaginationNext href={nextPageUrl || undefined}/>
+      </Pagination>
 
     </div>
   );
