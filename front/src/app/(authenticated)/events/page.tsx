@@ -4,13 +4,37 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/button';
 import { Heading } from '@/components/heading';
 import { Divider } from '@/components/divider'
+import {useSearchParams} from "next/navigation";
+import {getEvents} from "@/services/eventService";
 
-function EventPage() {
+function EventPage({pageQuery}) {
+  const searchParams = useSearchParams()
+
+  const page: number = Number(searchParams.get('page')) || pageQuery
 
   const [events, setEvents] = useState([])
+
+  // pagination state vars
+  const [currentPage, setCurrentPage] = useState(1)
+  const [lastPage, setLastPage] = useState(1)
+  const [nextPageUrl, setNextPageUrl] = useState('')
+  const [prevPageUrl, setPrevPageUrl] = useState('')
+
+  async function loadEvents(): Promise<void> {
+    const events = await getEvents(page, 6, false);
+    setEvents(events.data);
+    setPaginate(events)
+  }
+
+  function setPaginate(meta) {
+    setCurrentPage(meta.currentPage);
+    setLastPage(meta.lastPage);
+    setNextPageUrl(meta.nextPageUrl);
+    setPrevPageUrl(meta.prevPageUrl);
+  }
   
   useEffect(() => {
-  
+    loadEvents();
   }, []);
 
   return (
@@ -30,19 +54,18 @@ function EventPage() {
           <div key={item.id}>
             <div className="mb-8 flex items-center">
               <img
-                src={item && item.levelImageUrl}
-                alt={`${item.level} thumbnail`}
+                src={item && item.imageUrl}
+                alt={`${item.title} thumbnail`}
                 className="mr-4 h-[85.33px] w-[128px] rounded object-cover"
               />
               <div className="flex-1">
-                <h2 className="text-lg font-semibold">{item.level}</h2>
+                <h2 className="text-lg font-semibold">{item.title}</h2>
                 <p className="mt-2 text-sm">
-                  {item.dayOfWeekString} {item.timeSlot.startsAt} ~ {item.timeSlot.endsAt}
+                  {item.startsAtFormatted} ~ {item.endsAtFormatted}
                 </p>
                 <p className="mt-2 text-sm">
-                  Main Instructor : {item.mainInstructorName}
+                  {item.description}
                 </p>
-                <p className="mt-1 text-sm text-gray-600">{item.classSize} Students in this class</p>
               </div>
               <div className="flex items-center space-x-4">
               </div>
