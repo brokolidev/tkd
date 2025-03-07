@@ -14,8 +14,8 @@ public class GetEventsDTO
     public DateTime? UpdatedAt { get; set; }
     public bool IsOpen { get; set; }
     
-    public string? StartsAtFormatted => StartsAt?.ToString("yyyy-MM-dd");
-    public string? EndsAtFormatted => EndsAt?.ToString("yyyy-MM-dd");
+    public string? StartsAtFormatted => StartsAt?.ToString("yyyy-MM-dd HH:mm");
+    public string? EndsAtFormatted => EndsAt?.ToString("yyyy-MM-dd HH:mm");
     public string imageUrl => "https://api.dicebear.com/9.x/lorelei/svg";
     
     public string ShortDescription => GetShortDescription(Description, 100);

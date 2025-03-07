@@ -102,7 +102,19 @@ namespace taekwondo_backend.Controllers
                     return NotFound($"Event with ID {id} not found");
                 }
                 
-                return Ok(eventItem);
+                var eventDTO = new GetEventsDTO 
+                {
+                    Id = eventItem.Id,
+                    Title = eventItem.Title,
+                    StartsAt = eventItem.StartsAt,
+                    EndsAt = eventItem.EndsAt,
+                    Description = eventItem.Description,
+                    CreatedAt = eventItem.CreatedAt,
+                    UpdatedAt = eventItem.UpdatedAt,
+                    IsOpen = eventItem.IsOpen
+                };
+                
+                return Ok(eventDTO);
             }
             catch (Exception ex)
             {
