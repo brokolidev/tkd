@@ -3,21 +3,24 @@
 import { Divider } from '@/components/divider'
 import { Heading, Subheading } from '@/components/heading'
 import { Link } from '@/components/link'
-import {ChevronLeftIcon, CalendarDateRangeIcon} from '@heroicons/react/16/solid'
+import {ChevronLeftIcon} from '@heroicons/react/16/solid'
 import Datepicker from "react-tailwindcss-datepicker";
-
 import {Input} from "@/components/input";
 import {useRef, useState} from "react";
 import Tiptap from "@/components/tiptap";
 import {Button} from "@/components/button";
 import axios from "@/lib/axios";
+import {Alert, AlertActions, AlertDescription, AlertTitle} from "@/components/alert";
+import {useRouter} from "next/navigation";
 
-export default function CreateSchedulePage() {
+export default function CreateEventsPage() {
+  const router = useRouter();
 
   const [value, setValue] = useState({
     startDate: null,
     endDate: null
   });
+  const [isCreated, setIsCreated] = useState(false);
 
   const titleRef = useRef(null);
   const tiptapRef = useRef(null);
@@ -40,6 +43,7 @@ export default function CreateSchedulePage() {
     
     try {
       const response = await axios.post("/events", payload);
+      if (response.status === 201) { setIsCreated(true); router }
     } catch (error) {
       console.error("Error creating event:", error);
     }
@@ -47,6 +51,16 @@ export default function CreateSchedulePage() {
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-full">
+
+      <Alert open={isCreated} onClose={() => { setIsCreated(false); router.push('/events'); }}>
+        <AlertTitle>Congratulations!</AlertTitle>
+        <AlertDescription>A new event has been created</AlertDescription>
+        <AlertActions>
+          <Link href="/events">
+            <Button onClick={() => setIsCreated(false)}>Back to the list</Button>
+          </Link>
+        </AlertActions>
+      </Alert>
 
       <Link href="/events" className="max-lg:hidden inline-flex items-center gap-2 text-sm/6 text-zinc-500 ">
         <ChevronLeftIcon className="size-4 fill-zinc-400 " />
