@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using taekwondo_backend.Data;
 using taekwondo_backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -52,6 +53,40 @@ namespace taekwondo_backend.Controllers
                     pageSize);
 
             return Ok(pagedEvents);
+        }
+        
+        // POST: /events
+        [HttpPost]
+        public async Task<IActionResult> CreateEvent([FromBody] CreateEventDTO createEventDTO)
+        {
+            if (createEventDTO == null)
+            {
+                return BadRequest("Event data is required.");
+            }
+            
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized("User id claim is invalid.");
+            }
+            var user = await _context.Users.FindAsync(userId);
+
+            var newEvent = new Event
+            {
+                Title = createEventDTO.Title,
+                StartsAt = createEventDTO.StartsAt,
+                EndsAt = createEventDTO.EndsAt,
+                Description = createEventDTO.Description,
+                User = user,
+                IsOpen = true, // 기본적으로 열려 있는 이벤트로 설정
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.Events.Add(newEvent);
+            await _context.SaveChangesAsync();
+            
+            return CreatedAtAction(nameof(GetSchedules), new { id = newEvent.Id }, newEvent);
         }
     }
 }
