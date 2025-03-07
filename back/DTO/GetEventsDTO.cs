@@ -6,7 +6,7 @@ namespace taekwondo_backend.DTO;
 public class GetEventsDTO
 {
     public int Id { get; set; }
-    public string Title { get; set; }
+    public required string Title { get; set; }
     public DateTime? StartsAt { get; set; }
     public DateTime? EndsAt { get; set; }
     public required string Description { get; set; }

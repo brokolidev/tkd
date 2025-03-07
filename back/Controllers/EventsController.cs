@@ -65,11 +65,17 @@ namespace taekwondo_backend.Controllers
             }
             
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
             if (!int.TryParse(userIdClaim, out int userId))
             {
                 return Unauthorized("User id claim is invalid.");
             }
             var user = await _context.Users.FindAsync(userId);
+            
+            if(user == null)
+            {
+                return Unauthorized("User does not exist.");
+            }
 
             var newEvent = new Event
             {
@@ -116,9 +122,10 @@ namespace taekwondo_backend.Controllers
                 
                 return Ok(eventDTO);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the event");
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    "An error occurred while retrieving the event" + e.Message);
             }
         }
     }

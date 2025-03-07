@@ -2,8 +2,8 @@
 
 public class CreateEventDTO
 {
-    public string Title { get; set; }
-    public DateTime StartsAt { get; set; }
-    public DateTime EndsAt { get; set; }
-    public string Description { get; set; }
+    public required string Title { get; set; }
+    public required DateTime StartsAt { get; set; }
+    public required DateTime EndsAt { get; set; }
+    public required string Description { get; set; }
 }

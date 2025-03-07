@@ -6,7 +6,7 @@ import axios from '@/lib/axios'
 import { Heading, Subheading } from '@/components/heading'
 import { Divider } from '@/components/divider'
 import { Link } from '@/components/link'
-import { ChevronLeftIcon, CalendarIcon, ClockIcon } from '@heroicons/react/16/solid'
+import { ChevronLeftIcon, CalendarIcon } from '@heroicons/react/16/solid'
 import { Button } from '@/components/button'
 import EventContent from "@/components/event-content"
 import {Badge} from "@/components/badge"
