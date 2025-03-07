@@ -8,9 +8,8 @@ import { Divider } from '@/components/divider'
 import { Link } from '@/components/link'
 import { ChevronLeftIcon, CalendarIcon, ClockIcon } from '@heroicons/react/16/solid'
 import { Button } from '@/components/button'
-import EventContent from "@/components/event-content";
-import { formatDate } from '@/lib/utils'
-import {Badge} from "@/components/badge";
+import EventContent from "@/components/event-content"
+import {Badge} from "@/components/badge"
 
 // Type for our event data
 interface Event {
