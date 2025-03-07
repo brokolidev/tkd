@@ -11,6 +11,11 @@
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
+    "@tiptap/extension-color": "^2.11.5",
+    "@tiptap/extension-text-style": "^2.11.5",
+    "@tiptap/pm": "^2.11.5",
+    "@tiptap/react": "^2.11.5",
+    "@tiptap/starter-kit": "^2.11.5",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "framer-motion": "^11.12.0",
@@ -19,7 +24,9 @@
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.0-next-fecc288b7-20221025",
+    "react-tailwindcss-datepicker": "^2.0.0",
     "react-webcam": "^7.2.0",
+    "sass": "^1.85.1",
     "swr": "^2.2.5"
   },
   "devDependencies": {
