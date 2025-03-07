@@ -72,7 +72,7 @@ function EventPage({pageQuery}) {
                   {item.startsAtFormatted} ~ {item.endsAtFormatted}
                 </p>
                 <p className="mt-2 text-sm">
-                  {item.description}
+                  {item.shortDescription}
                 </p>
               </div>
               <div className="flex items-center space-x-4">
