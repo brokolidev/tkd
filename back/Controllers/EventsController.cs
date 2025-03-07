@@ -28,23 +28,26 @@ namespace taekwondo_backend.Controllers
             bool openOnly = true
         )
         {
-            var pagedEvents =
-                PagedList<GetEventsDTO>.Create(
-                    _context.Events.AsQueryable()
-                        .Where(e=> e.IsOpen == openOnly)
-                        .OrderByDescending(e => e.CreatedAt)
-                        .Select(e => new GetEventsDTO
-                        {
-                            Id = e.Id,
-                            Title = e.Title,
-                            StartsAt = e.StartsAt,
-                            EndsAt = e.EndsAt,
-                            IsOpen = e.IsOpen,
-                            Description = e.Description,
-                            CreatedAt = e.CreatedAt,
-                            UpdatedAt = e.UpdatedAt
-                        })
-                    ,
+            var query = _context.Events.AsQueryable();
+            
+            if (openOnly)
+            {
+                query = query.Where(e => e.IsOpen);
+            }
+            
+            var pagedEvents = PagedList<GetEventsDTO>.Create(
+                query.OrderByDescending(e => e.CreatedAt)
+                    .Select(e => new GetEventsDTO
+                    {
+                        Id = e.Id,
+                        Title = e.Title,
+                        StartsAt = e.StartsAt,
+                        EndsAt = e.EndsAt,
+                        IsOpen = e.IsOpen,
+                        Description = e.Description,
+                        CreatedAt = e.CreatedAt,
+                        UpdatedAt = e.UpdatedAt
+                    }),
                     pageNumber,
                     pageSize);
 
