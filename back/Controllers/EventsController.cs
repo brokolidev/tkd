@@ -88,5 +88,26 @@ namespace taekwondo_backend.Controllers
             
             return CreatedAtAction(nameof(GetSchedules), new { id = newEvent.Id }, newEvent);
         }
+        
+        // GET /events/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<GetEventsDTO>> GetEventById(int id)
+        {
+            try
+            {
+                var eventItem = await _context.Events.FindAsync(id);
+                
+                if (eventItem == null)
+                {
+                    return NotFound($"Event with ID {id} not found");
+                }
+                
+                return Ok(eventItem);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the event");
+            }
+        }
     }
 }
