@@ -7,9 +7,10 @@ import {ChevronLeftIcon, CalendarDateRangeIcon} from '@heroicons/react/16/solid'
 import Datepicker from "react-tailwindcss-datepicker";
 
 import {Input} from "@/components/input";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import Tiptap from "@/components/tiptap";
 import {Button} from "@/components/button";
+import axios from "@/lib/axios";
 
 export default function CreateSchedulePage() {
 
@@ -18,8 +19,34 @@ export default function CreateSchedulePage() {
     endDate: null
   });
 
+  const titleRef = useRef(null);
+  const tiptapRef = useRef(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const title = titleRef.current?.value || "";
+    const { startDate, endDate } = value;
+    const description = tiptapRef.current?.getHTML
+      ? tiptapRef.current.getHTML()
+      : "";
+    
+    const payload = {
+      title: title,
+      startsAt: startDate,
+      endsAt: endDate,
+      description: description
+    }
+    
+    try {
+      const response = await axios.post("/events", payload);
+    } catch (error) {
+      console.error("Error creating event:", error);
+    }
+  };
+
   return (
-    <form className="mx-auto max-w-full">
+    <form onSubmit={handleSubmit} className="mx-auto max-w-full">
 
       <Link href="/events" className="max-lg:hidden inline-flex items-center gap-2 text-sm/6 text-zinc-500 ">
         <ChevronLeftIcon className="size-4 fill-zinc-400 " />
@@ -36,6 +63,7 @@ export default function CreateSchedulePage() {
         <div>
           <Input
             aria-label="Event Title"
+            ref={titleRef}
             name="title"
           />
         </div>
@@ -59,14 +87,14 @@ export default function CreateSchedulePage() {
           <Subheading>Description</Subheading>
         </div>
         <div>
-          <Tiptap className="max-w-full" />
+          <Tiptap ref={tiptapRef} />
         </div>
       </section>
 
       <Divider className="my-10" />
 
       <div className="flex justify-end gap-4">
-        <Button className="cursor-pointer text-white bg-black">
+        <Button type="submit" className="cursor-pointer text-white bg-black">
           Create
         </Button>
       </div>
