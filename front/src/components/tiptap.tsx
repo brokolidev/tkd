@@ -3,7 +3,7 @@ import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
 import { EditorProvider, useCurrentEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import React from 'react'
+import React, {forwardRef, useImperativeHandle} from 'react'
 
 const MenuBar = () => {
   const { editor } = useCurrentEditor()
@@ -16,6 +16,7 @@ const MenuBar = () => {
     <div className="control-group">
       <div className="button-group">
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={
             !editor.can()
@@ -29,6 +30,7 @@ const MenuBar = () => {
           Bold
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           disabled={
             !editor.can()
@@ -42,6 +44,7 @@ const MenuBar = () => {
           Italic
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleStrike().run()}
           disabled={
             !editor.can()
@@ -55,6 +58,7 @@ const MenuBar = () => {
           Strike
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleCode().run()}
           disabled={
             !editor.can()
@@ -67,85 +71,91 @@ const MenuBar = () => {
         >
           Code
         </button>
-        <button onClick={() => editor.chain().focus().unsetAllMarks().run()}>
+        <button type="button" onClick={() => editor.chain().focus().unsetAllMarks().run()}>
           Clear marks
         </button>
-        <button onClick={() => editor.chain().focus().clearNodes().run()}>
+        <button type="button" onClick={() => editor.chain().focus().clearNodes().run()}>
           Clear nodes
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().setParagraph().run()}
           className={editor.isActive('paragraph') ? 'is-active' : ''}
         >
           Paragraph
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}
         >
           H1
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
         >
           H2
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
           className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}
         >
           H3
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
           className={editor.isActive('heading', { level: 4 }) ? 'is-active' : ''}
         >
           H4
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
           className={editor.isActive('heading', { level: 5 }) ? 'is-active' : ''}
         >
           H5
         </button>
-        <button
+        <button type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
           className={editor.isActive('heading', { level: 6 }) ? 'is-active' : ''}
         >
           H6
         </button>
-        <button
+        <button type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={editor.isActive('bulletList') ? 'is-active' : ''}
         >
           Bullet list
         </button>
-        <button
+        <button type="button"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={editor.isActive('orderedList') ? 'is-active' : ''}
         >
           Ordered list
         </button>
-        <button
+        <button type="button"
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           className={editor.isActive('codeBlock') ? 'is-active' : ''}
         >
           Code block
         </button>
-        <button
+        <button type="button"
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           className={editor.isActive('blockquote') ? 'is-active' : ''}
         >
           Blockquote
         </button>
-        <button onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+        <button type="button" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
           Horizontal rule
         </button>
-        <button onClick={() => editor.chain().focus().setHardBreak().run()}>
+        <button type="button" onClick={() => editor.chain().focus().setHardBreak().run()}>
           Hard break
         </button>
-        <button
+        <button type="button"
           onClick={() => editor.chain().focus().undo().run()}
           disabled={
             !editor.can()
@@ -195,7 +205,7 @@ const extensions = [
   }),
 ]
 
-const content = `
+const defaultContent = `
 <h2>
   Hi there,
 </h2>
@@ -226,10 +236,49 @@ const content = `
 </blockquote>
 `
 
-export default () => {
+const TiptapEditor = forwardRef((props, ref) => {
+  // State to hold the editor instance
+  const [editorInstance, setEditorInstance] = React.useState(null);
+
+  // Expose methods via the ref
+  useImperativeHandle(ref, () => ({
+    getHTML: () => {
+      return editorInstance?.getHTML() || '';
+    },
+    getJSON: () => {
+      return editorInstance?.getJSON() || {};
+    },
+    getContent: () => {
+      return editorInstance?.getHTML() || '';
+    },
+    clearContent: () => {
+      editorInstance?.commands.clearContent();
+    },
+    focus: () => {
+      editorInstance?.commands.focus();
+    }
+  }));
+
   return (
-    <EditorProvider slotBefore={<MenuBar />} 
-                    extensions={extensions} 
-                    content={content}></EditorProvider>
-  )
-}
+    <EditorProvider
+      slotBefore={<MenuBar />}
+      extensions={extensions}
+      content={props.initialContent || defaultContent}
+      onUpdate={({ editor }) => {
+        // Store the editor instance when it updates
+        if (!editorInstance) {
+          setEditorInstance(editor);
+        }
+      }}
+      onCreate={({ editor }) => {
+        // Store the editor instance when it's created
+        setEditorInstance(editor);
+      }}
+      {...props}
+    />
+  );
+});
+
+TiptapEditor.displayName = 'Tiptap';
+
+export default TiptapEditor;
