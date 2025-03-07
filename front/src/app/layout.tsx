@@ -1,4 +1,6 @@
 import '@/styles/tailwind.css'
+import '@/styles/global.scss'
+
 import type { Metadata } from 'next'
 import type React from 'react'
 
