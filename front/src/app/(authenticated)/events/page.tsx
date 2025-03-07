@@ -14,6 +14,7 @@ import {
   PaginationPage,
   PaginationPrevious
 } from "@/components/pagination";
+import {Link} from "@/components/link";
 
 function EventPage({pageQuery}) {
   const searchParams = useSearchParams()
@@ -67,13 +68,15 @@ function EventPage({pageQuery}) {
                 className="mr-4 h-[85.33px] w-[128px] rounded object-cover"
               />
               <div className="flex-1">
-                <h2 className="text-lg font-semibold">{item.title}</h2>
-                <p className="mt-2 text-sm">
-                  {item.startsAtFormatted} ~ {item.endsAtFormatted}
-                </p>
-                <p className="mt-2 text-sm">
-                  {item.shortDescription}
-                </p>
+                <Link href={`/events/${item.id}`}>
+                  <h2 className="text-lg font-semibold">{item.title}</h2>
+                  <p className="mt-2 text-sm">
+                    {item.startsAtFormatted} ~ {item.endsAtFormatted}
+                  </p>
+                  <p className="mt-2 text-sm">
+                    {item.shortDescription}
+                  </p>
+                </Link>
               </div>
               <div className="flex items-center space-x-4">
               </div>
