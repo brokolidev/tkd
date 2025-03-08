@@ -192,7 +192,7 @@ const MenuBar = () => {
 
 const extensions = [
   Color.configure({ types: [TextStyle.name, ListItem.name] }),
-  TextStyle.configure({ types: [ListItem.name] }),
+  TextStyle.configure(),
   StarterKit.configure({
     bulletList: {
       keepMarks: true,
@@ -263,7 +263,7 @@ const TiptapEditor = forwardRef((props, ref) => {
     <EditorProvider
       slotBefore={<MenuBar />}
       extensions={extensions}
-      content={props.initialContent || defaultContent}
+      content={defaultContent}
       onUpdate={({ editor }) => {
         // Store the editor instance when it updates
         if (!editorInstance) {

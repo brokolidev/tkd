@@ -28,7 +28,7 @@ export default function UserPage({ params }: { params: Promise<{ id: string }> }
     email: "",
     dateOfBirth: new Date(),
     beltColor: beltColors.UNKNOWN,
-    profileImgUrl: "",
+    profileImage: "",
     role: userViews.UNKNOWN
   })
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)

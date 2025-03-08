@@ -35,7 +35,7 @@ export default function UserEditPage({params}) {
     email: "",
     dateOfBirth: new Date(),
     beltColor: beltColors.UNKNOWN,
-    profileImgUrl: "",
+    profileImage: "",
     role: userViews.UNKNOWN
   })
 

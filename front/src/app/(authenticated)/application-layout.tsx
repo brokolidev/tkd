@@ -23,7 +23,6 @@ import {
 } from '@/components/sidebar'
 import { SidebarLayout } from '@/components/sidebar-layout'
 import { Spinner } from '@/components/spinner'
-import { getEvents } from '@/data'
 import useUser from '@/hooks/swrHooks'
 import { userViews } from '@/hooks/userViews'
 import { setCookie } from '@/lib/cookie'
@@ -81,10 +80,8 @@ function AccountDropdownMenu({ anchor, onLogout }: { anchor: 'top start' | 'bott
 }
 
 export function ApplicationLayout({
-  events,
   children,
 }: {
-  events: Awaited<ReturnType<typeof getEvents>>
   children: React.ReactNode
 }) {
   const { user, isError, isLoading, getRole } = useUser()
@@ -203,12 +200,12 @@ export function ApplicationLayout({
             </SidebarSection>
 
             <SidebarSection className="max-lg:hidden">
-              <SidebarHeading>Upcoming Events</SidebarHeading>
-              {events.map((event) => (
-                <SidebarItem key={event.id} href="#">
-                  {event.name}
-                </SidebarItem>
-              ))}
+              {/*<SidebarHeading>Upcoming Events</SidebarHeading>*/}
+              {/*{events.map((event) => (*/}
+              {/*  <SidebarItem key={event.id} href="#">*/}
+              {/*    {event.name}*/}
+              {/*  </SidebarItem>*/}
+              {/*))}*/}
             </SidebarSection>
 
             <SidebarSpacer />
