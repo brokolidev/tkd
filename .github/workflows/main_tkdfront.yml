@@ -23,19 +23,26 @@ jobs:
         with:
           node-version: '22.x'
 
-      - name: bun install, build
-        run: cd ./front
+      - name: Install bun
+        run: |
+          curl -fsSL https://bun.sh/install | bash
+          echo "$HOME/.bun/bin" >> $GITHUB_PATH
+
+      - name: bun install & build
+        working-directory: ./front
+        run: |
           bun install
           bun run build
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./front/* -r
+        working-directory: ./front
+        run: zip -r release.zip .
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: release.zip
+          path: ./front/release.zip
 
   deploy:
     runs-on: ubuntu-latest
