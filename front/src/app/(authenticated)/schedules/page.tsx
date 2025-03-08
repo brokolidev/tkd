@@ -12,7 +12,6 @@ import {
   PaginationPage,
   PaginationPrevious,
 } from "@/components/pagination";
-import {Link} from "@/components/link";
 import {useSearchParams} from 'next/navigation'
 
 function SchedulesPage({pageQuery}) {
