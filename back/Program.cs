@@ -7,6 +7,7 @@ using taekwondo_backend.Data;
 using taekwondo_backend.Models.Identity;
 using taekwondo_backend.Seeder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi.Models;
 
 namespace taekwondo_backend
 {
@@ -20,7 +21,7 @@ namespace taekwondo_backend
 
             //add config files for settings not meant to be pushed to git
             //we don't want it to be optional, but we do want it to reload on change.
-            builder.Configuration.AddJsonFile("secretSettings.json", optional: false, reloadOnChange: true);
+            builder.Configuration.AddJsonFile("secretSettings.json", optional: true, reloadOnChange: true);
 
             builder.Services.AddCors(options =>
             {
@@ -80,7 +81,15 @@ namespace taekwondo_backend
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Taekwondo Backend API",
+                    Version = "v1",
+                    Description = "API Documentation"
+                });
+            });
 
             var app = builder.Build();
             app.MapHealthChecks("/healthz");
