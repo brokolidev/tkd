@@ -12,8 +12,8 @@ using taekwondo_backend.Data;
 namespace taekwondo_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250210225439_DbInit")]
-    partial class DbInit
+    [Migration("20250308171327_InitDb")]
+    partial class InitDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,6 +158,28 @@ namespace taekwondo_backend.Migrations
                     b.ToTable("ScheduleStudentUser");
                 });
 
+            modelBuilder.Entity("taekwondo_backend.Models.AttendanceRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateRecorded")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AttendanceRecords");
+                });
+
             modelBuilder.Entity("taekwondo_backend.Models.Event", b =>
                 {
                     b.Property<int>("Id")
@@ -176,13 +198,17 @@ namespace taekwondo_backend.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("EndsAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<bool>("IsOpen")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime>("StartsAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Title")
                         .IsRequired()
