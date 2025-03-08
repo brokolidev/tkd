@@ -405,3 +405,5 @@ FodyWeavers.xsd
 
 # Secret Settings.
 secretSettings.json
+appsettings.Production.json
+secrets.json
