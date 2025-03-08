@@ -14,10 +14,10 @@ import {
 } from "@/components/pagination";
 import {useSearchParams} from 'next/navigation'
 
-function SchedulesPage({pageQuery}) {
+function SchedulesPage() {
   const searchParams = useSearchParams()
 
-  const page: number = Number(searchParams.get('page')) || pageQuery
+  const page: number = Number(searchParams.get('page')) || null
 
   const [schedules, setSchedules] = useState([]);
 
