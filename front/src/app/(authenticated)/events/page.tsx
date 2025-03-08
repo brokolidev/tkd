@@ -16,10 +16,10 @@ import {
 } from "@/components/pagination";
 import {Link} from "@/components/link";
 
-function EventPage({pageQuery}) {
+function EventPage() {
   const searchParams = useSearchParams()
-
-  const page: number = Number(searchParams.get('page')) || pageQuery
+  
+  const page: number = Number(searchParams.get('page')) || null
 
   const [events, setEvents] = useState([])
 
