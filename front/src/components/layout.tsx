@@ -1,11 +1,10 @@
 import { ApplicationLayout } from '@/app/(authenticated)/application-layout'
 
-export async function Layout({ children }: { children: React.ReactNode }) {
-  const events = []
+export async function Layout({ children }: { children: React.ReactNode }) {  
   
   return (
     <>
-      <ApplicationLayout events={events}>{children}</ApplicationLayout>
+      <ApplicationLayout>{children}</ApplicationLayout>
     </>
   )
 }
