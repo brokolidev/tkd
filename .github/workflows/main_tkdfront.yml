@@ -77,5 +77,5 @@ jobs:
         with:
           app-name: 'tkdfront'
           slot-name: 'Production'
-          package: release.zip
+          package: .
           
