@@ -23,7 +23,7 @@ namespace taekwondo_backend.Controllers
 
         // GET: /events
         [HttpGet]
-        public ActionResult<IEnumerable<Event>> GetSchedules(
+        public ActionResult<IEnumerable<Event>> GetEvents(
             int pageNumber = 1,
             int pageSize = 30,
             bool openOnly = true
@@ -92,7 +92,7 @@ namespace taekwondo_backend.Controllers
             _context.Events.Add(newEvent);
             await _context.SaveChangesAsync();
             
-            return CreatedAtAction(nameof(GetSchedules), new { id = newEvent.Id }, newEvent);
+            return CreatedAtAction(nameof(GetEvents), new { id = newEvent.Id }, newEvent);
         }
         
         // GET /events/{id}
