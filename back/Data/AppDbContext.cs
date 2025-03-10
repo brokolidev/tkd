@@ -96,10 +96,10 @@ namespace taekwondo_backend.Data
                 .ValueGeneratedOnAdd();
         }
 
-        public required DbSet<TimeSlot> TimeSlots { get; set; }
-        public required DbSet<Schedule> Schedules { get; set; }
-        public required DbSet<Event> Events { get; set; }
-        public required DbSet<Setting> Settings { get; set; }
-        public required DbSet<AttendanceRecord> AttendanceRecords { get; set; }
+        public DbSet<TimeSlot> TimeSlots { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<Event> Events { get; set; }
+        public DbSet<Setting> Settings { get; set; }
+        public DbSet<AttendanceRecord> AttendanceRecords { get; set; }
     }
 }
