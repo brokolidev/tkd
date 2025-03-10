@@ -31,7 +31,11 @@
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "C:\\dev\\sait\\tkd\\back\\taekwondo_backend.csproj": {
+                "projectPath": "C:\\dev\\sait\\tkd\\back\\taekwondo_backend.csproj"
+              }
+            }
           }
         },
         "warningProperties": {

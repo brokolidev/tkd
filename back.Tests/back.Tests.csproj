@@ -18,4 +18,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\back\taekwondo_backend.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -936,6 +936,7 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "C:\\dev\\sait\\tkd\\back\\taekwondo_backend.csproj",
       "Microsoft.NET.Test.Sdk >= 17.12.0",
       "coverlet.collector >= 6.0.2",
       "xunit >= 2.9.2",
@@ -973,7 +974,11 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\dev\\sait\\tkd\\back\\taekwondo_backend.csproj": {
+              "projectPath": "C:\\dev\\sait\\tkd\\back\\taekwondo_backend.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -1028,5 +1033,16 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1105",
+      "level": "Error",
+      "message": "Unable to find project information for 'C:\\dev\\sait\\tkd\\back\\taekwondo_backend.csproj'. If you are using Visual Studio, this may be because the project is unloaded or not part of the current solution so run a restore from the command-line. Otherwise, the project file may be invalid or missing targets required for restore.",
+      "libraryId": "C:\\dev\\sait\\tkd\\back\\taekwondo_backend.csproj",
+      "targetGraphs": [
+        "net9.0"
+      ]
+    }
+  ]
 }

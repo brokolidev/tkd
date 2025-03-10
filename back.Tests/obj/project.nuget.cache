@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "dgSpecHash": "yRtncqFvVe4=",
-  "success": true,
+  "dgSpecHash": "L/53TL0ogpw=",
+  "success": false,
   "projectFilePath": "C:\\dev\\sait\\tkd\\back.Tests\\back.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ted\\.nuget\\packages\\coverlet.collector\\6.0.2\\coverlet.collector.6.0.2.nupkg.sha512",
@@ -20,5 +20,15 @@
     "C:\\Users\\ted\\.nuget\\packages\\xunit.extensibility.execution\\2.9.2\\xunit.extensibility.execution.2.9.2.nupkg.sha512",
     "C:\\Users\\ted\\.nuget\\packages\\xunit.runner.visualstudio\\2.8.2\\xunit.runner.visualstudio.2.8.2.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1105",
+      "level": "Error",
+      "message": "Unable to find project information for 'C:\\dev\\sait\\tkd\\back\\taekwondo_backend.csproj'. If you are using Visual Studio, this may be because the project is unloaded or not part of the current solution so run a restore from the command-line. Otherwise, the project file may be invalid or missing targets required for restore.",
+      "libraryId": "C:\\dev\\sait\\tkd\\back\\taekwondo_backend.csproj",
+      "targetGraphs": [
+        "net9.0"
+      ]
+    }
+  ]
 }
