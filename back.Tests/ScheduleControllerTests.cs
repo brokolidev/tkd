@@ -87,5 +87,166 @@ namespace back.Tests
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
+
+        [Fact]
+        public async Task UpdateSchedule_ReturnsForbidden_WhenWithInvalidRole()
+        {
+            // Arrange
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                // Remove any existing schedule with ID 1 for a clean state.
+                var existingSchedule = context.Schedules.FirstOrDefault(s => s.Id == 1);
+                if (existingSchedule != null)
+                {
+                    context.Schedules.Remove(existingSchedule);
+                    context.SaveChanges();
+                }
+
+                // Add a new schedule entry with ID 1. Adjust property values as needed.
+                context.Schedules.Add(new Schedule
+                {
+                    Id = 1,
+                    TimeSlot = new TimeSlot(),                  // Assuming default constructor exists for dummy data.
+                    Students = new List<User>(),                // An empty list is acceptable if no students yet.
+                    Instructors = new List<User>(),             // An empty list for instructors.
+                    Day = DayOfWeek.Monday,                     // Example day.
+                    Level = "Beginner Class",                   // Default level.
+                    IsOpen = true,                              // Initial state is open.
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                context.SaveChanges();
+            }
+
+            var client = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddAuthentication("Student")
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Student", options => { });
+                });
+            }).CreateClient();
+
+            // This header drives our test authentication handler.
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Student");
+
+            var updateSchedule = new
+            {
+                isOpen = false,
+            };
+
+            var jsonContent = new StringContent(
+                JsonSerializer.Serialize(updateSchedule),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act
+            var response = await client.PatchAsync("/schedules/1", jsonContent);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task DeleteSchedule_ReturnsOK_WhenAdminAttempts()
+        {
+            // Arrange
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                // Remove any existing schedule with ID 1 for a clean state.
+                var existingSchedule = context.Schedules.FirstOrDefault(s => s.Id == 1);
+                if (existingSchedule != null)
+                {
+                    context.Schedules.Remove(existingSchedule);
+                    context.SaveChanges();
+                }
+
+                // Add a new schedule entry with ID 1. Adjust property values as needed.
+                context.Schedules.Add(new Schedule
+                {
+                    Id = 1,
+                    TimeSlot = new TimeSlot(),                  // Assuming default constructor exists for dummy data.
+                    Students = new List<User>(),                // An empty list is acceptable if no students yet.
+                    Instructors = new List<User>(),             // An empty list for instructors.
+                    Day = DayOfWeek.Monday,                     // Example day.
+                    Level = "Beginner Class",                   // Default level.
+                    IsOpen = true,                              // Initial state is open.
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                context.SaveChanges();
+            }
+
+            var client = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddAuthentication("Admin")
+                        .AddScheme<AuthenticationSchemeOptions, TestAdminAuthHandler>("Admin", options => { });
+                });
+            }).CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Admin");
+
+            // Act
+            var response = await client.DeleteAsync("/schedules/1");
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task DeleteSchedule_ReturnsForbidden_WhenInvalidRoleAttempts()
+        {
+            // Arrange
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                // Remove any existing schedule with ID 1 for a clean state.
+                var existingSchedule = context.Schedules.FirstOrDefault(s => s.Id == 1);
+                if (existingSchedule != null)
+                {
+                    context.Schedules.Remove(existingSchedule);
+                    context.SaveChanges();
+                }
+
+                // Add a new schedule entry with ID 1. Adjust property values as needed.
+                context.Schedules.Add(new Schedule
+                {
+                    Id = 1,
+                    TimeSlot = new TimeSlot(),                  // Assuming default constructor exists for dummy data.
+                    Students = new List<User>(),                // An empty list is acceptable if no students yet.
+                    Instructors = new List<User>(),             // An empty list for instructors.
+                    Day = DayOfWeek.Monday,                     // Example day.
+                    Level = "Beginner Class",                   // Default level.
+                    IsOpen = true,                              // Initial state is open.
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                context.SaveChanges();
+            }
+
+            var client = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddAuthentication("Student")
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Student", options => { });
+                });
+            }).CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Student");
+
+            // Act
+            var response = await client.DeleteAsync("/schedules/1");
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
     }
 }
