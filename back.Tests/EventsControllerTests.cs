@@ -307,5 +307,34 @@ namespace back.Tests
                 Assert.Single(events.Data);
             }
         }
+
+        [Fact]
+        public async Task CreateEvent_AccessDenied_WithoutToken()
+        {
+            // Arrange
+            // We override the authentication service so that any request using the "Test" scheme gets a 
+            // ClaimsPrincipal with the "User" role rather than "Admin" or "Instructor".
+            var client = _factory.CreateClient();
+
+            // Create a dummy event payload.
+            var newEvent = new
+            {
+                Title = "Unauthorized Event",
+                StartsAt = DateTime.UtcNow,
+                EndsAt = DateTime.UtcNow.AddHours(1),
+                Description = "This event should not be created"
+            };
+
+            var jsonContent = new StringContent(
+                JsonSerializer.Serialize(newEvent),
+                Encoding.UTF8,
+                "application/json");
+
+            // Act: attempt to create a new event.
+            var response = await client.PostAsync("/events", jsonContent);
+
+            // Assert: the response should be 403 Forbidden
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
     }
 }
