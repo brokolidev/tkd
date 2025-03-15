@@ -8,9 +8,10 @@ namespace taekwondo_backend.DTO;
 public class CreateScheduleDTO
 {
     [Required]
-    public required List<int> TimeSlotId { get; set; }
+    public required int TimeSlotId { get; set; }
 
-    public List<int>? StudentIds { get; set; } = new List<int>();
+    [Required]
+    public List<int> StudentIds { get; set; } = new List<int>();
 
     [Required]
     public List<int> InstructorIds { get; set; } = new List<int>();

@@ -89,13 +89,19 @@ namespace taekwondo_backend.Controllers
             }
 
             // Query Users for student IDs provided in the DTO.
+            if(scheduleDTO.StudentIds == null || !scheduleDTO.StudentIds.Any())
+            {
+                return BadRequest(new[] { "At least one valid student is required." });
+            }
+
             var students = _context.Users
                 .Where(u => scheduleDTO.StudentIds.Contains(u.Id))
                 .ToList();
 
-            if (students == null || !students.Any())
+            // Query Users for student IDs provided in the DTO.
+            if (scheduleDTO.InstructorIds == null || !scheduleDTO.InstructorIds.Any())
             {
-                return BadRequest(new[] { "At least one valid student is required." });
+                return BadRequest(new[] { "At least one valid instructor is required." });
             }
 
             // Query Users for instructor IDs provided in the DTO.
@@ -103,15 +109,17 @@ namespace taekwondo_backend.Controllers
                 .Where(u => scheduleDTO.InstructorIds.Contains(u.Id))
                 .ToList();
 
-            if (instructors == null || !instructors.Any())
+            var timeslot = _context.TimeSlots.FirstOrDefault(ts => ts.Id == scheduleDTO.TimeSlotId);
+
+            if(timeslot == null)
             {
-                return BadRequest(new[] { "At least one valid instructor is required." });
+                return BadRequest(new[] { "Invalid TimeSlotId provided." });
             }
 
             // Create a Schedule entity from the DTO.
             var schedule = new Schedule
             {
-                TimeSlot = scheduleDTO.TimeSlot,
+                TimeSlot = timeslot,
                 Students = students,
                 Instructors = instructors,
                 Day = scheduleDTO.Day,
