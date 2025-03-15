@@ -1,5 +1,4 @@
-﻿using System.Runtime.Intrinsics.X86;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using taekwondo_backend.Data;
 using taekwondo_backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -51,62 +50,84 @@ namespace taekwondo_backend.Controllers
             return Ok(pagedSchedules);
         }
 
-        // // GET: schedule/5
-        // [HttpGet("/{id}")]
-        // public ActionResult<GetSchedulesDTO> GetSchedule(int id)
-        // {
-        //     var schedule = _context.Schedules
-        //         .Where(s => s.Id == id)
-        //         .Select(s => new GetSchedulesDTO
-        //         {
-        //             Id = s.Id,
-        //             TimeSlot = s.TimeSlot,
-        //             StudentIds = s.Students.Select(st => st.Id).ToList(),
-        //             Instructors = s.Instructors,
-        //             DayOfWeek = s.Day,
-        //             Level = s.Level
-        //         }).FirstOrDefault();
-        //
-        //     if (schedule == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //
-        //     return Ok(schedule);
-        // }
+        // GET: /Schedules/{id}
+        [HttpGet("{id:int}")]
+        public ActionResult<GetSchedulesDTO> GetScheduleById(int id)
+        {
+            // Retrieve the schedule using the provided id from the database.
+            var scheduleDTO = _context.Schedules
+                .Where(s => s.Id == id)
+                .Select(s => new GetSchedulesDTO
+                {
+                    Id = s.Id,
+                    TimeSlot = s.TimeSlot,
+                    StudentIds = s.Students.Select(student => student.Id).ToList(),
+                    Instructors = s.Instructors, // Adjust mapping as needed
+                    DayOfWeek = s.Day,
+                    Level = s.Level,
+                    CreatedAt = s.CreatedAt
+                })
+                .FirstOrDefault();
+
+            // If the schedule is not found, return a 404 Not Found response.
+            if (scheduleDTO == null)
+            {
+                return NotFound(new[] { "Schedule not found." });
+            }
+
+            // Return the schedule data.
+            return Ok(scheduleDTO);
+        }
 
         // POST: schedule
-        // [HttpPost]
-        // public ActionResult<Schedule> CreateSchedule(GetSchedulesDTO scheduleDTO)
-        // {
-        //     // Map DTO to Schedule model
-        //     var students = _context.Users.Where(u => scheduleDTO.StudentIds.Contains(u.Id)).ToList();
-        //     var instructors = scheduleDTO.Instructors;
-        //
-        //     // Ensure students and instructors are valid and not empty
-        //     if (students == null || students.Count == 0 || instructors == null || instructors.Count == 0)
-        //     {
-        //         return BadRequest(new[] { "At least one student and one instructor must be assigned." });
-        //     }
-        //
-        //     if (scheduleDTO.TimeSlot == null)
-        //     {
-        //         return BadRequest(new[] { "TimeSlot cannot be null." });
-        //     }
-        //
-        //     // Initialize Schedule with Instructors and Students explicitly
-        //     var schedule = new Schedule
-        //     {
-        //         TimeSlot = scheduleDTO.TimeSlot,
-        //         Students = students,
-        //         Instructors = instructors
-        //     };
-        //
-        //     _context.Schedules.Add(schedule);
-        //     _context.SaveChanges();
-        //
-        //     return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, schedule);
-        // }
+        [HttpPost]
+        public ActionResult<Schedule> CreateSchedule([FromBody] CreateScheduleDTO scheduleDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Query Users for student IDs provided in the DTO.
+            var students = _context.Users
+                .Where(u => scheduleDTO.StudentIds.Contains(u.Id))
+                .ToList();
+
+            if (students == null || !students.Any())
+            {
+                return BadRequest(new[] { "At least one valid student is required." });
+            }
+
+            // Query Users for instructor IDs provided in the DTO.
+            var instructors = _context.Users
+                .Where(u => scheduleDTO.InstructorIds.Contains(u.Id))
+                .ToList();
+
+            if (instructors == null || !instructors.Any())
+            {
+                return BadRequest(new[] { "At least one valid instructor is required." });
+            }
+
+            // Create a Schedule entity from the DTO.
+            var schedule = new Schedule
+            {
+                TimeSlot = scheduleDTO.TimeSlot,
+                Students = students,
+                Instructors = instructors,
+                Day = scheduleDTO.Day,
+                Level = scheduleDTO.Level,
+                IsOpen = scheduleDTO.IsOpen,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow // Set the UpdatedAt field to the current time.
+            };
+
+            _context.Schedules.Add(schedule);
+            _context.SaveChanges();
+
+            // Assume there exists a GET endpoint (e.g., GetScheduleById) to retrieve the created schedule.
+            return CreatedAtAction(nameof(GetScheduleById), new { id = schedule.Id }, schedule);
+        }
+
 
         // PATCH: schedule/5
         [HttpPatch("{id:int}")]
