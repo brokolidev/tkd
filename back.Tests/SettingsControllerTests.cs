@@ -87,9 +87,6 @@ namespace back.Tests
             // Arrange
             var client = _factory.CreateClient();
 
-            // This header drives our test authentication handler.
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Test");
-
             // Create a dummy event payload.
             var newSetting = new
             {
