@@ -76,12 +76,12 @@ namespace back.Tests
             {
                 builder.ConfigureTestServices(services =>
                 {
-                    services.AddAuthentication("TestAdmin")
-                        .AddScheme<AuthenticationSchemeOptions, TestAdminAuthHandler>("TestAdmin", options => { });
+                    services.AddAuthentication("Admin")
+                        .AddScheme<AuthenticationSchemeOptions, TestAdminAuthHandler>("Admin", options => { });
                 });
             }).CreateClient();
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("TestAdmin");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Admin");
 
             var newEvent = new
             {
@@ -101,10 +101,6 @@ namespace back.Tests
 
             // Assert
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-
-            // Optionally, you can deserialize the response and assert its properties:
-            // string responseContent = await response.Content.ReadAsStringAsync();
-            // Assert.Contains("Authorized Event", responseContent);
         }
 
         [Fact]
