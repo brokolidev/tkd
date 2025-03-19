@@ -59,6 +59,7 @@ export default function CreateSchedulePage() {
     'Private Lesson',
     'Private Class',
   ]
+  const [selectedClassLevel, setSelectedClassLevel] = useState(classLevels[0])
 
   const handleDOWSelect = (e, idx) => {
     selectedTimeslots[idx][0] = e
@@ -98,7 +99,7 @@ export default function CreateSchedulePage() {
       day: 6,
       studentIds: selectedStudentIds,
       instructorIds: [11],
-      level: classLevels[0],
+      level: selectedClassLevel,
       isOpen: true,
     }
 
@@ -134,7 +135,12 @@ export default function CreateSchedulePage() {
         </div>
         <div>
           <Headless.Field className="mb-4 flex items-baseline justify-center gap-6">
-            <Listbox name="classLevel" defaultValue={classLevels[0]} className="max-w-full">
+            <Listbox
+              name="classLevel"
+              value={selectedClassLevel}
+              onChange={setSelectedClassLevel}
+              className="max-w-full"
+            >
               {classLevels.map((level: string, idx: number) => (
                 <ListboxOption<string> value={level} key={idx}>
                   <ListboxLabel>{level}</ListboxLabel>
