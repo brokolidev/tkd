@@ -12,6 +12,7 @@ import { Link } from '@/components/link'
 import { Listbox, ListboxLabel, ListboxOption } from '@/components/listbox'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
 import { getAllInstructors } from '@/services/instructorServices'
+import { createSchedule } from '@/services/schdeuleServices'
 import { getAllStudents } from '@/services/studentServices'
 import { getTimeSlots } from '@/services/tmeSlotServices'
 import { ISchedule } from '@/structures/schedule'
@@ -88,7 +89,27 @@ export default function CreateSchedulePage() {
   }
 
   const handleSubmit = async (event?: React.FormEvent) => {
-    return false
+    event?.preventDefault()
+
+    const [day, timeSlotId] = selectedTimeslots[0]
+
+    const scheduleData = {
+      timeSlotId: timeSlotId,
+      day: 6,
+      studentIds: selectedStudentIds,
+      instructorIds: [11],
+      level: classLevels[0],
+      isOpen: true,
+    }
+
+    try {
+      const response = await createSchedule(scheduleData)
+      console.log('Saved schedule:', response)
+      setIsSaveOpen(false)
+      setIsCreated(true)
+    } catch (e) {
+      console.error('Error saving schedule:', e)
+    }
   }
 
   useEffect(() => {

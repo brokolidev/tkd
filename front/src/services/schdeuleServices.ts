@@ -16,9 +16,9 @@ export async function getSchedules(page: number | null = 1, pageSize: number = 6
   }
 }
 
-export async function createSchedules(data: {
+export async function createSchedule(data: {
   timeSlotId: number
-  day: string
+  day: number
   studentIds: number[]
   instructorIds: number[]
   level: string
