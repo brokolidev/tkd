@@ -15,14 +15,12 @@ import { getAllInstructors } from '@/services/instructorServices'
 import { createSchedule } from '@/services/schdeuleServices'
 import { getAllStudents } from '@/services/studentServices'
 import { getTimeSlots } from '@/services/tmeSlotServices'
-import { ISchedule } from '@/structures/schedule'
 import * as Headless from '@headlessui/react'
 import { ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { useEffect, useState } from 'react'
 
 export default function CreateSchedulePage() {
   const [isCreated, setIsCreated] = useState(false)
-  const [formData, setFormData] = useState<ISchedule | null>(null)
   const [isResetOpen, setIsResetOpen] = useState(false)
   const [isSaveOpen, setIsSaveOpen] = useState(false)
   const [students, setStudents] = useState([])
