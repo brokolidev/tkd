@@ -128,7 +128,7 @@ namespace taekwondo_backend.Controllers
                 IsOpen = scheduleDTO.IsOpen,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow, // Set the UpdatedAt field to the current time.
-                ImageUrl = scheduleDTO.ImageUrl ?? string.Empty,
+                ImageUrl = scheduleDTO.ImageUrl
             };
 
             _context.Schedules.Add(schedule);
