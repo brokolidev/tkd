@@ -71,7 +71,6 @@ export default function CreateSchedulePage() {
   }
 
   const handleReset = () => {
-    setFormData(null)
     setIsResetOpen(false)
   }
 
