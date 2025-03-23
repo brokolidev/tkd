@@ -50,7 +50,7 @@ export default function CreateSchedulePage() {
     setStudents(studentsData.data)
   }
 
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
   const classLevels = [
     'Little Warriors',
