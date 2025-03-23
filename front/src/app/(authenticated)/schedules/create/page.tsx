@@ -30,6 +30,7 @@ export default function CreateSchedulePage() {
   const [selectedTimeslots, setSelectedTimeslots] = useState([])
   const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([])
   const [selectedInstructorIds, setSelectedInstructorIds] = useState<number[]>([])
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
 
   async function loadTimeslots(): Promise<void> {
     const timeslots = await getTimeSlots()
@@ -100,6 +101,7 @@ export default function CreateSchedulePage() {
       instructorIds: selectedInstructorIds,
       level: selectedClassLevel,
       isOpen: true,
+      imageUrl: uploadedImageUrl ?? null,
     }
 
     try {
@@ -157,7 +159,7 @@ export default function CreateSchedulePage() {
           <Subheading>Class Image</Subheading>
         </div>
         <div>
-          <ImageUpload />
+          <ImageUpload onImageUploaded={(url) => setUploadedImageUrl(url)} />
         </div>
       </section>
 
