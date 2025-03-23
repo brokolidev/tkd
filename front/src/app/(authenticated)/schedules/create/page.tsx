@@ -31,6 +31,7 @@ export default function CreateSchedulePage() {
   const [timeslotComponents, setTimeslotComponents] = useState([])
   const [selectedTimeslots, setSelectedTimeslots] = useState([])
   const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([])
+  const [selectedInstructorIds, setSelectedInstructorIds] = useState<number[]>([])
 
   async function loadTimeslots(): Promise<void> {
     const timeslots = await getTimeSlots()
@@ -98,7 +99,7 @@ export default function CreateSchedulePage() {
       timeSlotId: timeSlotId,
       day: 6,
       studentIds: selectedStudentIds,
-      instructorIds: [11],
+      instructorIds: selectedInstructorIds,
       level: selectedClassLevel,
       isOpen: true,
     }
@@ -215,23 +216,30 @@ export default function CreateSchedulePage() {
           <Subheading>Instructors</Subheading>
         </div>
         <fieldset className="pl-4">
-          {instructors.map((value, idx) => (
+          {instructors.map((instructor, idx) => (
             <div className="space-y-5" key={idx}>
               <div className="flex gap-3">
                 <div className="flex h-6 shrink-0 items-center">
                   <div className="group grid size-4 grid-cols-1">
                     <input
-                      defaultChecked={idx == 0}
-                      id="comments"
-                      name="comments"
                       type="checkbox"
-                      aria-describedby="comments-description"
-                      className="col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                      value={instructor.id}
+                      checked={selectedInstructorIds.includes(instructor.id)}
+                      onChange={(e) => {
+                        const id = Number(e.target.value)
+                        if (e.target.checked) {
+                          setSelectedInstructorIds([...selectedInstructorIds, id])
+                        } else {
+                          setSelectedInstructorIds(selectedInstructorIds.filter((iid) => iid !== id))
+                        }
+                      }}
+                      aria-describedby="instructor-description"
+                      className="col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     />
                     <svg
                       fill="none"
                       viewBox="0 0 14 14"
-                      className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25"
+                      className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white"
                     >
                       <path
                         d="M3 8L6 11L11 3.5"
@@ -240,19 +248,12 @@ export default function CreateSchedulePage() {
                         strokeLinejoin="round"
                         className="opacity-0 group-has-[:checked]:opacity-100"
                       />
-                      <path
-                        d="M3 7H11"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="opacity-0 group-has-[:indeterminate]:opacity-100"
-                      />
                     </svg>
                   </div>
                 </div>
                 <div className="text-sm/6">
-                  <label htmlFor="comments" className="font-medium text-gray-900">
-                    {`${value.firstName} ${value.lastName}`}
+                  <label htmlFor={`instructor-${idx}`} className="font-medium text-gray-900">
+                    {`${instructor.firstName} ${instructor.lastName}`}
                   </label>
                 </div>
               </div>
