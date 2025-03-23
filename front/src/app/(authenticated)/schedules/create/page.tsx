@@ -94,10 +94,11 @@ export default function CreateSchedulePage() {
     event?.preventDefault()
 
     const [day, timeSlotId] = selectedTimeslots[0]
+    const dayIndex = daysOfWeek.indexOf(day)
 
     const scheduleData = {
       timeSlotId: timeSlotId,
-      day: 6,
+      day: dayIndex === -1 ? 0 : dayIndex,
       studentIds: selectedStudentIds,
       instructorIds: selectedInstructorIds,
       level: selectedClassLevel,
