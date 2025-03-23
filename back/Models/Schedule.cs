@@ -30,8 +30,7 @@ namespace taekwondo_backend.Models
 
         public DateTime? UpdatedAt { get; set; }
 
-        public string ImageUrl { get; set; } = string.Empty;
-
+        public string? ImageUrl { get; set; }
 
         public Schedule()
         {

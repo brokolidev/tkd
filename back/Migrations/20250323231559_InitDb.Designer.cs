@@ -12,7 +12,7 @@ using taekwondo_backend.Data;
 namespace taekwondo_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250323225543_InitDb")]
+    [Migration("20250323231559_InitDb")]
     partial class InitDb
     {
         /// <inheritdoc />
@@ -355,7 +355,6 @@ namespace taekwondo_backend.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsOpen")
