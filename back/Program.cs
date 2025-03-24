@@ -28,7 +28,7 @@ namespace taekwondo_backend
                 options.AddDefaultPolicy(policy =>
                 {
                     policy.WithOrigins(
-                        "http://localhost:3001", 
+                        "http://localhost:3001",
                         "http://localhost:3000",
                         "https://tkd.brokolidev.com"
                         )
@@ -42,6 +42,8 @@ namespace taekwondo_backend
             builder.Services.AddControllers();
             // Add services to Azure bob service 
             builder.Services.AddSingleton<AzureBlobStorageService>();
+            // Add services to Azure blob service for Schedule page
+            builder.Services.AddSingleton<AzureBlobStorageScheduleService>();
 
             // Add a database context to the container
             builder.Services.AddDbContext<AppDbContext>(options =>
