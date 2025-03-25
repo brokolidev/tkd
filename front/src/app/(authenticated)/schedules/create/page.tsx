@@ -159,7 +159,13 @@ export default function CreateSchedulePage() {
           <Subheading>Class Image</Subheading>
         </div>
         <div>
-          <ImageUpload onImageUploaded={(url) => setUploadedImageUrl(url)} />
+          <ImageUpload
+            uploadType="schedule"
+            onImageUploaded={(url) => {
+              console.log('Upload Success URL:', url)
+              setUploadedImageUrl(url)
+            }}
+          />
         </div>
       </section>
 
