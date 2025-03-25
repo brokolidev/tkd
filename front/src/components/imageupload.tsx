@@ -1,7 +1,12 @@
-import { useState } from "react";
 import { Button } from "@/components/button";
+import { useState } from "react";
 
-export default function ImageUpload({ onImageUploaded }: { onImageUploaded?: (url: string) => void }) {
+interface ImageUploadProps {
+  uploadType: "profile" | "schedule";
+  onImageUploaded?: (url: string) => void;
+}
+
+export default function ImageUpload({ uploadType, onImageUploaded }: ImageUploadProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,25 +22,39 @@ export default function ImageUpload({ onImageUploaded }: { onImageUploaded?: (ur
   const uploadImage = async () => {
     if (!imagePreview) return;
 
-    try {
-      const response = await fetch("https://localhost:7183/images/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: imagePreview }),
-      });
+    const uploadUrls = [
+      uploadType === "profile"
+        ? "https://localhost:7183/images/upload"
+        : "https://localhost:7183/schedule-images/upload",
+      uploadType === "profile" ? "http://localhost:5043/images/upload" : "http://localhost:5043/schedule-images/upload",
+    ];
 
-      const data = await response.json();
-      alert("Image uploaded successfully. URL: " + data.fileUrl);
-      
-      // Pass the uploaded image URL back to the parent component if a callback is provided.
-      if (onImageUploaded) {
-        onImageUploaded(data.fileUrl);
+    let success = false;
+
+    for (const url of uploadUrls) {
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: imagePreview }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert("Image uploaded successfully. URL: " + data.fileUrl);
+          if (onImageUploaded) onImageUploaded(data.fileUrl);
+          success = true;
+          break;
+        }
+      } catch (err) {
+        console.warn(`Failed to upload via ${url}:`, err);
       }
-    } catch (error) {
-      console.error("Error uploading image:", error);
+    }
+
+    if (!success) {
+      alert("Failed to upload image to both servers.");
     }
   };
-
   return (
     <div>
       <input
@@ -44,18 +63,14 @@ export default function ImageUpload({ onImageUploaded }: { onImageUploaded?: (ur
         name="class_image"
         accept="image/*"
         onChange={handleImageChange}
-        className="w-full p-2 border rounded-md"
+        className="w-full rounded-md border p-2"
       />
       {imagePreview && (
         <>
-          <img
-            src={imagePreview}
-            alt="Class Preview"
-            className="mt-4 rounded-md max-w-full max-h-64"
-          />
+          <img src={imagePreview} alt="Class Preview" className="mt-4 max-h-64 max-w-full rounded-md" />
           <Button
             onClick={uploadImage}
-            className="mt-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow"
+            className="mt-2 rounded-lg bg-green-500 px-4 py-2 text-white shadow hover:bg-green-600"
           >
             Upload Image
           </Button>
