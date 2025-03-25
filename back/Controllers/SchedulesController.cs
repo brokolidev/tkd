@@ -43,6 +43,7 @@ namespace taekwondo_backend.Controllers
                             DayOfWeek = s.Day,
                             Level = s.Level,
                             CreatedAt = s.CreatedAt,
+                            ImageUrl = s.ImageUrl
                         }),
                     pageNumber,
                     pageSize);
