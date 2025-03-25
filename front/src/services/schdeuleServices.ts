@@ -23,6 +23,7 @@ export async function createSchedule(data: {
   instructorIds: number[]
   level: string
   isOpen: boolean
+  imageUrl: string | null
 }) {
   try {
     const response = await axios.post('/schedules', data)

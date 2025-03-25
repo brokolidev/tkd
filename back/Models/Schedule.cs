@@ -16,20 +16,21 @@ namespace taekwondo_backend.Models
 
         [Required]
         public List<User> Instructors { get; set; }
-        
+
         [Required]
         public DayOfWeek Day { get; set; }
-        
+
         [Required]
         public string Level { get; set; }
-        
+
         [Required]
         public bool IsOpen { get; set; }
-        
+
         public DateTime? CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
-        
+
+        public string? ImageUrl { get; set; }
 
         public Schedule()
         {
@@ -42,12 +43,13 @@ namespace taekwondo_backend.Models
         }
 
         public Schedule(
-            TimeSlot timeSlot, 
-            List<User> students, 
+            TimeSlot timeSlot,
+            List<User> students,
             List<User> instructors,
             DayOfWeek day,
             string level,
-            bool isOpen)
+            bool isOpen,
+            string imageUrl)
         {
             TimeSlot = timeSlot;
             Students = students;
@@ -55,6 +57,7 @@ namespace taekwondo_backend.Models
             Day = day;
             Level = level;
             IsOpen = isOpen;
+            ImageUrl = imageUrl;
         }
     }
 }

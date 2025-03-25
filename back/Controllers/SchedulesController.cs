@@ -24,12 +24,12 @@ namespace taekwondo_backend.Controllers
         // GET: /schedule
         [HttpGet]
         public ActionResult<IEnumerable<GetSchedulesDTO>> GetSchedules(
-            int pageNumber = 1, 
-            int pageSize = 30, 
+            int pageNumber = 1,
+            int pageSize = 30,
             bool openOnly = true
             )
         {
-            var pagedSchedules = 
+            var pagedSchedules =
                 PagedList<GetSchedulesDTO>.Create(
                     _context.Schedules.AsQueryable()
                         .Where(s => !openOnly || s.IsOpen)
@@ -43,10 +43,11 @@ namespace taekwondo_backend.Controllers
                             DayOfWeek = s.Day,
                             Level = s.Level,
                             CreatedAt = s.CreatedAt,
-                        }), 
-                    pageNumber, 
+                            ImageUrl = s.ImageUrl
+                        }),
+                    pageNumber,
                     pageSize);
-            
+
             return Ok(pagedSchedules);
         }
 
@@ -65,7 +66,8 @@ namespace taekwondo_backend.Controllers
                     Instructors = s.Instructors, // Adjust mapping as needed
                     DayOfWeek = s.Day,
                     Level = s.Level,
-                    CreatedAt = s.CreatedAt
+                    CreatedAt = s.CreatedAt,
+                    ImageUrl = s.ImageUrl
                 })
                 .FirstOrDefault();
 
@@ -89,7 +91,7 @@ namespace taekwondo_backend.Controllers
             }
 
             // Query Users for student IDs provided in the DTO.
-            if(scheduleDTO.StudentIds == null || !scheduleDTO.StudentIds.Any())
+            if (scheduleDTO.StudentIds == null || !scheduleDTO.StudentIds.Any())
             {
                 return BadRequest(new[] { "At least one valid student is required." });
             }
@@ -111,7 +113,7 @@ namespace taekwondo_backend.Controllers
 
             var timeslot = _context.TimeSlots.FirstOrDefault(ts => ts.Id == scheduleDTO.TimeSlotId);
 
-            if(timeslot == null)
+            if (timeslot == null)
             {
                 return BadRequest(new[] { "Invalid TimeSlotId provided." });
             }
@@ -126,7 +128,8 @@ namespace taekwondo_backend.Controllers
                 Level = scheduleDTO.Level,
                 IsOpen = scheduleDTO.IsOpen,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow // Set the UpdatedAt field to the current time.
+                UpdatedAt = DateTime.UtcNow, // Set the UpdatedAt field to the current time.
+                ImageUrl = scheduleDTO.ImageUrl
             };
 
             _context.Schedules.Add(schedule);
@@ -146,10 +149,10 @@ namespace taekwondo_backend.Controllers
             {
                 return NotFound(new[] { $"Schedule with id {id} could not be found." });
             }
-            
+
             // Get all properties from DTO
             var properties = typeof(UpdateSchedulesDTO).GetProperties();
-            
+
             // To check if any changes are made
             var hasChanges = false;
 
@@ -159,22 +162,22 @@ namespace taekwondo_backend.Controllers
                 // Get the value from input
                 var newValue = property.GetValue(updateScheduleDTO);
                 if (newValue == null) continue;
-                
+
                 // Find the matching property
                 var entityProperty = typeof(Schedule).GetProperty(property.Name);
                 if (entityProperty == null) continue;
-                
+
                 // Update the value with new values
                 entityProperty.SetValue(selectedSchedule, newValue);
                 hasChanges = true;
             }
-            
+
             // Save changes to the database only if there are updates
             if (hasChanges)
             {
                 _context.SaveChanges();
             }
-            
+
             return Ok(selectedSchedule);
         }
 

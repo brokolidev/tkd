@@ -24,4 +24,5 @@ public class CreateScheduleDTO
 
     [Required]
     public bool IsOpen { get; set; }
+    public string? ImageUrl { get; set; }
 }
