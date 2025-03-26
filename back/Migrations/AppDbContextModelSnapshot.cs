@@ -351,6 +351,9 @@ namespace taekwondo_backend.Migrations
                     b.Property<int>("Day")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsOpen")
                         .HasColumnType("boolean");
 

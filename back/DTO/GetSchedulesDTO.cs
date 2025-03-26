@@ -12,11 +12,12 @@ public class GetSchedulesDTO
     public DayOfWeek DayOfWeek { get; set; }
     public required string Level { get; set; }
     public DateTime? CreatedAt { get; set; }
-        
+
     public string DayOfWeekString => DayOfWeek.ToString();
     public string MainInstructorName => Instructors.First().FirstName + " " + Instructors.First().LastName;
     public int ClassSize => StudentIds.Count;
     public string LevelImageUrl => "https://api.dicebear.com/9.x/lorelei/svg";
     public bool IsOpen { get; set; }
-        
+    public string? ImageUrl { get; set; }
+
 }

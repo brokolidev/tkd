@@ -1,99 +1,95 @@
-'use client'
+"use client";
 
-import { Alert, AlertActions, AlertDescription, AlertTitle } from '@/components/alert'
-import { Button } from '@/components/button'
-import { Divider } from '@/components/divider'
-import { Heading, Subheading } from '@/components/heading'
-import { Input } from '@/components/input'
-import { Link } from '@/components/link'
-import { Select } from '@/components/select'
-import { userViews, useUserViews } from '@/hooks/userViews'
-import { beltColors } from '@/structures/users'
-import { ChevronLeftIcon } from '@heroicons/react/16/solid'
-import { NewUser } from '@/structures/users'
-import { useState } from 'react'
-import { createUser } from '@/services/userServices'
-import WebcamCapture from '@/components/webcapture'
-import ImageUpload from '@/components/imageupload'
+import { Alert, AlertActions, AlertDescription, AlertTitle } from "@/components/alert";
+import { Button } from "@/components/button";
+import { Divider } from "@/components/divider";
+import { Heading, Subheading } from "@/components/heading";
+import ImageUpload from "@/components/imageupload";
+import { Input } from "@/components/input";
+import { Link } from "@/components/link";
+import { Select } from "@/components/select";
+import WebcamCapture from "@/components/webcapture";
+import { userViews, useUserViews } from "@/hooks/userViews";
+import { createUser } from "@/services/userServices";
+import { beltColors, NewUser } from "@/structures/users";
+import { ChevronLeftIcon } from "@heroicons/react/16/solid";
+import { useState } from "react";
 
 export default function UserRegisterPage() {
-  const [activeImageSource, setActiveImageSource] = useState('upload') // 'upload' or 'webcam
-  const { currentView } = useUserViews()
+  const [activeImageSource, setActiveImageSource] = useState("upload"); // 'upload' or 'webcam
+  const { currentView } = useUserViews();
 
   const formAction = (event) => {
-    event.preventDefault()
+    event.preventDefault();
 
-    console.log(newUser)
+    console.log(newUser);
 
-    const errors: string[] = []
+    const errors: string[] = [];
 
     //alert the user if there are errors that exist
 
     //this stuff will be moved to another function later
     if (newUser.Role == userViews.UNKNOWN) {
-        errors.push("The user's role must be specified.")
+      errors.push("The user's role must be specified.");
     }
 
     if (!newUser.FirstName) {
-      errors.push("The first name must be filled in")
+      errors.push("The first name must be filled in");
     }
 
     if (!newUser.LastName) {
-      errors.push("The last name must be filled in")
+      errors.push("The last name must be filled in");
     }
 
     if (!newUser.Email) {
-      errors.push("The email must be filled in")
+      errors.push("The email must be filled in");
     }
 
     if (!newUser.DateOfBirth) {
-      errors.push("The birth date must be filled in")
+      errors.push("The birth date must be filled in");
     }
 
     if (newUser.BeltColor == beltColors.UNKNOWN && newUser.Role == userViews.STUDENT) {
-      errors.push("The user is a student, but no belt color was specified")
+      errors.push("The user is a student, but no belt color was specified");
     }
 
     if (!newUser.Password) {
-      errors.push("A password must be set")
+      errors.push("A password must be set");
     }
-
 
     //if any errors exist with the data, return from the function and alert the user
     if (errors.length > 0) {
-      alert("The following errors occurred while trying to register a user: \n\n"
-        + errors.join("\n\n"))
+      alert("The following errors occurred while trying to register a user: \n\n" + errors.join("\n\n"));
       //exit the function
-      return
+      return;
     }
 
     //ensure the enum values are numbers, not strings
-    const user = {...newUser}
+    const user = { ...newUser };
 
     user.BeltColor = parseInt(user.BeltColor.toString());
     if (isNaN(user.BeltColor)) {
-        alert("invalid belt color chosen.")
-        return
+      alert("invalid belt color chosen.");
+      return;
     }
 
     user.Role = parseInt(user.Role.toString());
     if (isNaN(user.Role)) {
-        alert("invalid role chosen.")
-        return
+      alert("invalid role chosen.");
+      return;
     }
 
-
     createUser(user)
-      .then(r => {
-        console.log("Success: ", r)
-        setIsCreated(true)
+      .then((r) => {
+        console.log("Success: ", r);
+        setIsCreated(true);
       })
-      .catch(err => {
-        console.log("ERROR: formAction: " + err)
-      })
-  }
+      .catch((err) => {
+        console.log("ERROR: formAction: " + err);
+      });
+  };
 
-  const [isCreated, setIsCreated] = useState(false)
+  const [isCreated, setIsCreated] = useState(false);
   const [newUser, setNewUser] = useState<NewUser>({
     FirstName: "",
     LastName: "",
@@ -102,18 +98,18 @@ export default function UserRegisterPage() {
     BeltColor: beltColors.WHITE, //init to white, as that is the default below
     Password: "",
     profileImage: "", // This is the uploaded image URL.
-    Role: currentView //init to current view 
-  })
-  const [confirmPassword, setConfirmPassword] = useState("")
+    Role: currentView, //init to current view
+  });
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const setIndividualPropertForUser = (event) => {
     //copy the user so we're not changing newUser directly
-    const user = {...newUser}
+    const user = { ...newUser };
     //update the property
-    user[event.target.name] = event.target.value
+    user[event.target.name] = event.target.value;
     //finally update the newUser
-    setNewUser(user)
-  }
+    setNewUser(user);
+  };
 
   return (
     <>
@@ -127,13 +123,12 @@ export default function UserRegisterPage() {
         </AlertActions>
       </Alert>
       <div className="max-lg:hidden">
-        <Link href="/users" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500 ">
-          <ChevronLeftIcon className="size-4 fill-zinc-400 " />
+        <Link href="/users" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500">
+          <ChevronLeftIcon className="size-4 fill-zinc-400" />
           Users
         </Link>
       </div>
 
-      
       <form onSubmit={formAction} className="mt-4 lg:mt-8">
         <Heading>Student Registration</Heading>
         <Divider className="my-10 mt-6" />
@@ -143,23 +138,13 @@ export default function UserRegisterPage() {
             <Subheading>First Name</Subheading>
           </div>
           <div>
-            <Input
-              onChange={setIndividualPropertForUser}
-              aria-label="First Name"
-              name="FirstName"
-              placeholder="John"
-            />
+            <Input onChange={setIndividualPropertForUser} aria-label="First Name" name="FirstName" placeholder="John" />
           </div>
           <div className="space-y-1">
             <Subheading>Last Name</Subheading>
           </div>
           <div>
-            <Input
-              onChange={setIndividualPropertForUser}
-              aria-label="Last Name"
-              name="LastName"
-              placeholder="Doe"
-            />
+            <Input onChange={setIndividualPropertForUser} aria-label="Last Name" name="LastName" placeholder="Doe" />
           </div>
 
           <div className="space-y-1">
@@ -167,33 +152,25 @@ export default function UserRegisterPage() {
           </div>
           <div>
             {/* Toggle buttons to choose between upload and webcam */}
-            <div className="flex gap-4 mb-2">
-            <Button
-            type="button"
-             onClick={() => setActiveImageSource('upload')}
-              className='bg-red-500 text-white'
-              >
+            <div className="mb-2 flex gap-4">
+              <Button type="button" onClick={() => setActiveImageSource("upload")} className="bg-red-500 text-white">
                 Upload Image
-            </Button>
-            <Button
-              type="button"
-              onClick={() => setActiveImageSource('webcam')}
-              className='bg-blue-500 text-white'
-                  >
+              </Button>
+              <Button type="button" onClick={() => setActiveImageSource("webcam")} className="bg-blue-500 text-white">
                 Capture with Webcam
               </Button>
             </div>
             {/* Conditionally render the component based on activeImageSource */}
-            {activeImageSource === 'upload' && (
-              <ImageUpload onImageUploaded={(url) => setNewUser({ ...newUser, profileImage: url })} />
-            )}        
-              {activeImageSource === 'webcam' && (
-                <WebcamCapture onImageUploaded={(url) => setNewUser({ ...newUser, profileImage: url })} />
+            {activeImageSource === "upload" && (
+              <ImageUpload
+                uploadType="profile"
+                onImageUploaded={(url) => setNewUser({ ...newUser, profileImage: url })}
+              />
+            )}
+            {activeImageSource === "webcam" && (
+              <WebcamCapture onImageUploaded={(url) => setNewUser({ ...newUser, profileImage: url })} />
             )}
           </div>
-            
-            
-        
 
           <div className="space-y-1">
             <Subheading>Email</Subheading>
@@ -222,26 +199,19 @@ export default function UserRegisterPage() {
             <Subheading>Belt Color</Subheading>
           </div>
           <div>
-            <Select
-              aria-label="Belt Color"
-              name="BeltColor"
-              defaultValue="1"
-              onChange={setIndividualPropertForUser}
-            >
+            <Select aria-label="Belt Color" name="BeltColor" defaultValue="1" onChange={setIndividualPropertForUser}>
               {
                 //looping refind from https://chatgpt.com/share/6793ebed-e188-800c-8126-8f22d0ae64af
-                Object.entries(beltColors).filter(entry => !isNaN(Number(beltColors[entry[0]])))
-                  .map(([key, value]) => (
-                    value != beltColors.UNKNOWN &&
-
-                    <option
-                      key={value}
-                      value={value.toString()}
-                      className='capitalize'
-                    >
-                      { key.toLowerCase() }
-                    </option>
-                  ))
+                Object.entries(beltColors)
+                  .filter((entry) => !isNaN(Number(beltColors[entry[0]])))
+                  .map(
+                    ([key, value]) =>
+                      value != beltColors.UNKNOWN && (
+                        <option key={value} value={value.toString()} className="capitalize">
+                          {key.toLowerCase()}
+                        </option>
+                      )
+                  )
               }
             </Select>
           </div>
@@ -249,50 +219,38 @@ export default function UserRegisterPage() {
 
         <Divider className="my-10" soft />
 
-          {/* For the user role */}
-          <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-            <div className='space-y-1'>
-              <Subheading>Role</Subheading>
-            </div>
-            <div>
-              <Select
-                aria-label='Role'
-                name='Role'
-                value={newUser.Role}
-                onChange={setIndividualPropertForUser}
-              >
-                {
+        {/* For the user role */}
+        <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Subheading>Role</Subheading>
+          </div>
+          <div>
+            <Select aria-label="Role" name="Role" value={newUser.Role} onChange={setIndividualPropertForUser}>
+              {
                 //looping refind from https://chatgpt.com/share/6793ebed-e188-800c-8126-8f22d0ae64af
-                  Object.entries(userViews).filter(entry => !isNaN(Number(userViews[entry[0]])))
-                    .map(([key, value]) => (
-                          value != userViews.UNKNOWN &&
+                Object.entries(userViews)
+                  .filter((entry) => !isNaN(Number(userViews[entry[0]])))
+                  .map(
+                    ([key, value]) =>
+                      value != userViews.UNKNOWN && (
+                        <option key={value} value={value.toString()} className="capitalize">
+                          {key.toLowerCase()}
+                        </option>
+                      )
+                  )
+              }
+            </Select>
+          </div>
+        </section>
 
-                          <option
-                            key={value}
-                            value={value.toString()}
-                            className='capitalize'
-                          >
-                          { key.toLowerCase() }
-                          </option>
-                        ))
-                }
-              </Select>
-            </div>
-          </section>
-
-        <Divider className='my-10' soft />
+        <Divider className="my-10" soft />
 
         <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
           <div className="space-y-1">
             <Subheading>Password</Subheading>
           </div>
           <div>
-            <Input
-              onChange={setIndividualPropertForUser}
-              type="password"
-              aria-label="Password"
-              name="Password"
-            />
+            <Input onChange={setIndividualPropertForUser} type="password" aria-label="Password" name="Password" />
           </div>
           <div className="space-y-1">
             <Subheading>Confirm Password</Subheading>
@@ -317,7 +275,8 @@ export default function UserRegisterPage() {
             type="submit"
             className="cursor-pointer"
             disabled={!(confirmPassword === newUser.Password && newUser.Password != "")}
-            title={!(confirmPassword === newUser.Password && newUser.Password != "")
+            title={
+              !(confirmPassword === newUser.Password && newUser.Password != "")
                 ? "A valid password is needed before continuing"
                 : ""
             }
@@ -327,5 +286,5 @@ export default function UserRegisterPage() {
         </div>
       </form>
     </>
-  )
+  );
 }
