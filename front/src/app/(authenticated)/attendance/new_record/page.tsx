@@ -10,7 +10,7 @@ import { use, useEffect, useState } from 'react'
 export default function UserPage(props) {
   const searchParams: any = use(props.searchParams)
   const userToken: string = searchParams.user
-  const timeOverride: string = searchParams.timeOverride
+  const timeOverride: string = searchParams.timeoverride
 
   const [creationFinished, setCreationFinished] = useState(false)
   const [errors, setErrors] = useState("")
