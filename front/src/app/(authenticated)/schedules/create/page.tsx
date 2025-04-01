@@ -274,67 +274,70 @@ export default function CreateSchedulePage() {
         <div className="flex items-center gap-3">
           <Subheading>Students</Subheading>
         </div>
-        <Table className="[--gutter:--spacing(6)] sm:[--gutter:--spacing(8)]">
-          <TableHead>
-            <TableRow>
-              <TableHeader>Name</TableHeader>
-              <TableHeader>Status</TableHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {students.map((student) => (
-              <TableRow key={student.id}>
-                <TableCell>
-                  <div className="flex items-center gap-4">
-                    <div className="group grid size-4 grid-cols-1">
-                      <input
-                        type="checkbox"
-                        value={student.id}
-                        checked={selectedStudentIds.includes(student.id)}
-                        onChange={(e) => {
-                          const id = Number(e.target.value)
-                          if (e.target.checked) {
-                            setSelectedStudentIds([...selectedStudentIds, id])
-                          } else {
-                            setSelectedStudentIds(selectedStudentIds.filter((sid) => sid !== id))
-                          }
-                        }}
-                        className="col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                      />
-                      <svg
-                        fill="none"
-                        viewBox="0 0 14 14"
-                        className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25"
-                      >
-                        <path
-                          d="M3 8L6 11L11 3.5"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="opacity-0 group-has-[:checked]:opacity-100"
-                        />
-                        <path
-                          d="M3 7H11"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="opacity-0 group-has-[:indeterminate]:opacity-100"
-                        />
-                      </svg>
-                    </div>
-                    <Avatar src={student.profileImage} className="size-12" />
-                    <div>
-                      <div className="font-medium">{`${student.firstName} ${student.lastName}`}</div>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {student.online ? <Badge color="lime">Online</Badge> : <Badge color="zinc">Offline</Badge>}
-                </TableCell>
+        {/* Scroll view container added below */}
+        <div className="max-h-96 overflow-y-auto">
+          <Table className="[--gutter:--spacing(6)] sm:[--gutter:--spacing(8)]">
+            <TableHead>
+              <TableRow>
+                <TableHeader>Name</TableHeader>
+                <TableHeader>Status</TableHeader>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {students.map((student) => (
+                <TableRow key={student.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-4">
+                      <div className="group grid size-4 grid-cols-1">
+                        <input
+                          type="checkbox"
+                          value={student.id}
+                          checked={selectedStudentIds.includes(student.id)}
+                          onChange={(e) => {
+                            const id = Number(e.target.value)
+                            if (e.target.checked) {
+                              setSelectedStudentIds([...selectedStudentIds, id])
+                            } else {
+                              setSelectedStudentIds(selectedStudentIds.filter((sid) => sid !== id))
+                            }
+                          }}
+                          className="col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                        />
+                        <svg
+                          fill="none"
+                          viewBox="0 0 14 14"
+                          className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25"
+                        >
+                          <path
+                            d="M3 8L6 11L11 3.5"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="opacity-0 group-has-[:checked]:opacity-100"
+                          />
+                          <path
+                            d="M3 7H11"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="opacity-0 group-has-[:indeterminate]:opacity-100"
+                          />
+                        </svg>
+                      </div>
+                      <Avatar src={student.profileImage} className="size-12" />
+                      <div>
+                        <div className="font-medium">{`${student.firstName} ${student.lastName}`}</div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {student.online ? <Badge color="lime">Online</Badge> : <Badge color="zinc">Offline</Badge>}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </section>
 
       <Divider className="my-10" />
