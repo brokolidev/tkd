@@ -9546,11 +9546,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\tkd\\back.Tests\\back.Tests.csproj",
+      "projectUniqueName": "D:\\capstone\\tkd\\back.Tests\\back.Tests.csproj",
       "projectName": "back.Tests",
-      "projectPath": "E:\\tkd\\back.Tests\\back.Tests.csproj",
+      "projectPath": "D:\\capstone\\tkd\\back.Tests\\back.Tests.csproj",
       "packagesPath": "C:\\Users\\aryan\\.nuget\\packages\\",
-      "outputPath": "E:\\tkd\\back.Tests\\obj\\",
+      "outputPath": "D:\\capstone\\tkd\\back.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -9572,8 +9572,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "E:\\tkd\\back\\taekwondo_backend.csproj": {
-              "projectPath": "E:\\tkd\\back\\taekwondo_backend.csproj"
+            "D:\\capstone\\tkd\\back\\taekwondo_backend.csproj": {
+              "projectPath": "D:\\capstone\\tkd\\back\\taekwondo_backend.csproj"
             }
           }
         }
